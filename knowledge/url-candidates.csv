@@ -1,0 +1,16 @@
+url,source_id,topic,priority,crawl_status,allowed,batch,notes
+https://www.optionseducation.org/optionsoverview/what-is-an-option,oic,concept,1,ingested,true,pilot-12,OIC sitemap; first-batch fundamentals
+https://www.optionseducation.org/optionsoverview/options-pricing,oic,concept,1,ingested,true,pilot-12,OIC sitemap; pricing fundamentals
+https://www.optionseducation.org/optionsoverview/exercising-options,oic,lifecycle,1,ingested,true,pilot-12,OIC sitemap; exercise lifecycle
+https://www.optionseducation.org/optionsoverview/what-are-the-benefits-risks,oic,concept,1,ingested,true,pilot-12,OIC sitemap; benefits and risks
+https://www.optionseducation.org/advancedconcepts/delta,oic,greek,1,ingested,true,pilot-12,OIC sitemap; Greeks
+https://www.optionseducation.org/advancedconcepts/gamma,oic,greek,1,ingested,true,pilot-12,OIC sitemap; Greeks
+https://www.optionseducation.org/advancedconcepts/theta,oic,greek,1,ingested,true,pilot-12,OIC sitemap; Greeks
+https://www.optionseducation.org/advancedconcepts/vega,oic,greek,1,ingested,true,pilot-12,OIC sitemap; Greeks
+https://optionalpha.com/courses/options-basics,optionalpha,curriculum,1,ingested,true,pilot-12,Option Alpha sitemap; course overview
+https://optionalpha.com/courses/pricing-volatility,optionalpha,volatility,1,ingested,true,pilot-12,Option Alpha sitemap; pricing and volatility
+https://optionalpha.com/courses/options-expiration,optionalpha,lifecycle,1,ingested,true,pilot-12,Option Alpha sitemap; expiration
+https://www.cmegroup.com/education/courses/introduction-to-options,cme,futures-options,1,ingested,true,pilot-12,Linked from CME All About Options curriculum
+https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write,oic,strategy,2,pending,true,next,OIC sitemap; held for the next reviewed batch
+https://optionalpha.com/courses/neutral-options-strategies,optionalpha,strategy,2,pending,true,next,Option Alpha sitemap; held for the next reviewed batch
+https://www.cmegroup.com/education/courses/option-greeks,cme,futures-options,2,pending,true,next,Linked from CME curriculum; held for the next reviewed batch

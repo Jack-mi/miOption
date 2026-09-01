@@ -1,0 +1,113 @@
+{
+  "id": "27879bf81e791259",
+  "source_id": "cme",
+  "source_name": "CME Institute",
+  "url": "https://www.cmegroup.com/education/courses/introduction-to-options",
+  "title": "Introduction to Options - CME Group",
+  "description": "Learn how options work, how they are constructed, what key option terms mean and which features make options on futures unique.",
+  "language": "en",
+  "text": "Introduction to Options - CME Group\nCourse overview\nToday’s markets are full of options. Discover how options on futures from CME Group can help you mitigate downside risk and diversify your portfolio across major asset classes such as interest rates, equity indexes, foreign exchange, energy, agriculture and metals. Get acquainted with the basic fundamentals, strategy and vocabulary of our options markets, providing a solid base of knowledge that will prepare you to tackle these opportunities.\nACCREDITED COURSE\nDid you know that CME Institute classes can fulfill CFA and GARP continuing education requirements? Every CME Institute course can be self-reported in your CFA online CE tracker and select classes can be used for GARP credits. See which of our classes qualify for GARP credits here.",
+  "markdown": "# Introduction to Options - CME Group\n\n## Course overview\n\nToday’s markets are full of options. Discover how options on futures from CME Group can help you mitigate downside risk and diversify your portfolio across major asset classes such as interest rates, equity indexes, foreign exchange, energy, agriculture and metals. Get acquainted with the basic fundamentals, strategy and vocabulary of our options markets, providing a solid base of knowledge that will prepare you to tackle these opportunities.\n\n*   #### ACCREDITED COURSE\n    \n    ![](https://www.cmegroup.com/fragments/courses-lessons/accredited-courses/media_18eb3077e93e578ab77c6bf8af857ccc3139ebecc.png?width=750&format=png&optimize=medium)\n    \n    Did you know that CME Institute classes can fulfill CFA and GARP continuing education requirements? Every CME Institute course can be self-reported in your CFA online [CE tracker](https://cpd.cfainstitute.org/) and select classes can be used for GARP credits. See which of our classes qualify for GARP credits [here](https://www.garp.org/cpd).",
+  "crawl": {
+    "loadedUrl": "https://www.cmegroup.com/education/courses/introduction-to-options",
+    "loadedTime": "2026-09-01T09:38:27.182Z",
+    "referrerUrl": "https://www.cmegroup.com/education/courses/introduction-to-options",
+    "httpStatusCode": 200,
+    "depth": 0,
+    "contentLengthBytes": 4198,
+    "contentType": "text/html; charset=utf-8"
+  },
+  "metadata": {
+    "canonicalUrl": "https://www.cmegroup.com/education/courses/introduction-to-options",
+    "title": "Introduction to Options - CME Group",
+    "description": "Learn how options work, how they are constructed, what key option terms mean and which features make options on futures unique.",
+    "author": "authors/cme-group",
+    "keywords": "intro to options,CME Group,English (EN),Course,Fundamentals,Options,General,Getting Started,Education,Market Fundamentals,Both,Trading Options on Futures,Trading Crypto Futures,Available in Trading Simulator",
+    "languageCode": "en",
+    "openGraph": [
+      {
+        "property": "og:title",
+        "content": "Introduction to Options - CME Group"
+      },
+      {
+        "property": "og:description",
+        "content": "Learn how options work, how they are constructed, what key option terms mean and which features make options on futures unique."
+      },
+      {
+        "property": "og:url",
+        "content": "https://www.cmegroup.com/education/courses/introduction-to-options"
+      },
+      {
+        "property": "og:image",
+        "content": "https://www.cmegroup.com/content/dam/cmegroup/education/courses/images/introduction-to-options.jpg"
+      },
+      {
+        "property": "og:image:secure_url",
+        "content": "https://www.cmegroup.com/content/dam/cmegroup/education/courses/images/introduction-to-options.jpg"
+      },
+      {
+        "property": "article:tag",
+        "content": "authors/cme-group"
+      },
+      {
+        "property": "article:tag",
+        "content": "language/english"
+      },
+      {
+        "property": "article:tag",
+        "content": "content-type/course"
+      },
+      {
+        "property": "article:tag",
+        "content": "display/featured-courses/fundamentals"
+      },
+      {
+        "property": "article:tag",
+        "content": "topic/options"
+      },
+      {
+        "property": "article:tag",
+        "content": "asset-class/general"
+      },
+      {
+        "property": "article:tag",
+        "content": "topic/getting-started"
+      },
+      {
+        "property": "article:tag",
+        "content": "topic/education"
+      },
+      {
+        "property": "article:tag",
+        "content": "topic/market-fundamentals"
+      },
+      {
+        "property": "article:tag",
+        "content": "customer/both"
+      },
+      {
+        "property": "article:tag",
+        "content": "topic/education/getting-started/trading-options-on-futures"
+      },
+      {
+        "property": "article:tag",
+        "content": "topic/education/getting-started/trading-crypto-futures"
+      },
+      {
+        "property": "article:tag",
+        "content": "display/trading-sim"
+      },
+      {
+        "property": "article:tag",
+        "content": "display/trading-sim/options"
+      }
+    ],
+    "jsonLd": null
+  },
+  "run_id": "uciKhdZjhHKjs0ytM",
+  "quality": {
+    "content_chars": 1059,
+    "requires_manual_review": false
+  },
+  "ingested_at": "2026-09-01T09:44:52.179394+00:00"
+}

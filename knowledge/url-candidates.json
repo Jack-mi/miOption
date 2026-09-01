@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "generated_at": "2026-09-01T00:00:00+08:00",
+  "policy": "Only approved HTTPS URLs matching sources.json host and path allowlists may be run. Existing sample pages are excluded from the pilot.",
+  "candidates": [
+    {
+      "url": "https://www.optionseducation.org/optionsoverview/what-is-an-option",
+      "source_id": "oic",
+      "topic": "concept",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; first-batch fundamentals"
+    },
+    {
+      "url": "https://www.optionseducation.org/optionsoverview/options-pricing",
+      "source_id": "oic",
+      "topic": "concept",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; pricing fundamentals"
+    },
+    {
+      "url": "https://www.optionseducation.org/optionsoverview/exercising-options",
+      "source_id": "oic",
+      "topic": "lifecycle",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; exercise lifecycle"
+    },
+    {
+      "url": "https://www.optionseducation.org/optionsoverview/what-are-the-benefits-risks",
+      "source_id": "oic",
+      "topic": "concept",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; benefits and risks"
+    },
+    {
+      "url": "https://www.optionseducation.org/advancedconcepts/delta",
+      "source_id": "oic",
+      "topic": "greek",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; Greeks"
+    },
+    {
+      "url": "https://www.optionseducation.org/advancedconcepts/gamma",
+      "source_id": "oic",
+      "topic": "greek",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; Greeks"
+    },
+    {
+      "url": "https://www.optionseducation.org/advancedconcepts/theta",
+      "source_id": "oic",
+      "topic": "greek",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; Greeks"
+    },
+    {
+      "url": "https://www.optionseducation.org/advancedconcepts/vega",
+      "source_id": "oic",
+      "topic": "greek",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "OIC sitemap; Greeks"
+    },
+    {
+      "url": "https://optionalpha.com/courses/options-basics",
+      "source_id": "optionalpha",
+      "topic": "curriculum",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "Option Alpha sitemap; course overview"
+    },
+    {
+      "url": "https://optionalpha.com/courses/pricing-volatility",
+      "source_id": "optionalpha",
+      "topic": "volatility",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "Option Alpha sitemap; pricing and volatility"
+    },
+    {
+      "url": "https://optionalpha.com/courses/options-expiration",
+      "source_id": "optionalpha",
+      "topic": "lifecycle",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "Option Alpha sitemap; expiration"
+    },
+    {
+      "url": "https://www.cmegroup.com/education/courses/introduction-to-options",
+      "source_id": "cme",
+      "topic": "futures-options",
+      "priority": 1,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "pilot-12",
+      "notes": "Linked from CME All About Options curriculum"
+    },
+    {
+      "url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+      "source_id": "oic",
+      "topic": "strategy",
+      "priority": 2,
+      "crawl_status": "pending",
+      "allowed": true,
+      "batch": "next",
+      "notes": "OIC sitemap; held for the next reviewed batch"
+    },
+    {
+      "url": "https://optionalpha.com/courses/neutral-options-strategies",
+      "source_id": "optionalpha",
+      "topic": "strategy",
+      "priority": 2,
+      "crawl_status": "pending",
+      "allowed": true,
+      "batch": "next",
+      "notes": "Option Alpha sitemap; held for the next reviewed batch"
+    },
+    {
+      "url": "https://www.cmegroup.com/education/courses/option-greeks",
+      "source_id": "cme",
+      "topic": "futures-options",
+      "priority": 2,
+      "crawl_status": "pending",
+      "allowed": true,
+      "batch": "next",
+      "notes": "Linked from CME curriculum; held for the next reviewed batch"
+    }
+  ]
+}

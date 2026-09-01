@@ -1,0 +1,60 @@
+{
+  "id": "b33e35b91e19dcfc",
+  "source_id": "oic",
+  "source_name": "The Options Industry Council",
+  "url": "https://www.optionseducation.org/advancedconcepts/vega",
+  "title": "Vega",
+  "description": "Master Vega in options trading: a key metric for understanding how options prices change with implied volatility, vital for sophisticated trading techniques.",
+  "language": "en",
+  "text": "Vega\nVega measures an option’s sensitivity to changes in implied volatility. Implied volatility is measured in percentage terms and is a key variable in pricing models. Implied volatility has no direct correlation to actual past historical or statistical volatility; rather it is a measure of predicted future movement. Implied volatility tends to increase when there is uncertainty or anticipated news, while it tends to decrease in times of calm. Some investors use a stock’s historical volatility as an indication of where the implied volatility should be, but the market is the ultimate determining factor of current implied volatility levels. Also, Vega and implied volatility can change without any movement in the underlying.\nIf we know what the current market premiums are for the calls and the puts on a certain strike, we can solve for the implied volatility using the OIC Calculators. The calculators provide the Greeks including Vega. If a large sell order came into the market and the price of the option declined due to lack of interested buyers at the current price, we would see a decline in the implied volatility if there were no change in the other assumptions. Increased demand and higher premiums mean an increase in implied volatility. Changes in implied volatility can also impact the other Greeks like Delta and Gamma so traders should be aware how the Greeks work together.\nVega measures the amount of increase or decrease in premium based on a 1% (100 basis points) change in the implied volatility assumption. Longer-term options tend to have higher Vega than near-term options. Longer-termed options are typically more expensive, and a 1% change in implied volatility will represent a larger dollar amount of that premium than an option with a lower premium. If OICX were trading $50 and front-month $50 call was trading $2 and the 12-month-out $50 call was trading $5, the more expensive call would be more profoundly affected by a 1% change in implied volatility. To increase in price by identical amounts, the near term option’s implied volatility would have to have gone up around 2.5x that of the longer-termed option.\nFor example, OICX is trading at $50, a call with 12 months until expiration has an implied volatility of 30%, a Vega of .15, and a current market value of $4. If implied volatility were to instantly rise 2% to 32%, the investor might expect the option premium to increase by: .15 X 2 = $.30 to around $4.30, all things being equal. A decrease in implied volatility by 5% may result in the option losing around: .15 X 5 = $.75 in value. As we can see, changes in implied volatility can have drastic effects on an option price, probably second only to underlying price in importance.",
+  "markdown": "# Vega\n\n[Vega](https://www.optionseducation.org/referencelibrary/optionsglossary?filter=V) measures an option’s sensitivity to changes in implied volatility. Implied volatility is measured in percentage terms and is a key variable in pricing models. Implied volatility has no direct correlation to actual past historical or statistical volatility; rather it is a measure of predicted future movement. Implied volatility tends to increase when there is uncertainty or anticipated news, while it tends to decrease in times of calm. Some investors use a stock’s historical volatility as an indication of where the implied volatility should be, but the market is the ultimate determining factor of current implied volatility levels. Also, Vega and implied volatility can change without any movement in the underlying.\n\nIf we know what the current market premiums are for the calls and the puts on a certain strike, we can solve for the implied volatility using the [OIC Calculators](https://www.optionseducation.org/toolsoptionquotes/optionscalculator). The calculators provide the Greeks including Vega. If a large sell order came into the market and the price of the option declined due to lack of interested buyers at the current price, we would see a decline in the implied volatility if there were no change in the other assumptions. Increased demand and higher premiums mean an increase in implied volatility. Changes in implied volatility can also impact the other Greeks like Delta and Gamma so traders should be aware how the Greeks work together.\n\nVega measures the amount of increase or decrease in premium based on a 1% (100 basis points) change in the implied volatility assumption. Longer-term options tend to have higher Vega than near-term options. Longer-termed options are typically more expensive, and a 1% change in implied volatility will represent a larger dollar amount of that premium than an option with a lower premium. If OICX were trading $50 and front-month $50 call was trading $2 and the 12-month-out $50 call was trading $5, the more expensive call would be more profoundly affected by a 1% change in implied volatility. To increase in price by identical amounts, the near term option’s implied volatility would have to have gone up around 2.5x that of the longer-termed option.\n\nFor example, OICX is trading at $50, a call with 12 months until expiration has an implied volatility of 30%, a Vega of .15, and a current market value of $4. If implied volatility were to instantly rise 2% to 32%, the investor might expect the option premium to increase by: .15 X 2 = $.30 to around $4.30, all things being equal. A decrease in implied volatility by 5% may result in the option losing around: .15 X 5 = $.75 in value. As we can see, changes in implied volatility can have drastic effects on an option price, probably second only to underlying price in importance.",
+  "crawl": {
+    "loadedUrl": "https://www.optionseducation.org/advancedconcepts/vega",
+    "loadedTime": "2026-09-01T09:37:55.738Z",
+    "referrerUrl": "https://www.optionseducation.org/advancedconcepts/vega",
+    "httpStatusCode": 200,
+    "depth": 0,
+    "contentType": "text/html; charset=utf-8"
+  },
+  "metadata": {
+    "canonicalUrl": "https://www.optionseducation.org/advancedconcepts/vega",
+    "title": "Vega",
+    "description": "Master Vega in options trading: a key metric for understanding how options prices change with implied volatility, vital for sophisticated trading techniques.",
+    "author": null,
+    "keywords": null,
+    "languageCode": "en",
+    "openGraph": [
+      {
+        "property": "og:type",
+        "content": "website"
+      },
+      {
+        "property": "og:title",
+        "content": "Vega"
+      },
+      {
+        "property": "og:description",
+        "content": "Master Vega in options trading: a key metric for understanding how options prices change with implied volatility, vital for sophisticated trading techniques."
+      },
+      {
+        "property": "og:url",
+        "content": "https://www.optionseducation.org/advancedconcepts/vega"
+      },
+      {
+        "property": "twitter:title",
+        "content": "Vega"
+      },
+      {
+        "property": "twitter:description",
+        "content": "Master Vega in options trading: a key metric for understanding how options prices change with implied volatility, vital for sophisticated trading techniques."
+      }
+    ],
+    "jsonLd": null
+  },
+  "run_id": "uciKhdZjhHKjs0ytM",
+  "quality": {
+    "content_chars": 2889,
+    "requires_manual_review": false
+  },
+  "ingested_at": "2026-09-01T09:44:52.179350+00:00"
+}

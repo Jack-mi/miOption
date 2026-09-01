@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "actor": "apify/website-content-crawler",
+  "crawl_policy": {
+    "sample_max_pages": 4,
+    "max_crawl_pages": 12,
+    "max_crawl_depth": 0,
+    "crawler_type": "playwright:adaptive",
+    "save_markdown": true,
+    "save_html": false,
+    "respect_robots_txt": true,
+    "max_concurrency": 1,
+    "max_request_retries": 1,
+    "max_session_rotations": 0,
+    "run_timeout_secs": 300,
+    "wait_timeout_secs": 330,
+    "estimated_cost_per_page_usd": 0.03,
+    "max_cost_usd": 1.0,
+    "min_content_chars": 100,
+    "manual_review_below_chars": 500,
+    "proxy": {
+      "useApifyProxy": true
+    }
+  },
+  "sources": [
+    {
+      "id": "oic",
+      "name": "The Options Industry Council",
+      "allowed": true,
+      "sample_url": "https://www.optionseducation.org/optionsoverview/options-basics",
+      "include_prefixes": [
+        "/optionsoverview/",
+        "/strategies/",
+        "/advancedconcepts/",
+        "/referencelibrary/",
+        "/videolibrary/"
+      ]
+    },
+    {
+      "id": "cboe",
+      "name": "Cboe Options Institute",
+      "allowed": true,
+      "sample_url": "https://www.cboe.com/optionsinstitute/courses/options101",
+      "include_prefixes": [
+        "/optionsinstitute/"
+      ]
+    },
+    {
+      "id": "optionalpha",
+      "name": "Option Alpha",
+      "allowed": true,
+      "sample_url": "https://optionalpha.com/options-strategies",
+      "include_prefixes": [
+        "/education/",
+        "/courses/",
+        "/options-strategies",
+        "/handbook"
+      ]
+    },
+    {
+      "id": "cme",
+      "name": "CME Institute",
+      "allowed": true,
+      "sample_url": "https://www.cmegroup.com/education/courses/curriculum-all-about-options",
+      "include_prefixes": [
+        "/education/"
+      ]
+    },
+    {
+      "id": "investopedia",
+      "name": "Investopedia",
+      "allowed": false,
+      "reason": "Terms and robots.txt prohibit automated scraping and AI dataset construction; retain links only, not crawled content."
+    }
+  ]
+}
