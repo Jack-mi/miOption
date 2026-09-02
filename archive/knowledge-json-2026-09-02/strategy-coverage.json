@@ -1,7 +1,7 @@
 {
   "version": 1,
   "updated_at": "2026-09-02T07:47:58.039938+08:00",
-  "purpose": "Align the knowledge base to Futu's official option-strategy menu. Content is filled from OIC text pages, not from Futu. Custom is product UI only.",
+  "purpose": "Align the knowledge base to Futu's official option-strategy menu. Content is filled from OIC text pages, not from Futu.",
   "presentation_fields": {
     "meaning": [
       "definition_meaning",
@@ -28,13 +28,7 @@
     "breakeven",
     "assignment_or_expiration_risk"
   ],
-  "skip": [
-    {
-      "futu_name_zh": "自定义策略",
-      "futu_name_en": "Custom",
-      "reason": "Product feature for arbitrary multi-leg builds, not a named standard strategy card."
-    }
-  ],
+  "skip": [],
   "categories": [
     {
       "futu_name_zh": "单腿期权",

@@ -141,7 +141,10 @@ def allowed_url_globs(sources: list[dict]) -> list[str]:
     for source in allowed_sources(sources):
         sample = urlparse(source["sample_url"])
         origin = f"{sample.scheme}://{sample.netloc}"
-        globs.extend(f"{origin}{normalized_prefix(prefix)}/**" for prefix in source["include_prefixes"])
+        for prefix in source["include_prefixes"]:
+            path = normalized_prefix(prefix)
+            globs.append(f"{origin}{path}")
+            globs.append(f"{origin}{path}/**")
     return globs
 
 
@@ -420,7 +423,12 @@ def self_check() -> None:
     }
     actor_input = build_input(config)
     assert actor_input["maxCrawlPages"] == 1
-    assert actor_input["includeUrlGlobs"] == ["https://www.optionseducation.org/a/**", "https://www.optionseducation.org/education/**"]
+    assert actor_input["includeUrlGlobs"] == [
+        "https://www.optionseducation.org/a",
+        "https://www.optionseducation.org/a/**",
+        "https://www.optionseducation.org/education",
+        "https://www.optionseducation.org/education/**",
+    ]
     assert source_for_url("https://www.optionseducation.org/education/x", config["sources"])["id"] == "oic"
     expect_value_error(lambda: source_for_url("http://www.optionseducation.org/a", config["sources"]))
     expect_value_error(lambda: source_for_url("https://www.optionseducation.org/educationx", config["sources"]))

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>miOption vault map — 知识库架构与策略卡</title>
+  <meta name="description" content="富途定覆盖，OIC 与 Wikipedia 定含义。43 页证据，49 条源笔记，13 张概念，27 张策略卡。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="map.css" />
+</head>
+<body>
+  <div class="shell">
+    <div class="rails" aria-hidden="true"></div>
+
+    <nav class="nav-min" aria-label="页面分区">
+      <a class="wordmark" href="#top">mioption</a>
+      <ul>
+        <li><a href="#map">架构</a></li>
+        <li><a href="#strategies">策略</a></li>
+      </ul>
+    </nav>
+
+    <header class="band band--hero" id="top">
+      <div class="grid-12">
+        <div class="span-copy">
+          <p class="label">Knowledge vault · 2026-09-02</p>
+          <h1>the vault<span class="period" aria-hidden="true"></span></h1>
+          <span class="bar" aria-hidden="true"></span>
+          <p class="lede">Futu 定覆盖。OIC 与 Wikipedia 定含义。成品在 <code>knowledge/wiki</code>，不是 JSON。</p>
+          <p class="meta">27 张策略卡全部 evergreen。对角没有单一盈亏公式；Strap / Strip 只发表腿与方向，不填最多赚、最多亏、打平价。</p>
+        </div>
+      </div>
+    </header>
+  </div>
+
+  <section class="plate" id="map">
+    <p class="label">01 · 路径</p>
+    <h2>four layers<span class="period" aria-hidden="true"></span></h2>
+    <span class="bar" aria-hidden="true"></span>
+    <ol class="flow">
+      <li>
+        <span class="n">01 覆盖</span>
+        <strong>Futu ∪ topic474</strong>
+        <p>App 菜单和「常用期权组合简介」合成一套清单。</p>
+        <span class="arrow" aria-hidden="true"></span>
+      </li>
+      <li>
+        <span class="n">02 证据</span>
+        <strong>raw pages</strong>
+        <p><code>data/raw/pages</code>：43 页抓取。另有 6 篇只存在 vault 本地捕获。</p>
+        <span class="arrow" aria-hidden="true"></span>
+      </li>
+      <li>
+        <span class="n">03 捕获</span>
+        <strong>.raw / captured</strong>
+        <p>不可变正文，按 sha256 落在 <code>knowledge/.raw/captured</code>。</p>
+        <span class="arrow" aria-hidden="true"></span>
+      </li>
+      <li>
+        <span class="n">04 源笔记</span>
+        <strong>wiki / sources</strong>
+        <p>49 条来源笔记。主张必须能指回段落，不能凭空写。</p>
+        <span class="arrow" aria-hidden="true"></span>
+      </li>
+      <li>
+        <span class="n">05 成品</span>
+        <strong>concepts · strategies</strong>
+        <p>13 张概念，27 张策略。入口是 vault 笔记，不是 <code>items.json</code>。</p>
+        <span class="arrow" aria-hidden="true"></span>
+      </li>
+    </ol>
+  </section>
+
+  <div class="shell">
+    <div class="rails" aria-hidden="true"></div>
+
+    <section class="band" id="counts" aria-labelledby="counts-h">
+      <div class="band-head">
+        <p class="label">02 · 存量</p>
+        <h2 id="counts-h">inventory<span class="period" aria-hidden="true"></span></h2>
+        <p class="meta">不是产品 KPI，只是各层当前有多少条的快照（来自 STATUS · 2026-09-02）。条形按 49 条源笔记为满宽。</p>
+      </div>
+      <div class="counts">
+        <div class="count">
+          <div>
+            <p class="label">原始页面</p>
+            <b>43</b>
+            <span class="step" style="width: 88%"></span>
+          </div>
+        </div>
+        <div class="count">
+          <div>
+            <p class="label">源笔记</p>
+            <b>49</b>
+            <span class="step" style="width: 100%"></span>
+          </div>
+        </div>
+        <div class="count">
+          <div>
+            <p class="label">概念</p>
+            <b>13</b>
+            <span class="step" style="width: 27%"></span>
+          </div>
+        </div>
+        <div class="count">
+          <div>
+            <p class="label">策略卡</p>
+            <b>27</b>
+            <span class="step" style="width: 55%"></span>
+          </div>
+        </div>
+      </div>
+      <p class="meta" style="margin-top: 1.5rem">正文证据页 35，目录/课程页 8。来源构成：OIC 31 · Option Alpha 5 · CME 4 · Cboe 1 · Wikipedia 2。关系笔记 5 条。</p>
+    </section>
+
+    <section class="band" id="strategies" aria-labelledby="strat-h">
+      <div class="band-head">
+        <span class="numeral" aria-hidden="true">27</span>
+        <p class="label">03 · 策略卡</p>
+        <h2 id="strat-h">the cards<span class="period" aria-hidden="true"></span></h2>
+        <p class="meta">点开看含义。筛选按富途类别。盈亏数字只在来源发表过时才写。</p>
+      </div>
+
+      <div class="legend" aria-label="盈亏标记说明">
+        <span><span class="mark" data-pl="num">数字</span> OIC 已发表最大收益 / 损失 / 打平</span>
+        <span><span class="mark" data-pl="struct">结构</span> 腿与方向已发表，具体数字未写</span>
+        <span><span class="mark" data-pl="none">无公式</span> 无单一盈亏公式，不借用别的策略数字</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="filters-wrap">
+    <form class="filters" aria-label="按富途类别筛选">
+      <input type="radio" name="cat" id="cat-all" value="all" checked />
+      <label for="cat-all">全部</label>
+      <input type="radio" name="cat" id="cat-single" value="single" />
+      <label for="cat-single">单腿</label>
+      <input type="radio" name="cat" id="cat-vertical" value="vertical" />
+      <label for="cat-vertical">垂直</label>
+      <input type="radio" name="cat" id="cat-covered" value="covered" />
+      <label for="cat-covered">担保</label>
+      <input type="radio" name="cat" id="cat-collar" value="collar" />
+      <label for="cat-collar">领口</label>
+      <input type="radio" name="cat" id="cat-straddle" value="straddle" />
+      <label for="cat-straddle">跨式</label>
+      <input type="radio" name="cat" id="cat-strangle" value="strangle" />
+      <label for="cat-strangle">宽跨</label>
+      <input type="radio" name="cat" id="cat-strap" value="strap" />
+      <label for="cat-strap">带条</label>
+      <input type="radio" name="cat" id="cat-calendar" value="calendar" />
+      <label for="cat-calendar">日历</label>
+      <input type="radio" name="cat" id="cat-diagonal" value="diagonal" />
+      <label for="cat-diagonal">对角</label>
+      <input type="radio" name="cat" id="cat-butterfly" value="butterfly" />
+      <label for="cat-butterfly">蝶式</label>
+      <input type="radio" name="cat" id="cat-condor" value="condor" />
+      <label for="cat-condor">鹰式</label>
+      <input type="radio" name="cat" id="cat-ironfly" value="ironfly" />
+      <label for="cat-ironfly">铁蝶</label>
+      <input type="radio" name="cat" id="cat-ironcondor" value="ironcondor" />
+      <label for="cat-ironcondor">铁鹰</label>
+    </form>
+  </div>
+
+  <div class="shell">
+    <div class="rails" aria-hidden="true"></div>
+    <div class="band band--tight">
+      <div class="catalog">
+
+        <details class="row" data-cat="single">
+          <summary><span class="row-name">Long Call</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">单腿期权 · Single Option</p>
+            <p>看涨：买入看涨期权，上涨跟涨，风险限于已付权利金。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Call.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="single">
+          <summary><span class="row-name">Long Put</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">单腿期权 · Single Option</p>
+            <p>看跌：买入看跌期权，下跌跟跌，风险限于已付权利金。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Put.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="single">
+          <summary><span class="row-name">Naked Call</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">单腿期权 · Single Option · Uncovered / Short Call</p>
+            <p>裸卖看涨，收权利金；预期横盘或下跌。标的大涨时亏损理论上无限。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Naked Call (Uncovered Call, Short Call).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="single">
+          <summary><span class="row-name">Naked Put</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">单腿期权 · Single Option · Uncovered / Short Put</p>
+            <p>裸卖看跌，未预留接股现金。横盘或上涨赚权利金；大跌时亏损可接近股价归零。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Naked Put (Uncovered Put, Short Put).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="single">
+          <summary><span class="row-name">Protective Put</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">单腿期权 · Single Option · Married Put</p>
+            <p>持股同时买 put，用权利金换一段时间的下跌地板。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Protective Put (Married Put).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="vertical">
+          <summary><span class="row-name">Bull Call Spread</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">垂直策略 · Vertical · Debit Call Spread</p>
+            <p>中等看涨：买低执行价 call，卖更高执行价 call。风险和收益都封顶。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Bull Call Spread (Debit Call Spread).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="vertical">
+          <summary><span class="row-name">Bear Call Spread</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">垂直策略 · Vertical · Credit Call Spread</p>
+            <p>收净权利金，预期股价停在短 call 之下。上方风险被长 call 封顶。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Bear Call Spread (Credit Call Spread).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="vertical">
+          <summary><span class="row-name">Bull Put Spread</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">垂直策略 · Vertical · Credit Put Spread</p>
+            <p>收净权利金，预期股价停在短 put 之上。下方风险被长 put 封顶。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Bull Put Spread (Credit Put Spread).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="vertical">
+          <summary><span class="row-name">Bear Put Spread</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">垂直策略 · Vertical</p>
+            <p>中等看跌：买高执行价 put，卖更低执行价 put。风险和收益都封顶。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Bear Put Spread.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="covered">
+          <summary><span class="row-name">Covered Call</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">股票担保 · Covered Stock · Buy-Write</p>
+            <p>持股同时卖 call，赚权利金；上涨被封顶，下跌只得到有限缓冲。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Covered Call (Buy-Write).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="covered">
+          <summary><span class="row-name">Cash-Secured Put</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">股票担保 · Covered Stock</p>
+            <p>预留现金卖 put：希望更低价接股；未被指派则赚权利金。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Cash-Secured Put.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="collar">
+          <summary><span class="row-name">Collar</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">领口策略 · Protective Collar</p>
+            <p>持股夹在 put 地板和 call 天花板之间，净权利金往往很低。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Collar (Protective Collar).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="straddle">
+          <summary><span class="row-name">Long Straddle</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">跨式策略 · Straddle</p>
+            <p>同执行价买 call 和 put。大涨或大跌，或隐含波动率急升时获利。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Straddle.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="straddle">
+          <summary><span class="row-name">Short Straddle</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">跨式策略 · Straddle</p>
+            <p>同执行价卖 call 和 put。收权利金，预期窄幅震荡且波动率稳定或下降。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Short Straddle.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="strangle">
+          <summary><span class="row-name">Long Strangle</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">宽跨式策略 · Strangle · Long Combination</p>
+            <p>买 OTM call 和 OTM put。比跨式便宜，但要走得更远才打平。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Strangle (Long Combination).md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="strangle">
+          <summary><span class="row-name">Short Strangle</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">宽跨式策略 · Strangle</p>
+            <p>卖 OTM call 和 OTM put。获利区比空跨式宽，仍怕单边大行情。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Short Strangle.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="strap">
+          <summary><span class="row-name">Strap</span><span class="mark" data-pl="struct">结构</span></summary>
+          <div class="row-body">
+            <p class="row-cat">带式策略 · Strap · topic474 #8</p>
+            <p>两张长 call、一张长 put，同到期、同执行价。偏看涨的波动组合。Wikipedia 与富途只给腿，没有最多赚 / 亏 / 打平数字，所以不填。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Strap.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="strap">
+          <summary><span class="row-name">Strip</span><span class="mark" data-pl="struct">结构</span></summary>
+          <div class="row-body">
+            <p class="row-cat">条式策略 · Strip · topic474 #9</p>
+            <p>两张长 put、一张长 call，同到期、同执行价。偏看跌的波动组合。同样不填具体盈亏数字。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Strip.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="calendar">
+          <summary><span class="row-name">Long Call Calendar</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">日历策略 · Calendar Spread</p>
+            <p>卖近月 call、买远月 call。近月时间价值衰减，同时保留更远的看涨仓。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Call Calendar Spread.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="calendar">
+          <summary><span class="row-name">Long Put Calendar</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">日历策略 · Calendar Spread · topic474 #12</p>
+            <p>卖近月 put、买远月 put，通常同执行价。近月偏中性到略看涨，远月看跌。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Put Calendar Spread.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="diagonal">
+          <summary><span class="row-name">Diagonal Call Spread</span><span class="mark" data-pl="none">无公式</span></summary>
+          <div class="row-body">
+            <p class="row-cat">对角策略 · Diagonal Spread</p>
+            <p>同类型期权，不同执行价且不同到期。日历加垂直。Wikipedia 写明每种变体要单独分析，因此没有单一最大收益 / 损失 / 打平；也不借用日历数字。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Diagonal Call Spread.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="butterfly">
+          <summary><span class="row-name">Long Call Butterfly</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">蝶式策略 · Butterfly</p>
+            <p>到期收在中轴执行价附近时获利。风险等于净支出。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Call Butterfly.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="butterfly">
+          <summary><span class="row-name">Long Put Butterfly</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">蝶式策略 · Butterfly · topic474 #5</p>
+            <p>到期形态与同执行价的 call butterfly 相同：收在中轴附近获利，风险等于净支出。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Put Butterfly.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="condor">
+          <summary><span class="row-name">Long Call Condor</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">鹰式策略 · Condor</p>
+            <p>到期停在两根短 call 之间时获利。甜区比蝶式宽。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Call Condor.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="condor">
+          <summary><span class="row-name">Long Put Condor</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">鹰式策略 · Condor</p>
+            <p>到期停在两根短 put 之间时获利。风险封顶。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Long Put Condor.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="ironfly">
+          <summary><span class="row-name">Short Iron Butterfly</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">铁蝶式策略 · Iron Butterfly</p>
+            <p>卖 ATM 跨式，再买 OTM 宽跨式对冲。收权利金；价格靠近中轴时赚。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Short Iron Butterfly.md</code></p>
+          </div>
+        </details>
+
+        <details class="row" data-cat="ironcondor">
+          <summary><span class="row-name">Short Condor</span><span class="mark" data-pl="num">数字</span></summary>
+          <div class="row-body">
+            <p class="row-cat">铁鹰式策略 · Iron Condor</p>
+            <p>收权利金，预期到期停在短 put 与短 call 之间。</p>
+            <p>笔记 <code>knowledge/wiki/strategies/Short Condor (Iron Condor).md</code></p>
+          </div>
+        </details>
+
+      </div>
+    </div>
+
+    <section class="band" id="concepts" aria-labelledby="concept-h">
+      <div class="band-head">
+        <p class="label">04 · 概念</p>
+        <h2 id="concept-h">thirteen notes<span class="period" aria-hidden="true"></span></h2>
+        <p class="meta">策略卡挂在这些概念上。全部 evergreen，路径 <code>knowledge/wiki/concepts/</code>。</p>
+      </div>
+      <div class="matrix">
+        <div class="cell">Option contract</div>
+        <div class="cell">Equity options basics</div>
+        <div class="cell">Option premium and pricing drivers</div>
+        <div class="cell">Delta</div>
+        <div class="cell">Gamma</div>
+        <div class="cell">Theta and time decay</div>
+        <div class="cell">Vega and implied volatility sensitivity</div>
+        <div class="cell">Exercise, assignment, and expiration</div>
+        <div class="cell">Options risk, leverage, and hedging</div>
+        <div class="cell">Option strategy design and payoff principles</div>
+        <div class="cell">Options margin and account approval</div>
+        <div class="cell">Bid-ask spread and liquidity cost</div>
+        <div class="cell">Options on futures exercise and assignment</div>
+      </div>
+    </section>
+
+    <footer class="foot-line">
+      <p>证据不进笔记，笔记不发明数字 · knowledge/wiki · 2026-09-02</p>
+    </footer>
+  </div>
+</body>
+</html>

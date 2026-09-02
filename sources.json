@@ -102,6 +102,17 @@
       ]
     },
     {
+      "id": "wikipedia",
+      "name": "Wikipedia",
+      "allowed": true,
+      "sample_url": "https://en.wikipedia.org/wiki/Margin_(finance)",
+      "include_prefixes": [
+        "/wiki/Margin_(finance)",
+        "/wiki/Bid-ask_spread",
+        "/wiki/Bid–ask_spread"
+      ]
+    },
+    {
       "id": "investopedia",
       "name": "Investopedia",
       "allowed": false,

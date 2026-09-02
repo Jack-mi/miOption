@@ -1,7 +1,7 @@
 ---
 type: entity
 title: Diagonal Call Spread
-status: developing
+status: evergreen
 created: 2026-09-02
 updated: 2026-09-02
 tags:
@@ -13,6 +13,7 @@ aliases:
   - diagonal spread
   - call diagonal
 sources:
+  - "[[Source — Wikipedia Diagonal spread]]"
   - "[[Source — Long Call Calendar Spread (Call Horizontal)]]"
 related:
   - "[[Long Call Calendar Spread]]"
@@ -21,112 +22,73 @@ related:
 
 # Diagonal Call Spread
 
-Combine different strikes and expirations so the payoff differs from a same-strike calendar while still trading time decay.
+Buy and sell the same type of option (calls or puts) with **different strikes and different expirations**. Combines a calendar and a vertical. Futu's 对角 menu maps here.
 
 - Underlying: equity option
 - Knowledge id: `strategy.diagonal_spread`
-- Review status: `reviewed`
+- Review status: `published`
 - Futu category: 对角策略 / Diagonal Spread
 
-> Draft: this card stays `reviewed` until a dedicated diagonal source exists, or P/L fields are rewritten to diagonal (not calendar) evidence.
+Wikipedia is the dedicated structure source. It does **not** publish one max-gain / max-loss / breakeven formula: too many strike and expiry combinations. Calendar-page numbers are not copied here.
 
 ## Legs
 
-- short near-term call at one strike (call option)
-- long longer-dated call at a different strike (call option)
+Typical one-to-one long diagonal:
+
+- short near-term option at one strike
+- long longer-dated option of the same type at a different strike
+
+Wikipedia also allows ratioed (unequal) counts. Puts follow the same structure as calls.
 
 ## Meaning
 
-Combine different strikes and expirations so the payoff differs from a same-strike calendar while still trading time decay.
+A diagonal spread shares features of both a calendar spread and a vertical spread. It is established by simultaneously buying and selling equal amount of option contracts of the same type (calls or puts) but with different strike prices and expiration dates.
+
+OIC: a calendar most commonly uses the same strike (horizontal); different strikes make it a diagonal, with a slightly different profit/loss profile.
 
 ## Scenario
 
-Similar to a calendar but strike choice tilts bullish/bearish bias; exact profile depends on selected strikes.
-
-For traders who understand both calendar risk and the strike skew of a diagonal; evidence drawn from OIC calendar Variations text.
+Strike choice tilts bullish or bearish versus a same-strike calendar. A one-to-one diagonal with similar deltas behaves much like a calendar: close to delta-neutral, P/L driven mainly by volatility and time, not direction.
 
 ## Method
 
-- Max gain: At the expiration of the near-term option, the maximum gain would occur should the underlying stock be at the strike price of the expiring option. If the stock were any higher, the expiring option would have intrinsic value, and if the stock were any lower, the longer-term option would have less value.
-- Max loss: The maximum loss would occur should the two options reach parity. This could happen if the underlying stock declined enough that both options became worthless, or if the stock rose enough that both options went deep in-the-money and traded at their intrinsic value.
-- Breakeven: Since the options differ in their time to expiration, the level where the strategy breaks even is a function of the underlying stock price, implied volatility and rates of time decay. Should the near-term option expire worthless, breakeven at the longer-term option's expiration would occur if the stock were above the s
-- Assignment / expiration: Yes. Early assignment, while possible at any time, generally occurs for a call only when the stock goes ex-dividend. Slight. Should the near-term call (the short side of the spread) be exercised when it expires, the longer-term call option would remain to provide a hedge.
+- Max gain: Not a single published number. Wikipedia: each diagonal must be analyzed individually for its risk and reward profile.
+- Max loss: Not a single published number. Same reason.
+- Breakeven: Not a single published number. Same reason.
+- Assignment / expiration: The short near-term option can be assigned. For a short call, OIC calendar assignment text still applies to that short call leg (early assignment generally when the stock goes ex-dividend).
 
 ## Greeks and time
 
-- Volatility: An increase in implied volatility, all other things equal, would have an extremely positive impact on this strategy. In general, longer-term options have a greater sensitivity to changes in market volatility, i.e., a higher Vega.
-- Time decay: The passage of time, all other things equal, would have a positive impact on this strategy in the beginning. That changes, however, once the near-term option has expired and the strategy becomes simply a long call whose value will be eroded by the passage of time.
+- Volatility / time: Wikipedia: when constructed one-to-one with similar deltas, profit or loss is driven mainly by changes in volatility and the passage of time.
+- Do not treat same-strike calendar max-gain/max-loss formulas as the diagonal's published P/L.
 
 ## Evidence
 
 ### Definition
 
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Long Call Calendar Spread (Call Horizontal)` · lines 1–4
-  > This strategy combines a longer-term bullish outlook with a near-term neutral/bearish outlook.
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Description` · lines 5–8
-  > Short one call option and long a second call option with a more distant expiration is an example of a long call calendar spread. The strategy most commonly involves calls with the same strike (horizontal spread), but can also be done with different strikes (diagonal spread).
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Variations` · lines 38–41
-  > The strategy described here involves two calls with the same strike but at different expirations. A diagonal spread, involving two calls with different strikes as well as expirations, would have a slightly different profit/loss profile. The basic concepts, however, would continue to apply.
+- [[Source — Wikipedia Diagonal spread]] · `Diagonal spread` · lines 5–6
+  > In derivatives trading, the term diagonal spread is applied to an options spread position that shares features of both a calendar spread and a vertical spread. It is established by simultaneously buying and selling equal amount of option contracts of the same type (call options or put options) but with different strike prices and expiration dates.
+- [[Source — Wikipedia Diagonal spread]] · `Difference from calendar and vertical` · lines 8–10
+  > A diagonal spread differs from a pure calendar spread in that the strike prices are not the same, and from a pure vertical spread in that the expiration dates are not the same. Many diagonal spreads are constructed one-to-one (one long-term option for each short-term option), but they can also be created with unequal numbers of long and short market contracts (ratioed spreads). Due to the large number of possible variations, each diagonal spread must be analyzed individually to determine its risk and reward profile.
+- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Description`
+  > The strategy most commonly involves calls with the same strike (horizontal spread), but can also be done with different strikes (diagonal spread).
+- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Variations`
+  > A diagonal spread, involving two calls with different strikes as well as expirations, would have a slightly different profit/loss profile. The basic concepts, however, would continue to apply.
 
 ### Legs
 
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Example` · lines 21–33
-  > - Short 1 XYZ near 60 call - Long 1 XYZ far 60 call MAXIMUM GAIN - Unlimited MAXIMUM LOSS - Net premium paid
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Variations` · lines 38–41
-  > The strategy described here involves two calls with the same strike but at different expirations. A diagonal spread, involving two calls with different strikes as well as expirations, would have a slightly different profit/loss profile. The basic concepts, however, would continue to apply.
-
-### Objective
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Description` · lines 5–8
-  > Short one call option and long a second call option with a more distant expiration is an example of a long call calendar spread. The strategy most commonly involves calls with the same strike (horizontal spread), but can also be done with different strikes (diagonal spread).
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Variations` · lines 38–41
-  > The strategy described here involves two calls with the same strike but at different expirations. A diagonal spread, involving two calls with different strikes as well as expirations, would have a slightly different profit/loss profile. The basic concepts, however, would continue to apply.
+- [[Source — Wikipedia Diagonal spread]] · `Example` · lines 16–25
+  > Buy 1 June 115 call / Sell 1 April 110 call (and a matching put pair in the same example). Expirations differ and strikes differ within each pair.
 
 ### Market Outlook
 
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Outlook` · lines 9–12
-  > Looking for either a steady to slightly declining stock price during the life of the near-term option and then a move higher during the life of the far-term option, or a sharp move upward in implied volatility.
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Variations` · lines 38–41
-  > The strategy described here involves two calls with the same strike but at different expirations. A diagonal spread, involving two calls with different strikes as well as expirations, would have a slightly different profit/loss profile. The basic concepts, however, would continue to apply.
-
-### Max Gain
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Max Gain` · lines 46–49
-  > At the expiration of the near-term option, the maximum gain would occur should the underlying stock be at the strike price of the expiring option. If the stock were any higher, the expiring option would have intrinsic value, and if the stock were any lower, the longer-term option would have less value. Once the near-te
-
-### Max Loss
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Max Loss` · lines 42–45
-  > The maximum loss would occur should the two options reach parity. This could happen if the underlying stock declined enough that both options became worthless, or if the stock rose enough that both options went deep in-the-money and traded at their intrinsic value. In either case, the loss would be the premium paid to
-
-### Breakeven
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Breakeven` · lines 54–57
-  > Since the options differ in their time to expiration, the level where the strategy breaks even is a function of the underlying stock price, implied volatility and rates of time decay. Should the near-term option expire worthless, breakeven at the longer-term option's expiration would occur if the stock were above the s
-
-### Volatility Effect
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Volatility` · lines 58–61
-  > An increase in implied volatility, all other things equal, would have an extremely positive impact on this strategy. In general, longer-term options have a greater sensitivity to changes in market volatility, i.e., a higher Vega. Be aware, that the near-term and far-term options could and probably will trade at differe
-
-### Time Decay Effect
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Time Decay` · lines 62–65
-  > The passage of time, all other things equal, would have a positive impact on this strategy in the beginning. That changes, however, once the near-term option has expired and the strategy becomes simply a long call whose value will be eroded by the passage of time. In general, an option's rate of time decay increases as
+- [[Source — Wikipedia Diagonal spread]] · `One-to-one similar-delta case` · lines 12–14
+  > When a diagonal spread is constructed one-to-one, with both options having approximately the same delta, it behaves much like a conventional calendar spread. In this case, the position tends to be close to delta-neutral, with its profit or loss driven mainly by changes in volatility and the passage of time, rather than directional movement of the underlying.
 
 ### Assignment Or Expiration Risk
 
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Assignment Risk` · lines 66–71
-  > Yes. Early assignment, while possible at any time, generally occurs for a call only when the stock goes ex-dividend. Should early exercise occur, using the the longer-term option to cover the assignment would require establishing a short stock position for one business day. And be aware, a situation where a stock is in
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Expiration Risk` · lines 72–75
-  > Slight. Should the near-term call (the short side of the spread) be exercised when it expires, the longer-term call option would remain to provide a hedge. If the longer-term option were held into expiration, it may be exercised on the investor's behalf by their brokerage firm if it's in-the-money.
-
-### Suitability Constraints
-
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Motivation` · lines 34–37
-  > The investor hopes to reduce the cost of purchasing a longer-term call option.
-- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Comments` · lines 76–81
-  > The difference in time to expiration of these two call options results in their having a different Theta, Delta and Gamma. Obviously, the near-term call suffers more from time decay, i.e., has a greater Theta. Less intuitively, the near-term call has a lower Delta but a higher Gamma (if the strike is at-the-money). Thi
+- [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Assignment Risk`
+  > Yes. Early assignment, while possible at any time, generally occurs for a call only when the stock goes ex-dividend.
 
 ## See also
 

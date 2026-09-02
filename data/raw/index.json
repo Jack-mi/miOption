@@ -1,8 +1,42 @@
 {
   "version": 2,
-  "latest_run_id": "PUZYbnrk9cH2qOIMW",
-  "generated_at": "2026-09-01T22:19:30.577782+00:00",
+  "latest_run_id": "dwOriSJHmglF1wbJA",
+  "generated_at": "2026-09-02T06:57:41.668114+00:00",
   "documents": [
+    {
+      "id": "00823197d8941302",
+      "source_id": "wikipedia",
+      "source_name": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Margin_(finance)",
+      "title": "Margin (finance) - Wikipedia",
+      "description": null,
+      "language": "en",
+      "page_path": "data/raw/pages/00823197d8941302.json",
+      "markdown_path": "data/raw/pages/00823197d8941302.md",
+      "run_id": "dwOriSJHmglF1wbJA",
+      "quality": {
+        "content_chars": 23043,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T06:57:41.665178+00:00"
+    },
+    {
+      "id": "0674d2cfe2fb3528",
+      "source_id": "wikipedia",
+      "source_name": "Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Bid-ask_spread",
+      "title": "Bid–ask spread - Wikipedia",
+      "description": null,
+      "language": "en",
+      "page_path": "data/raw/pages/0674d2cfe2fb3528.json",
+      "markdown_path": "data/raw/pages/0674d2cfe2fb3528.md",
+      "run_id": "dwOriSJHmglF1wbJA",
+      "quality": {
+        "content_chars": 11439,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T06:57:41.665193+00:00"
+    },
     {
       "id": "09eb50206912b0be",
       "source_id": "optionalpha",
@@ -139,6 +173,23 @@
       "ingested_at": "2026-09-01T22:17:53.843167+00:00"
     },
     {
+      "id": "48ce58826e49a500",
+      "source_id": "cme",
+      "source_name": "CME Institute",
+      "url": "https://www.cmegroup.com/education/whitepapers/fundamentals-of-options-on-futures",
+      "title": "Fundamentals of Options on Futures - CME Group",
+      "description": "Get an overview of the fundamentals of options on futures, rights for buyers, obligations for sellers and more.",
+      "language": "en",
+      "page_path": "data/raw/pages/48ce58826e49a500.json",
+      "markdown_path": "data/raw/pages/48ce58826e49a500.md",
+      "run_id": "dwOriSJHmglF1wbJA",
+      "quality": {
+        "content_chars": 11552,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T06:57:41.665160+00:00"
+    },
+    {
       "id": "4a631c9d54364d94",
       "source_id": "oic",
       "source_name": "The Options Industry Council",
@@ -221,6 +272,23 @@
         "requires_manual_review": true
       },
       "ingested_at": "2026-09-01T09:44:52.179370+00:00"
+    },
+    {
+      "id": "6e601cf16cfe96ae",
+      "source_id": "oic",
+      "source_name": "The Options Industry Council",
+      "url": "https://www.optionseducation.org/optionsoverview/getting-started-with-options",
+      "title": "Getting Started with Options",
+      "description": "There are so many available options and ways to trade them that you might not know where to begin. Getting started is easier than you think, once you determine your goals.",
+      "language": "en",
+      "page_path": "data/raw/pages/6e601cf16cfe96ae.json",
+      "markdown_path": "data/raw/pages/6e601cf16cfe96ae.md",
+      "run_id": "dwOriSJHmglF1wbJA",
+      "quality": {
+        "content_chars": 5180,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T06:57:41.664966+00:00"
     },
     {
       "id": "6f34560bcaef42b5",

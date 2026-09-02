@@ -13,10 +13,10 @@ tags:
 
 One merged set from two Futu surfaces:
 
-- App strategy menu (product categories, including single-leg, covered, collar, diagonal, iron butterfly, custom)
+- App strategy menu (product categories: single-leg, covered, collar, diagonal, iron butterfly, and the rest of the named menu)
 - Help article [常用期权组合简介](https://support.futunn.com/topic474) (combo structures #1–12)
 
-Evidence for P/L and Greeks is OIC text, except Strap/Strip (Futu structure only) and Diagonal (still partial).
+Evidence for P/L and Greeks is OIC text, except Strap/Strip (Wikipedia + Futu structure; no numeric P/L) and Diagonal (Wikipedia: analyze each variation individually).
 
 Positioning source: [[Source — Futu 常用期权组合简介]]
 
@@ -27,6 +27,7 @@ Category status: `ready`. App menu; not in topic474.
 - [[Long Call]] — `ready`
 - [[Long Put]] — `ready`
 - [[Naked Call (Uncovered Call, Short Call)]] — `ready`
+- [[Naked Put (Uncovered Put, Short Put)]] — `ready`
 - [[Protective Put (Married Put)]] — `ready`
 
 ## 垂直策略 / Vertical Spread
@@ -67,10 +68,10 @@ Category status: `ready`. topic474 #11 (buy or sell).
 
 ## 带式 / 条式 / Strap and Strip
 
-Category status: `partial`. topic474 #8–9. No standalone OIC pages.
+Category status: `ready` for structure. topic474 #8–9 plus Wikipedia Straddle. Numeric max gain / max loss / breakeven are not published on those sources.
 
-- [[Strap]] — `reviewed` — 买 2 call + 买 1 put，同行权价同到期
-- [[Strip]] — `reviewed` — 买 2 put + 买 1 call，同行权价同到期
+- [[Strap]] — `ready` — 买 2 call + 买 1 put；偏多的跨式变体
+- [[Strip]] — `ready` — 买 2 put + 买 1 call；偏空的跨式变体
 
 ## 日历策略 / Calendar Spread
 
@@ -81,9 +82,9 @@ Category status: `ready`. topic474 #12 (sell near, buy far, same strike).
 
 ## 对角策略 / Diagonal Spread
 
-Category status: `partial`. App menu; not in topic474.
+Category status: `ready` for structure. Wikipedia dedicated page; OIC calendar only as the “different-strike variation” note. No single published P/L formula.
 
-- [[Diagonal Call Spread]] — `reviewed`
+- [[Diagonal Call Spread]] — `ready` — 不同执行价 + 不同到期；盈亏要按具体组合单独看
 
 ## 蝶式策略 / Butterfly
 
@@ -110,7 +111,3 @@ Category status: `ready`. App menu; not in topic474.
 Category status: `ready`. topic474 #7.
 
 - [[Short Condor (Iron Condor)]] — `ready`
-
-## Skipped
-
-- 自定义策略 / Custom: Product feature for arbitrary multi-leg builds, not a named standard strategy card.

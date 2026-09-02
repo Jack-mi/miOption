@@ -14,7 +14,8 @@ aliases:
   - cash secured put
 sources:
   - "[[Source — Cash-Secured Put]]"
-related: []
+related:
+  - "[[Naked Put (Uncovered Put, Short Put)]]"
 ---
 
 # Cash-Secured Put
@@ -124,5 +125,8 @@ Only for investors who want to own the stock at the strike (less premium) and ha
 - [[Source — Cash-Secured Put]] · `Comments` · lines 110–117
   > Investors are told repeatedly to be wary of short option strategies, and quite rightly so. Without question, they entail tremendous risk, far greater than the limited premium income. They are definitely not suitable for all investors and situations. However, here is a short option strategy with a risk profile that is i
 
+## See also
+
+- related to: [[Naked Put (Uncovered Put, Short Put)]]
 
 See the [[index|Wiki Index]].

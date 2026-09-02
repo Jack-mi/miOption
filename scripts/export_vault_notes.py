@@ -621,7 +621,7 @@ def main() -> None:
             "- Include option concepts, pricing, Greeks, lifecycle, strategies, and option-focused courses.",
             "- Include options on futures when the material is about option contracts and their risk or pricing.",
             "- Exclude standalone futures education, videos, webinars, course catalogs, and marketing pages from usable knowledge.",
-            "- Do not add stock-picking, timing calls, or Futu Custom as a named strategy card.",
+            "- Do not add stock-picking or timing calls as named strategy cards.",
             "",
             "## Layers",
             "",
@@ -688,8 +688,8 @@ def main() -> None:
             "## Key Recent Facts",
             "",
             "- Knowledge product is this Obsidian vault, not `items.json`.",
-            "- Futu's 12 named strategy types are covered; Custom is skipped.",
-            "- Diagonal Call Spread is still developing.",
+            "- Futu App menu ∪ topic474 is one coverage set; 27 strategy entities are evergreen.",
+            "- Diagonal / Strap / Strip publish structure; numeric P/L stays blank where sources do not publish it.",
             "",
             "## Recent Changes",
             "",
@@ -698,7 +698,7 @@ def main() -> None:
             "",
             "## Active Threads",
             "",
-            "- Find a dedicated diagonal-spread text source, or rewrite P/L fields before promoting that card.",
+            "- Keep P/L fields source-bound; do not invent textbook formulas for Diagonal / Strap / Strip.",
             "",
         ]
     )

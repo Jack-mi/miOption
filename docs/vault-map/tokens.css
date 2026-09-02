@@ -1,0 +1,48 @@
+/* Hallmark · genre: editorial · macrostructure: Map / Diagram · theme: Grid · enrichment: A · nav: N1 · footer: Ft2 */
+/* Hallmark · F1 knobs: n/a · N1 knobs: wordmark=left links=架构+策略 · Ft2 knobs: single-line credits */
+/* Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V4 */
+/* Hallmark · studied: no · context: inferred (audience=vault owner · use=scan architecture + every strategy · tone=utilitarian) */
+
+:root {
+  --color-paper: oklch(99% 0.003 255);
+  --color-paper-2: oklch(97.2% 0.004 255);
+  --color-paper-3: oklch(94.5% 0.006 255);
+  --color-ink: oklch(16% 0.010 255);
+  --color-muted: oklch(42% 0.018 255);
+  --color-rule: oklch(88% 0.008 255);
+  --color-accent: oklch(45% 0.19 264);
+  --color-accent-ink: oklch(99% 0.003 255);
+  --color-focus: oklch(45% 0.19 264);
+
+  --font-display: "Archivo", ui-sans-serif, sans-serif;
+  --font-body: "Archivo", ui-sans-serif, sans-serif;
+  --display-weight: 800;
+  --tracking-display: -0.045em;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  --page-gutter: clamp(1rem, 4vw, 4rem);
+  --shell: 80rem;
+  --rule-hair: 1px;
+  --radius-card: 0;
+  --shadow-card: none;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+}

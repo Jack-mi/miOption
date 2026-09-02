@@ -702,6 +702,89 @@
       ],
       "target_card_id": "strategy.long_put_calendar",
       "notes": "topic474 calendar call-or-put gap; vault note written from local capture 2026-09-02; not yet in data/raw/pages"
+    },
+    {
+      "url": "https://www.optionseducation.org/optionsoverview/getting-started-with-options",
+      "source_id": "oic",
+      "topic": "margin",
+      "priority": 6,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "new-topics-1usd",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "margin_requirement",
+        "approval_levels",
+        "assignment_or_expiration_risk"
+      ],
+      "target_card_id": "concept.options_margin",
+      "notes": "New topic: options approval levels and uncovered-writer margin (20%/10%). User-authorized $1 trial 2026-09-02. ingested run dwOriSJHmglF1wbJA"
+    },
+    {
+      "url": "https://www.cmegroup.com/education/whitepapers/fundamentals-of-options-on-futures",
+      "source_id": "cme",
+      "topic": "options-on-futures",
+      "priority": 6,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "new-topics-1usd",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "exercise_assignment",
+        "american_vs_european",
+        "premium_and_strike"
+      ],
+      "target_card_id": "concept.options_on_futures",
+      "notes": "New topic: options on futures exercise/assignment and settlement into futures. User-authorized $1 trial 2026-09-02. ingested run dwOriSJHmglF1wbJA"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Margin_(finance)",
+      "source_id": "wikipedia",
+      "topic": "margin",
+      "priority": 6,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "new-topics-1usd",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "initial_vs_maintenance_margin",
+        "margin_call",
+        "option_seller_collateral"
+      ],
+      "target_card_id": "concept.options_margin",
+      "notes": "New platform trial: Wikipedia margin article (includes option seller premium margin / SPAN). User-authorized $1 trial 2026-09-02. ingested run dwOriSJHmglF1wbJA"
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Bid-ask_spread",
+      "source_id": "wikipedia",
+      "topic": "liquidity",
+      "priority": 6,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "new-topics-1usd",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "quoted_vs_effective_spread",
+        "liquidity_cost"
+      ],
+      "target_card_id": "concept.option_liquidity",
+      "notes": "New platform trial: Wikipedia bid-ask spread as liquidity measure (mentions options). User-authorized $1 trial 2026-09-02. ingested run dwOriSJHmglF1wbJA"
     }
   ]
 }

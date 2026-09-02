@@ -15,7 +15,8 @@ aliases:
   - short call
 sources:
   - "[[Source — Naked Call (Uncovered Call, Short Call)]]"
-related: []
+related:
+  - "[[Naked Put (Uncovered Put, Short Put)]]"
 ---
 
 # Naked Call (Uncovered Call, Short Call)
@@ -124,5 +125,8 @@ Only for investors who can post margin and accept theoretically unlimited loss i
 - [[Source — Naked Call (Uncovered Call, Short Call)]] · `Comments` · lines 85–88
   > This is the riskiest option strategy there is, and definitely not suitable for most investors. It requires posting a significant cash margin to initiate the transaction, but the risk is well in excess of that initial margin, and an unfavorable market move could force the investor to post additional margin on very short
 
+## See also
+
+- related to: [[Naked Put (Uncovered Put, Short Put)]]
 
 See the [[index|Wiki Index]].

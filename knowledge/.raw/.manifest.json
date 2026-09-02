@@ -295,6 +295,55 @@
       "pages_created": [
         "wiki/sources/Source — Long Call Butterfly.md"
       ]
+    },
+    ".raw/captured/bbd3764d45fa5b4f1f86d9033aee5bfc4aba3ad64745dbb4447b6d378d909012.md": {
+      "hash": "bbd3764d45fa5b4f1f86d9033aee5bfc4aba3ad64745dbb4447b6d378d909012",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Wikipedia Diagonal spread.md"
+      ]
+    },
+    ".raw/captured/bc7b3b508117f055b8aba011b077e4996217853f08f6f5a386a606ba33adb91d.md": {
+      "hash": "bc7b3b508117f055b8aba011b077e4996217853f08f6f5a386a606ba33adb91d",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Wikipedia Straddle.md"
+      ]
+    },
+    ".raw/captured/9dc397fb031528f3355d35181e0585f1e4b6b7bb7fec26ff0521f2fe44d2f857.md": {
+      "hash": "9dc397fb031528f3355d35181e0585f1e4b6b7bb7fec26ff0521f2fe44d2f857",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Naked Put (Uncovered Put, Short Put).md"
+      ]
+    },
+    ".raw/captured/ec622c19428d005cf651ee5293cd2b6eabfba2d827beda1e663630988b4a05bf.md": {
+      "hash": "ec622c19428d005cf651ee5293cd2b6eabfba2d827beda1e663630988b4a05bf",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Getting Started with Options.md"
+      ]
+    },
+    ".raw/captured/d32b6ee0efabd2c118aa03c2bf1677d59c3571cdbb06c1dfd49a19cb57c442b8.md": {
+      "hash": "d32b6ee0efabd2c118aa03c2bf1677d59c3571cdbb06c1dfd49a19cb57c442b8",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Fundamentals of Options on Futures.md"
+      ]
+    },
+    ".raw/captured/0d509ac8d9bc96601e4a7bd9f618551923243cf00d84be6d98e625bfc4bc27e5.md": {
+      "hash": "0d509ac8d9bc96601e4a7bd9f618551923243cf00d84be6d98e625bfc4bc27e5",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Wikipedia Margin (finance).md"
+      ]
+    },
+    ".raw/captured/fb864559e896afae851c8bfa8e0b191ccdabf1004582a0856e439594bc0e4e47.md": {
+      "hash": "fb864559e896afae851c8bfa8e0b191ccdabf1004582a0856e439594bc0e4e47",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Wikipedia Bid-ask spread.md"
+      ]
     }
   },
   "version": 1

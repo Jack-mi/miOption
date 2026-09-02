@@ -1,7 +1,7 @@
 # miOption：当前项目现状
 
 更新时间：2026-09-02
-状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。10 张概念笔记 + 23 张 evergreen 策略实体 + 3 张 developing（对角、Strap、Strip）+ 5 条关系 wikilink。App 菜单与 topic474 已合并为一套覆盖。OIC put butterfly / put calendar 为 `proposed` 候选（vault 已有本地捕获，尚未进 `data/raw/pages`）。
+状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。**13** 张概念 + **27** 张策略（全部 evergreen：对角/Strap/Strip 已按 Wikipedia 落地结构；裸卖 put 已补）。App 菜单与 topic474 为一套覆盖。
 
 ## 1. 结论
 
@@ -13,7 +13,7 @@
 原始期权页面 → 页面准入 → vault `.raw/captured` → wiki 源笔记 / 概念 / 策略实体 → wikilink
 ```
 
-产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)（自定义除外）。清单用富途，P/L 证据用 OIC；Strap/Strip 仅有富途腿结构。vault 内 10 张概念、**26** 张策略实体（23 evergreen + 3 developing）、5 条关系。
+产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)。清单用富途；P/L 以 OIC 为准。对角用 Wikipedia：没有单一盈亏公式。Strap/Strip 用 Wikipedia+Futu 腿结构，不填具体最多赚/亏/打平数字。vault 内 **13** 张概念、**27** 张策略实体、5 条关系。
 
 ## 2. 范围与准入边界
 
@@ -27,8 +27,7 @@
 
 - 与期权无实质关联的纯期货教育、交易或产品内容；
 - 视频、webinar、podcast、playlist、视频课入口、交互式课程、课程目录、营销/导航页；
-- 只有 URL、不能形成可验证知识字段的页面；
-- 富途「自定义策略」：产品功能，不做标准策略卡。
+- 只有 URL、不能形成可验证知识字段的页面。
 
 课程和视频页可保留在来源目录中作为导航线索，但不会生成 chunk、知识卡、策略卡或进入知识检索。
 
@@ -36,25 +35,25 @@
 
 | 层级 | 数量 | 含义 |
 |---|---:|---|
-| 原始来源页面 | 39 | 每页保留 JSON 与 Markdown 证据（Apify 抓取） |
-| 正文证据页 | 31 | 满足主题与文字正文准入 |
+| 原始来源页面 | 43 | Apify 抓取（含 new-topics-1usd 四页） |
+| 正文证据页 | 35 | 满足主题与文字正文准入 |
 | 仅目录/课程/视频页 | 8 | 保留来源，不进入知识抽取 |
-| vault 本地捕获（未进 raw pages） | 3 | put butterfly、put calendar、Futu topic474 |
-| 可引用知识片段（chunks，归档 JSON） | 393 | 含标题、行号、内容哈希和来源 URL；不单独做成笔记 |
-| vault 源笔记 | 42 | `knowledge/wiki/sources/`（39 crawl + 3 local） |
-| vault 概念笔记 | 10 | 概念、定价、Greeks、生命周期、风险、策略原则 |
-| vault 策略实体 | 26 | 合并覆盖；含 Covered Call、put butterfly/calendar、Strap/Strip |
+| vault 本地捕获（未进 raw pages） | 6 | put butterfly/calendar、Futu topic474、Wikipedia 对角/跨式、Naked Put |
+| vault 源笔记 | 49 | `knowledge/wiki/sources/` |
+| vault 概念笔记 | 13 | 原 10 张 + 保证金、买卖价差、期货期权行权 |
+| vault 策略实体 | 27 | 含 Naked Put；对角/Strap/Strip 已按 Wikipedia 落地 |
 | 有证据的知识关系 | 5 | 已写成笔记间 wikilink（3 条 requires、2 条 affects） |
 
 ### 来源构成
 
 | 来源 | 原始页 | 正文证据页 | 仅目录/课程页 |
 |---|---:|---:|---:|
-| OIC | 30 | 30 | 0 |
+| OIC | 31 | 31 | 0 |
 | Option Alpha | 5 | 1 | 4 |
-| CME | 3 | 0 | 3 |
+| CME | 4 | 1 | 3 |
 | Cboe | 1 | 0 | 1 |
-| 合计 | 39 | 31 | 8 |
+| Wikipedia | 2 | 2 | 0 |
+| 合计 | 43 | 35 | 8 |
 
 ### 富途策略覆盖
 
@@ -62,20 +61,19 @@
 
 | 富途类别 | 状态 | 策略卡 |
 |---|---|---|
-| 单腿期权 | ready | Long Call、Long Put、Naked Call、Protective Put |
+| 单腿期权 | ready | Long Call、Long Put、Naked Call、Naked Put、Protective Put |
 | 垂直策略 | ready | Bull/Bear Call Spread、Bull/Bear Put Spread |
 | 股票担保 | ready | Covered Call（原有）、Cash-Secured Put |
 | 领口策略 | ready | Collar |
 | 跨式策略 | ready | Long / Short Straddle |
 | 宽跨式策略 | ready | Long / Short Strangle |
-| 带式 / 条式 | partial | Strap、Strip（topic474 腿结构；无独立 OIC 页，developing） |
+| 带式 / 条式 | ready | Strap、Strip（腿+方向偏好已发表；无具体最多赚/亏/打平数字） |
 | 日历策略 | ready | Long Call Calendar、Long Put Calendar |
-| 对角策略 | partial | Diagonal 仍为 developing（无独立 OIC 页；盈亏字段暂用日历同名段落） |
+| 对角策略 | ready | Diagonal（Wikipedia：无单一盈亏公式；未借用日历数字） |
 | 蝶式策略 | ready | Long Call Butterfly、Long Put Butterfly |
 | 鹰式策略 | ready | Long Call / Long Put Condor |
 | 铁蝶式策略 | ready | Short Iron Butterfly |
 | 铁鹰式策略 | ready | Short Condor (Iron Condor) |
-| 自定义策略 | 跳过 | 不做卡 |
 
 ## 4. 知识库架构
 
@@ -103,10 +101,9 @@ wiki
 
 ### 已形成的知识内容
 
-- **概念笔记**：10 张，均为 evergreen。
-- **策略实体**：26 张；23 张 evergreen，Diagonal / Strap / Strip 保持 developing。
-- **关系**：5 条已写成 wikilink（Gamma↔Delta；Covered Call 与基础/行权/Theta/Vega）。已补 butterfly / calendar / straddle↔strap/strip 的 related。
-- **抽查记录**：代表性卡（Covered Call、Cash-Secured Put、Long Call、Protective Put、Bull Call Spread、Iron Condor、Collar、Long Straddle、Call Calendar、Diagonal）字段与证据引用均通过。对角策略定义有日历页 Description/Variations 支撑，但 max gain/loss/breakeven 仍是同执行价日历口径，故未升 evergreen。Strap/Strip 不写 P/L 数字。
+- **概念笔记**：13 张，均为 evergreen（含保证金、买卖价差、期货期权行权）。
+- **策略实体**：27 张，均为 evergreen。对角没有单一盈亏公式；Strap/Strip 不填具体最多赚/亏/打平。
+- **关系**：5 条已写成 wikilink（Gamma↔Delta；Covered Call 与基础/行权/Theta/Vega）。另有策略 related（butterfly/calendar/straddle/strap/naked put）。
 
 ## 5. 抓取、成本与约束
 
@@ -120,10 +117,11 @@ wiki
 | 三页跟进批次 | `z89ZwcnZUNwpJf6QA` | `SUCCEEDED` | 3 | `$0.0155027516` |
 | 富途策略 A | `gu9ldfoHnNp8ctld9` | `SUCCEEDED` | 12 | `$0.0565566491` |
 | 富途策略 B | `PUZYbnrk9cH2qOIMW` | `SUCCEEDED` | 8 | `$0.0315424827` |
+| 新专题 1usd | `dwOriSJHmglF1wbJA` | `SUCCEEDED` | 4 | `$0.0042865904` |
 
 - 已记录总成本：约 `$0.2095836011`。
 - `$1` 探索额度中（pilot + 终止跑 + followup + A + B）累计约 `$0.1637666320`，约余 `$0.836`。
-- 候选队列 35 个 URL 为 `ingested`；另 2 个 OIC URL（put butterfly、put calendar）为 `proposed` 批次 `futu-topic474-gaps`，尚无 `approved` 待抓批次。
+- 候选队列：原 ingested 之外，`new-topics-1usd` 四页已 ingested；`futu-topic474-gaps` 两页仍为 `proposed`。尚无 `approved` 待抓批次。
 - 另有 4 篇初始小样本页面不在候选队列中且缺 `run_id`（legacy）。
 
 ### 实际采集护栏
@@ -164,21 +162,18 @@ python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge
 
 已知缺口：
 
-- Diagonal Call Spread 仍为 developing：需独立对角文字页，或按对角口径改写盈亏字段后再升 evergreen。
-- Strap / Strip 仍为 developing：仅有 Futu topic474 腿结构，无独立 OIC 页，不写 P/L。
-- Put butterfly / put calendar 的 vault 笔记来自本地捕获，尚未经 Apify 写入 `data/raw/pages`。
-- taxonomy 的 `options_on_futures` 仍为空；流动性、保证金、期货期权结算仍未做。
+- Strap / Strip 没有具体最多赚/亏/打平数字（Wikipedia 与 Futu 都没写）。
+- Put butterfly / put calendar / Naked Put 的 vault 笔记来自本地捕获，尚未全部经 Apify 写入 `data/raw/pages`。
+- taxonomy 的 `options_on_futures` 已有 CME 白皮书笔记；保证金与买卖价差已有概念卡。期权专用流动性宽度（典型 spread）仍没有独立来源。
 - 短 chunk 与 taxonomy 100 字门槛仍未强制对齐（可选后续处理）。
 - Cboe canonical `/en/optionsinstitute/` 路径策略未定。
 - 归档 JSON（`build_knowledge.py --check`）仍为迁移前 22 张策略，vault 已领先。
 
 ## 8. 下一步待办
 
-1. 对角策略：找独立文字证据页，或收窄字段只保留有对角原文支撑的含义/场景后再发布。
-2. 批准并抓取 `futu-topic474-gaps`（put butterfly / put calendar），把捕获写入 `data/raw/pages`。
-3. Strap/Strip：找到独立文字页后再写 P/L 并升 evergreen。
-4. 流动性、保证金、期货期权结算等专题另开缺口后再批候选。
-5. 不做整站抓取；Investopedia 仍不自动采。
+1. 可选：把仍停在本地捕获的 OIC 页（put butterfly / put calendar / Naked Put）批进 `data/raw/pages`。
+2. 期权专用流动性（典型买卖价差宽度）还没有独立文字页。
+3. 不做整站抓取；Investopedia 仍不自动采。
 
 ## 9. 交接注意事项
 

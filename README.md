@@ -13,9 +13,9 @@ This project builds a source-backed local knowledge base for options education a
 
 See [STATUS.md](STATUS.md) for the live snapshot, known gaps, and sequenced to-dos.
 
-- The raw evidence layer has 39 normalized source documents; 31 substantive text pages are eligible, while 8 video/course/catalog pages are retained only as navigation metadata.
-- The vault contains 42 source notes, 10 concept notes, 23 evergreen strategy entities plus three developing cards (Diagonal, Strap, Strip), and five relations as wikilinks. Coverage is one set: Futu App menu ∪ topic474 (Custom excluded).
-- There is no `approved` crawl batch. Batches A and B are ingested. Two OIC URLs (put butterfly, put calendar) are `proposed` as `futu-topic474-gaps`.
+- The raw evidence layer has 43 normalized source documents; 35 substantive text pages are eligible, while 8 video/course/catalog pages are retained only as navigation metadata.
+- The vault contains 49 source notes, 13 concept notes, 27 evergreen strategy entities, and five relations as wikilinks. Coverage is one set: Futu App menu ∪ topic474.
+- There is no `approved` crawl batch. `new-topics-1usd` is ingested (`dwOriSJHmglF1wbJA`, ~$0.004). Two OIC URLs remain `proposed` as `futu-topic474-gaps`.
 - Crawl scope is enforced in code: HTTPS-only source/path allowlists, fixed URL batches, depth `0`, robots.txt checks, and post-run validation of page count, status, source path, and cost.
 - Investopedia is excluded from automated crawling because its robots/terms prohibit automated scraping and AI dataset use.
 - Complete Apify run metadata is local-only and ignored by Git because it can contain signed URLs and runtime secrets. The repository contains only sanitized run summaries.
@@ -57,6 +57,7 @@ The crawler is only an evidence acquisition tool: a new crawl requires an `appro
 | `z89ZwcnZUNwpJf6QA` | 3 | `$0.0155027516` | Covered call, neutral strategies, and Option Greeks |
 | `gu9ldfoHnNp8ctld9` | 12 | `$0.0565566491` | Futu strategy coverage batch A |
 | `PUZYbnrk9cH2qOIMW` | 8 | `$0.0315424827` | Futu strategy coverage batch B |
+| `dwOriSJHmglF1wbJA` | 4 | `$0.0042865904` | New-topic trial: margin, options on futures, Wikipedia |
 
 Batches A and B added twenty OIC strategy text pages used to build the Futu-aligned strategy cards. CME course pages remain catalog-only; Option Alpha short course landings remain `body_eligible: false`.
 
