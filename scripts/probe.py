@@ -68,12 +68,43 @@ def source_for_url(url: str, sources: list[dict]) -> dict:
     raise ValueError(f"URL is outside the approved source/path allowlist: {url}")
 
 
+def validate_knowledge_url(url: str, knowledge_policy: dict) -> None:
+    path = urlparse(url).path.lower()
+    if any(fragment.lower() in path for fragment in knowledge_policy["excluded_url_fragments"]):
+        raise ValueError(f"Video or media URL is outside the knowledge corpus: {url}")
+
+
+def validate_knowledge_content(content: str, url: str, knowledge_policy: dict) -> None:
+    if len(content) < knowledge_policy["minimum_text_chars"]:
+        raise ValueError(f"Page lacks enough text for the knowledge corpus: {url}")
+    lowered = content.lower()
+    if any(marker.lower() in lowered for marker in knowledge_policy["excluded_content_markers"]):
+        raise ValueError(f"Video, course, or navigation page is outside the knowledge corpus: {url}")
+
+
+def validate_candidate(candidate: dict, knowledge_policy: dict) -> None:
+    missing = [key for key in knowledge_policy["candidate_required_fields"] if key not in candidate]
+    if missing:
+        raise ValueError(f"Candidate is missing knowledge fields ({', '.join(missing)}): {candidate.get('url')}")
+    if candidate.get("knowledge_eligible") is not True:
+        raise ValueError(f"Candidate is not approved for the knowledge corpus: {candidate.get('url')}")
+    if candidate.get("content_kind") not in knowledge_policy["eligible_content_kinds"]:
+        raise ValueError(f"Candidate is not a text knowledge page: {candidate.get('url')}")
+    if candidate.get("video") is not False:
+        raise ValueError(f"Candidate may contain video or media content: {candidate.get('url')}")
+    if not candidate.get("knowledge_type"):
+        raise ValueError(f"Candidate has no knowledge target: {candidate.get('url')}")
+    if not isinstance(candidate["expected_fields"], list) or not candidate["expected_fields"]:
+        raise ValueError(f"Candidate has no expected knowledge fields: {candidate.get('url')}")
+
+
 def doc_id(source_id: str, url: str) -> str:
     return hashlib.sha1(f"{source_id}:{url}".encode()).hexdigest()[:16]
 
 
 def validate_config(config: dict) -> None:
     crawl_policy = config["crawl_policy"]
+    knowledge_policy = config.get("knowledge_policy")
     required = (
         "sample_max_pages", "max_crawl_pages", "max_crawl_depth", "run_timeout_secs",
         "wait_timeout_secs", "estimated_cost_per_page_usd", "max_cost_usd", "min_content_chars",
@@ -90,6 +121,17 @@ def validate_config(config: dict) -> None:
         raise ValueError("wait_timeout_secs must be at least run_timeout_secs")
     if crawl_policy["estimated_cost_per_page_usd"] <= 0 or crawl_policy["max_cost_usd"] <= 0:
         raise ValueError("Cost limits must be positive")
+    if not isinstance(knowledge_policy, dict):
+        raise ValueError("Missing knowledge policy")
+    required_knowledge_fields = (
+        "minimum_text_chars", "eligible_content_kinds", "candidate_required_fields", "excluded_url_fragments",
+        "excluded_content_markers",
+    )
+    missing_knowledge_fields = [key for key in required_knowledge_fields if key not in knowledge_policy]
+    if missing_knowledge_fields:
+        raise ValueError(f"Missing knowledge policy fields: {', '.join(missing_knowledge_fields)}")
+    if knowledge_policy["minimum_text_chars"] < crawl_policy["min_content_chars"]:
+        raise ValueError("Knowledge text minimum cannot be lower than the crawl minimum")
     for source in allowed_sources(config["sources"]):
         source_for_url(source["sample_url"], config["sources"])
 
@@ -103,7 +145,9 @@ def allowed_url_globs(sources: list[dict]) -> list[str]:
     return globs
 
 
-def selected_candidate_urls(candidate_file: Path, batch: str | None, include_ingested: bool = False) -> list[str]:
+def selected_candidate_urls(
+    candidate_file: Path, batch: str | None, knowledge_policy: dict, include_ingested: bool = False,
+) -> list[str]:
     payload = json.loads(candidate_file.read_text())
     candidates = payload.get("candidates", payload) if isinstance(payload, dict) else payload
     if not isinstance(candidates, list):
@@ -111,7 +155,7 @@ def selected_candidate_urls(candidate_file: Path, batch: str | None, include_ing
     urls = []
     for candidate in candidates:
         status = candidate.get("crawl_status")
-        allowed_statuses = {"approved", "pending"}
+        allowed_statuses = {"approved"}
         if include_ingested:
             allowed_statuses.add("ingested")
         if status not in allowed_statuses:
@@ -120,6 +164,8 @@ def selected_candidate_urls(candidate_file: Path, batch: str | None, include_ing
             continue
         if candidate.get("allowed") is not True:
             raise ValueError(f"Approved candidate is not allowed: {candidate.get('url')}")
+        if not include_ingested:
+            validate_candidate(candidate, knowledge_policy)
         urls.append(candidate["url"])
     if not urls:
         raise ValueError("No approved candidates matched the requested batch")
@@ -134,6 +180,7 @@ def build_input(config: dict, urls: list[str] | None = None, max_pages: int | No
         raise ValueError("No URLs selected")
     for url in urls:
         source_for_url(url, config["sources"])
+        validate_knowledge_url(url, config["knowledge_policy"])
     page_budget = crawl_policy["sample_max_pages"] if max_pages is None else max_pages
     if page_budget != len(urls):
         raise ValueError(f"Page budget ({page_budget}) must exactly match selected URLs ({len(urls)})")
@@ -165,7 +212,7 @@ def build_input(config: dict, urls: list[str] | None = None, max_pages: int | No
 def preview_input(config: dict, candidate_file: Path | None, batch: str | None, urls: list[str] | None, max_pages: int | None) -> dict:
     if candidate_file and urls:
         raise ValueError("Use either a candidate file or explicit URLs, not both")
-    selected = selected_candidate_urls(candidate_file, batch, include_ingested=True) if candidate_file else urls
+    selected = selected_candidate_urls(candidate_file, batch, config["knowledge_policy"], include_ingested=True) if candidate_file else urls
     return build_input(config, selected, max_pages)
 
 
@@ -201,7 +248,9 @@ def wait_for_run(run_id: str, crawl_policy: dict) -> None:
         raise RuntimeError(f"Run {run_id} was not accepted; any still-active run was aborted: {error}") from error
 
 
-def validate_items(items: list[dict], sources: list[dict], requested_urls: list[str], crawl_policy: dict) -> None:
+def validate_items(
+    items: list[dict], sources: list[dict], requested_urls: list[str], crawl_policy: dict, knowledge_policy: dict,
+) -> None:
     if len(items) != len(requested_urls):
         raise ValueError(f"Expected {len(requested_urls)} results, received {len(items)}")
     observed_requests = set()
@@ -209,15 +258,18 @@ def validate_items(items: list[dict], sources: list[dict], requested_urls: list[
         if not isinstance(item, dict) or not item.get("url"):
             raise ValueError("Dataset contains an invalid item")
         source_for_url(item["url"], sources)
+        validate_knowledge_url(item["url"], knowledge_policy)
         crawl = item.get("crawl") or {}
         loaded_url = crawl.get("loadedUrl", item["url"])
         source_for_url(loaded_url, sources)
+        validate_knowledge_url(loaded_url, knowledge_policy)
         status = crawl.get("httpStatusCode")
         if not isinstance(status, int) or not 200 <= status < 300:
             raise ValueError(f"Dataset item did not return a successful HTTP status: {item['url']}")
         content = (item.get("markdown") or item.get("text") or "").strip()
         if len(content) < crawl_policy["min_content_chars"]:
             raise ValueError(f"Dataset item is too short to be useful: {item['url']}")
+        validate_knowledge_content(content, item["url"], knowledge_policy)
         observed_requests.add(crawl.get("referrerUrl", item["url"]))
     if observed_requests != set(requested_urls):
         raise ValueError("Dataset results do not exactly match the requested URL batch")
@@ -330,7 +382,7 @@ def run_probe(
     items = parse_json(cli([
         "datasets", "get-items", run["defaultDatasetId"], "--format", "json", "--limit", str(len(requested_urls) + 1),
     ]))
-    validate_items(items, config["sources"], requested_urls, crawl_policy)
+    validate_items(items, config["sources"], requested_urls, crawl_policy, config["knowledge_policy"])
     documents = [normalize_item(item, config["sources"], run_id, crawl_policy) for item in items]
     return store_documents(run, actor_input, documents, out_dir, index_path)
 
@@ -354,6 +406,13 @@ def self_check() -> None:
             "wait_timeout_secs": 90, "estimated_cost_per_page_usd": 0.03, "max_cost_usd": 0.06,
             "min_content_chars": 3, "manual_review_below_chars": 5,
         },
+        "knowledge_policy": {
+            "minimum_text_chars": 3,
+            "eligible_content_kinds": ["article"],
+            "candidate_required_fields": ["knowledge_eligible", "knowledge_type", "content_kind", "video", "expected_fields"],
+            "excluded_url_fragments": ["/video/"],
+            "excluded_content_markers": ["video lessons"],
+        },
         "sources": [
             {"id": "oic", "name": "OIC", "allowed": True, "sample_url": "https://www.optionseducation.org/a", "include_prefixes": ["/a", "/education"]},
             {"id": "no", "name": "No", "allowed": False},
@@ -371,9 +430,16 @@ def self_check() -> None:
     expect_value_error(lambda: validate_run({**run, "status": "FAILED"}, config["crawl_policy"]))
     expect_value_error(lambda: validate_run({**run, "usageTotalUsd": 0.07}, config["crawl_policy"]))
     item = {"url": "https://www.optionseducation.org/a", "text": "hello", "metadata": {"headers": {"set-cookie": "do-not-store"}}, "crawl": {"loadedUrl": "https://www.optionseducation.org/a", "referrerUrl": "https://www.optionseducation.org/a", "httpStatusCode": 200}}
-    validate_items([item], config["sources"], [item["url"]], config["crawl_policy"])
+    validate_items([item], config["sources"], [item["url"]], config["crawl_policy"], config["knowledge_policy"])
     assert "headers" not in normalize_item(item, config["sources"], "run", config["crawl_policy"])["metadata"]
-    expect_value_error(lambda: validate_items([{**item, "url": "https://example.com/a"}], config["sources"], [item["url"]], config["crawl_policy"]))
+    expect_value_error(lambda: validate_items([{**item, "url": "https://example.com/a"}], config["sources"], [item["url"]], config["crawl_policy"], config["knowledge_policy"]))
+    expect_value_error(lambda: validate_knowledge_url("https://www.optionseducation.org/video/example", config["knowledge_policy"]))
+    expect_value_error(lambda: validate_knowledge_content("video lessons", item["url"], config["knowledge_policy"]))
+    validate_candidate({
+        "url": item["url"], "knowledge_eligible": True, "knowledge_type": "concept", "content_kind": "article",
+        "video": False, "expected_fields": ["definition"],
+    }, config["knowledge_policy"])
+    expect_value_error(lambda: validate_candidate({"url": item["url"]}, config["knowledge_policy"]))
     assert parse_json("\napplication/json\n[{\"ok\": true}]\n") == [{"ok": True}]
 
 
@@ -381,12 +447,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=Path("sources.json"))
     parser.add_argument("--out", type=Path, default=Path("data/raw"))
-    parser.add_argument("--index", type=Path, default=Path("knowledge/index.json"))
+    parser.add_argument("--index", type=Path, default=Path("data/raw/index.json"))
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--run-id", help="Reuse a completed run only when its exact input matches")
     parser.add_argument("--candidate-file", type=Path, help="Candidate JSON file")
     parser.add_argument("--batch", help="Approved candidate batch to run")
-    parser.add_argument("--url", action="append", help="Approved HTTPS URL to run; repeat for a fixed batch")
+    parser.add_argument("--url", action="append", help="Preview an HTTPS URL only; new crawls must use reviewed candidates")
     parser.add_argument("--max-pages", type=int, help="Must exactly equal the selected URL count")
     parser.add_argument("--print-input", action="store_true", help="Validate and print the Actor input without starting a run")
     args = parser.parse_args()
@@ -398,11 +464,13 @@ def main() -> None:
         parser.error("Use either --candidate-file or --url, not both")
     if args.batch and not args.candidate_file:
         parser.error("--batch requires --candidate-file")
+    if args.url and not args.print_input:
+        parser.error("New crawls must use a reviewed candidate batch, not direct URLs")
     config = json.loads(args.config.read_text())
     if args.print_input:
         print(json.dumps(preview_input(config, args.candidate_file, args.batch, args.url, args.max_pages), ensure_ascii=False, indent=2))
         return
-    urls = selected_candidate_urls(args.candidate_file, args.batch) if args.candidate_file else args.url
+    urls = selected_candidate_urls(args.candidate_file, args.batch, config["knowledge_policy"]) if args.candidate_file else args.url
     documents = run_probe(config, args.out, args.index, args.run_id, urls, args.max_pages)
     print(f"Stored {len(documents)} documents in {args.index}")
 

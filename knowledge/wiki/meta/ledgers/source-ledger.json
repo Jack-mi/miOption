@@ -1,0 +1,747 @@
+{
+  "generated_at": "2026-09-02T01:50:00Z",
+  "schema": "claude-obsidian.source-ledger.v1",
+  "sources": {
+    "src-03bd7de4e5f322945c19": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "d4522097e0131cd937fb7e28e04575ee2a4e11de4f6f77659ce6bc6f53482f4a",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/advancedconcepts/theta"
+      },
+      "pages": [
+        "wiki/sources/Source — Theta.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Theta"
+    },
+    "src-095ce80633d1af4aa0c3": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "7d16e6079e878a73de4226f94093e98b6fa82f504b04825961d5ea8656fe7251",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/bull-call-spread-debit-call-spread"
+      },
+      "pages": [
+        "wiki/sources/Source — Bull Call Spread (Debit Call Spread).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Bull Call Spread (Debit Call Spread)"
+    },
+    "src-0dc6148eb3af3cc3a39b": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "c3ee400f1c2acf7bdd776e17136011de2ed59446069f90ca43c6e19db33d1f96",
+      "independence_key": "cboe",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.cboe.com/optionsinstitute/courses/options101"
+      },
+      "pages": [
+        "wiki/sources/Source — The Options Institute Options 101 - Cboe (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — The Options Institute Options 101 - Cboe (catalog only)"
+    },
+    "src-13fd54e237fa551c8890": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "7c20181efc42d6c73842ac34bd75e3eaa8ca4b501793e81a67f8fa87bc6adc83",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/optionsoverview/what-is-an-option"
+      },
+      "pages": [
+        "wiki/sources/Source — What is an Option-.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — What is an Option-"
+    },
+    "src-17684ae9efc0300323ec": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "51db45e48278bff1ab539e0f5b1fea07481363f76055292d2f69d525437e7cea",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/collar-protective-collar"
+      },
+      "pages": [
+        "wiki/sources/Source — Collar Protective Collar - Options Education.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Collar Protective Collar - Options Education"
+    },
+    "src-1c2f3fde49d72aed509b": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "2ef4d7d614fe980ca5f9d1d39b40613c1c7c53caf1b1feadca9a29d9a492836e",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/bull-put-spread-credit-put-spread"
+      },
+      "pages": [
+        "wiki/sources/Source — Bull Put Spread (Credit Put Spread).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Bull Put Spread (Credit Put Spread)"
+    },
+    "src-1d2a54d3b10e0956d641": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "95b39a891ea712e653ba79c99df70186bde68ef986dd8a4f253dfebf7e02706e",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/cash-secured-put"
+      },
+      "pages": [
+        "wiki/sources/Source — Cash-Secured Put.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Cash-Secured Put"
+    },
+    "src-2009adf80ff1829ff8ec": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "48e58664a560fddd1d10289519bb99525a614ef2b679969748d21ca60543d1ca",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/short-condor"
+      },
+      "pages": [
+        "wiki/sources/Source — Short Condor (Iron Condor).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Short Condor (Iron Condor)"
+    },
+    "src-2397453dd6585f6dfc2d": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "ffef2eb4456f5ed0971aab48034e76f78119984fea0a2dff2fb4569beda12fe8",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-call-butterfly"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Call Butterfly.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Call Butterfly"
+    },
+    "src-24c1725cf57459e8564c": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "2f0a3f4614cb379d721762b5215c24fba36d30ed93425668d9c9e674c53ec8a1",
+      "independence_key": "optionalpha",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://optionalpha.com/options-strategies"
+      },
+      "pages": [
+        "wiki/sources/Source — Complete Guide to Options Strategies - Option Alpha.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Complete Guide to Options Strategies - Option Alpha"
+    },
+    "src-2ca6475356be885a7dd4": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "2f6f834ae11c1bce0744f3753f88f1db0e6856859301d79bdc583ff499c26a12",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-put-condor"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Put Condor.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Put Condor"
+    },
+    "src-2cc3220c8c89a0361d8e": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "5797898a19b4c19a8a54ca489d8a52ab0e6c6e92cd82d2d941979ec800dbe1d3",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/short-iron-butterfly"
+      },
+      "pages": [
+        "wiki/sources/Source — Short Iron Butterfly.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Short Iron Butterfly"
+    },
+    "src-2f1c2387477cb9871084": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "65d1e24f97ea1a10c331dddc891d87f91eba700e1a251cd9ef68bcf9911d1ac4",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/optionsoverview/exercising-options"
+      },
+      "pages": [
+        "wiki/sources/Source — Exercising Options.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Exercising Options"
+    },
+    "src-30038701224059c24d2c": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "f8c5577c535df7a919bd42d12b4d9086a881ff4b9ee14dd91215cff1fe785c99",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/protective-put-married-put"
+      },
+      "pages": [
+        "wiki/sources/Source — Protective Put (Married Put).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Protective Put (Married Put)"
+    },
+    "src-3a14c2087712b64c2b55": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "2e5bdb5cb8f1655a2220ea8ab75ca5ad94f9210ca59c74c8bc0f546f1427d77f",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/optionsoverview/what-are-the-benefits-risks"
+      },
+      "pages": [
+        "wiki/sources/Source — What are the Benefits & Risks-.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — What are the Benefits & Risks-"
+    },
+    "src-3adcd852715390326626": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "1e187ad761bb0f60ee623ac3071ccc70287326681242ee3dc4d2472d00ffde3b",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-put"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Put.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Put"
+    },
+    "src-3b52412baea24bd15bbb": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "204c4aa8a7399b28a321fb0de3dd1be21220ba9cfb151c6f0040f957f7ab18f3",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/short-straddle"
+      },
+      "pages": [
+        "wiki/sources/Source — Short Straddle.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Short Straddle"
+    },
+    "src-4b259c375f105e53171a": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "4db9c227cbec26197661dbe88083abc6ed2da5cf4af8c9d187808dbf907f231a",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/optionsoverview/options-basics"
+      },
+      "pages": [
+        "wiki/sources/Source — Options Basics.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Options Basics"
+    },
+    "src-4c8bb50509ea6c178f63": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "fd669fa4930db5ba328332deb1e8dcb411729730bf9aa6d4d316dc19e14991c1",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/short-strangle"
+      },
+      "pages": [
+        "wiki/sources/Source — Short Strangle.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Short Strangle"
+    },
+    "src-4ccfe7ca8ea18b3494fc": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "5d2bb570ffde446c7ceb0e4c3ebf1f5ca88677f76d8f16db175daae03f1cab01",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-call"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Call.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Call"
+    },
+    "src-517a630fe332e7810624": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "b8621aa10da743cb90f63bb6c733aede0cfd8db29b9e8fc81555b2a0c35d381b",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/naked-call-uncovered-call-short-call"
+      },
+      "pages": [
+        "wiki/sources/Source — Naked Call (Uncovered Call, Short Call).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Naked Call (Uncovered Call, Short Call)"
+    },
+    "src-51ed6a9f21f7b91289fa": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "cd5308069beb0ee8dd22fcb96a67dd94f94a8bf6d77cfaf3ebb0ef2da35a406b",
+      "independence_key": "cme",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.cmegroup.com/education/courses/introduction-to-options"
+      },
+      "pages": [
+        "wiki/sources/Source — Introduction to Options - CME Group (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Introduction to Options - CME Group (catalog only)"
+    },
+    "src-6b87adf6886ab420110c": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "c494d438d6eee1f9eb4d2eff7afe3d1da95ce31498b9d6fdde5d08b9e0f49376",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-strangle-long-combination"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Strangle (Long Combination).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Strangle (Long Combination)"
+    },
+    "src-70199cd2d711eb8bac46": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "b9194f640fc39096c80060b484be0b64d5ba9efdab624fe748952434caf4aa8c",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-straddle"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Straddle.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Straddle"
+    },
+    "src-72e8c89b235834227830": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "a5c8b3458da025828a1c376897b16e126ba3e6a8c847d001590f4bdf312e893e",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/advancedconcepts/gamma"
+      },
+      "pages": [
+        "wiki/sources/Source — Gamma.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Gamma"
+    },
+    "src-7ea8704b0642f97e5731": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "c28d75940a4a050f8c5bc8635658f43a669f9ce29d18eedc390ee1ad3dcc6dfc",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-call-calendar-spread-call-horizontal"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Call Calendar Spread (Call Horizontal).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Call Calendar Spread (Call Horizontal)"
+    },
+    "src-7ebf5d8c234f3ad14f43": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "19f500c8f24fcbd4352d5c1b6ed6b00653662c5e55c6cf0fb953e04d17c53d25",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/bear-call-spread-credit-call-spread"
+      },
+      "pages": [
+        "wiki/sources/Source — Bear Call Spread (Credit Call Spread).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Bear Call Spread (Credit Call Spread)"
+    },
+    "src-874fb25f5f6125922614": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "5ff2da77ae933184a87ee42ea4d751e01d55d3fb189a09b089290ebf3bb53c91",
+      "independence_key": "cme",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.cmegroup.com/education/courses/option-greeks"
+      },
+      "pages": [
+        "wiki/sources/Source — Option Greeks - CME Group (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Option Greeks - CME Group (catalog only)"
+    },
+    "src-8b370aaf3e73e5f1b44f": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "45675f0d1623687b019cd4d48993df36390728a780cb6386ddcf4e0236eee34a",
+      "independence_key": "optionalpha",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://optionalpha.com/courses/options-basics"
+      },
+      "pages": [
+        "wiki/sources/Source — Free Options Basics Course - Option Alpha (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Free Options Basics Course - Option Alpha (catalog only)"
+    },
+    "src-8cdf4b433784f73f28eb": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "c1fcaeb76b473008bfbf7846d2f7b43116ff3c68fcd5b7edd14c7778af16ac31",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/advancedconcepts/vega"
+      },
+      "pages": [
+        "wiki/sources/Source — Vega.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Vega"
+    },
+    "src-a4e5a66e1a6df3836798": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "c0af39a3c87dd16463c253787e8337ccd776beee44c38ad8ed52f03c67a0c18b",
+      "independence_key": "optionalpha",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://optionalpha.com/courses/options-expiration"
+      },
+      "pages": [
+        "wiki/sources/Source — Free Options Expiration Course - Option Alpha (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Free Options Expiration Course - Option Alpha (catalog only)"
+    },
+    "src-a7b9ea5f812f410dc0b2": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "e2e23526c639db0d10d9457f9134a319a1adf257a46b05b2a54ecca78a4b4dda",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/optionsoverview/options-pricing"
+      },
+      "pages": [
+        "wiki/sources/Source — Options Pricing.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Options Pricing"
+    },
+    "src-aba3154d49268a5cc43c": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "fbf7124a24d7553ca1d114e52684ef77cf26b884db40554816035ef900ea6911",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/bear-put-spread"
+      },
+      "pages": [
+        "wiki/sources/Source — Bear Put Spread.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Bear Put Spread"
+    },
+    "src-ae888646fcccf61a210c": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "1430ba0de31deae6f8446a20537d504173dae10f00cfb1655a566e2e7b250d18",
+      "independence_key": "optionalpha",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://optionalpha.com/courses/pricing-volatility"
+      },
+      "pages": [
+        "wiki/sources/Source — Free Volatility and Options Pricing Course - Option Alpha (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Free Volatility and Options Pricing Course - Option Alpha (catalog only)"
+    },
+    "src-c0af20cb851e3d4fbb99": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "eb5d590d89ca595bae9087ceaed32b2a65f654f918650d80f8366373dffa4159",
+      "independence_key": "cme",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.cmegroup.com/education/courses/curriculum-all-about-options"
+      },
+      "pages": [
+        "wiki/sources/Source — Curriculum- All About Options - CME Group (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Curriculum- All About Options - CME Group (catalog only)"
+    },
+    "src-c2b5824ba01cd671c966": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "b827d93a1b28c32d1392e4b80f932d62aba26d0eb17cb8943756675948102bd6",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-call-condor"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Call Condor.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Call Condor"
+    },
+    "src-c7a8affb616754001471": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "104109d5ed17fae973d421294b4cfa6b9ed1743fe04def5443339487cf1ff024",
+      "independence_key": "optionalpha",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://optionalpha.com/courses/neutral-options-strategies"
+      },
+      "pages": [
+        "wiki/sources/Source — Free Neutral Options Strategies Course - Option Alpha (catalog only).md"
+      ],
+      "refresh_due": null,
+      "retrieved_at": "2026-09-01",
+      "review_status": "unreviewed",
+      "supersedes": null,
+      "title": "Source — Free Neutral Options Strategies Course - Option Alpha (catalog only)"
+    },
+    "src-d4cdb16a5623bfe8e132": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "c1a2904ca9db4ac583b56ad633eedbdb05ecdf465ff27c7f780d58a0487bfd13",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write"
+      },
+      "pages": [
+        "wiki/sources/Source — Covered Call (Buy-Write).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Covered Call (Buy-Write)"
+    },
+    "src-ef776a7522b07a9e8966": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "467e29cc1ee711885bb6cbfac3c6e88505c14d49b7de3efc2de92b32e3d0134f",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-01",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/advancedconcepts/delta"
+      },
+      "pages": [
+        "wiki/sources/Source — Options Delta.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-01",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Options Delta"
+    }
+  }
+}

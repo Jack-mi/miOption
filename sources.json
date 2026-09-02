@@ -1,6 +1,42 @@
 {
   "version": 1,
   "actor": "apify/website-content-crawler",
+  "content_scope": {
+    "include": "期权教育与策略内容；若页面主体是期权，也包括期货期权（options on futures）。",
+    "exclude": "不涉及期权的纯期货教育、交易或产品内容。"
+  },
+  "knowledge_policy": {
+    "minimum_text_chars": 1200,
+    "eligible_content_kinds": [
+      "article",
+      "reference",
+      "strategy",
+      "glossary",
+      "text_lesson"
+    ],
+    "candidate_required_fields": [
+      "knowledge_eligible",
+      "knowledge_type",
+      "content_kind",
+      "video",
+      "expected_fields"
+    ],
+    "excluded_url_fragments": [
+      "/videolibrary/",
+      "/video/",
+      "/webinar/",
+      "/podcast/",
+      "/playlist/",
+      "/watch/"
+    ],
+    "excluded_content_markers": [
+      "video lessons",
+      "start course",
+      "learning portal",
+      "explore more courses",
+      "course overview"
+    ]
+  },
   "crawl_policy": {
     "sample_max_pages": 4,
     "max_crawl_pages": 12,
@@ -32,8 +68,7 @@
         "/optionsoverview/",
         "/strategies/",
         "/advancedconcepts/",
-        "/referencelibrary/",
-        "/videolibrary/"
+        "/referencelibrary/"
       ]
     },
     {

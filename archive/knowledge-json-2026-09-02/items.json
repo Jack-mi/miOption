@@ -1,0 +1,541 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "id": "concept.equity_options_basics",
+      "type": "concept",
+      "title": "Equity options basics",
+      "aliases": [
+        "equity option",
+        "calls and puts",
+        "option premium"
+      ],
+      "summary": "Standardized equity options specify an underlying, strike, and expiration. Calls and puts create different holder rights and writer obligations; the premium is the option price.",
+      "terms": [
+        "equity option",
+        "contract multiplier",
+        "call",
+        "put",
+        "premium",
+        "underlying security",
+        "expiration"
+      ],
+      "content": "Options give you options by providing the ability to tailor your position to your situation.\n- You can protect stock holdings from a decline in market price.\n- You can increase income against current stock holdings.\n- You can prepare to buy stock at a lower price.\n- You can position yourself for a big market move, even when you don't know which way prices will move.\n- You can benefit from a stock price's rise or fall without buying the stock outright.\nThe following information provides the basic terms and descriptions for standardized equity options.\n\n- An equity option is a contract that conveys to its holder the right, but not the obligation, to buy (in the case of a call) or sell (in the case of a put) shares of the underlying security at a specified price (the strike price) on or before a given date (expiration day). After this given date, the option ceases to exist. The seller of an option is, in turn, obligated to sell (in the case of a call) or buy (in the case of a put) the shares to (or from) the buyer of the option at the specified price upon the buyer's request.\n- Equity option contracts usually represent 100 shares of the underlying stock.\n- Strike prices (or exercise prices) is the purchase price (in the case of of a long call) or sell price (in the case of a long put) by the option holder upon exercise of the option contract.\n- Equity option strike prices are listed in increments of .5, 1, 2.5, 5 or 10 points, depending on their price level.\n- Adjustments to an equity option contract's size, deliverable and/or strike price may be made to account for stock splits or mergers.\n- Generally, at any given time, you can purchase a particular equity option with one of at least four expiration dates.\n- Equity option holders do not enjoy the rights due stockholders (e.g., voting rights, regular cash or special dividends). A call holder must exercise the option and take ownership of underlying shares to be eligible for these rights.\n- Buyers and sellers set option prices in the exchange markets. All trading is conducted in the competitive manner of an auction market.\n\nThe two types of equity options are calls and puts.\nA call option gives its holder the right to buy 100 shares of the underlying security at the strike price, anytime before the option's expiration date. The writer (or seller) of the option has the obligation to sell the shares.\nThe opposite of a call option is a put option, which gives its holder the right to sell 100 shares of the underlying security at the strike price, anytime before the option's expiration date. The writer (or seller) of the option has the obligation to buy the shares.\n| | | |\n| --- | --- | --- |\n| | Holder (Buyer) | Writer (Seller) |\n| Call Option | Right to buy | Obligation to sell |\n| Put Option | Right to sell | Obligation to buy |\n\nAn option's price is called the premium and is priced at a per share basis. The option holder’s potential loss is limited to the initial premium paid for the contract. Alternately, the writer collects the premium and has theoretically unlimited loss potential for a call option and substantial loss potential for a put option.\nInvestors can use put and call option contracts to take a position in a market using limited capital. The initial investment is limited to the price of the premium.\nInvestors can also use put and call option contracts to actively hedge against market risk. Investors can purchase a put as insurance to protect a stock holding against an unfavorable market move while maintaining stock ownership while calls can be purchased either as a stock substitute or sold to cap upside gains while providing premium income to the investor.\n\nMost equity options that expire in a given month usually expire on the third Friday of the month. Therefore, this third Friday is the last trading day for all standard expiring equity options.\nIf there is an exchange holiday that falls on a Friday, expiration is then moved to the Thursday immediately preceding this holiday.\nMany products now offer short-term options with weekly expirations, so investors should know the exact contract terms, including expiration dates, for all contracts they trade.\nAfter the option's expiration date, the contract ceases to exist. At that point, the owner of the option who does not exercise the contract has no right and the seller has no obligations as previously conveyed by the contract.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.53ee399f5311d51eb263",
+          "source_document_id": "32b651721de087d4",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-basics",
+          "heading": "Options Basics",
+          "line_start": 1,
+          "line_end": 12,
+          "quote": "Options give you options by providing the ability to tailor your position to your situation.\n- You can protect stock holdings from a decline in market price.\n- You can increase income against current stock holdings.\n- You can prepare to buy stock at a lower price.\n- You can position yourself for a big market move, even"
+        },
+        {
+          "chunk_id": "chunk.7c023518ca5a5333d35e",
+          "source_document_id": "32b651721de087d4",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-basics",
+          "heading": "Describing Equity Options",
+          "line_start": 13,
+          "line_end": 23,
+          "quote": "- An equity option is a contract that conveys to its holder the right, but not the obligation, to buy (in the case of a call) or sell (in the case of a put) shares of the underlying security at a specified price (the strike price) on or before a given date (expiration day). After this given date, the option ceases to e"
+        },
+        {
+          "chunk_id": "chunk.1138020409af1af18398",
+          "source_document_id": "32b651721de087d4",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-basics",
+          "heading": "Calls and Puts",
+          "line_start": 24,
+          "line_end": 37,
+          "quote": "The two types of equity options are calls and puts.\nA call option gives its holder the right to buy 100 shares of the underlying security at the strike price, anytime before the option's expiration date. The writer (or seller) of the option has the obligation to sell the shares.\nThe opposite of a call option is a put o"
+        },
+        {
+          "chunk_id": "chunk.034905f8cb1f0a2d5b12",
+          "source_document_id": "32b651721de087d4",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-basics",
+          "heading": "The Options Premium",
+          "line_start": 38,
+          "line_end": 45,
+          "quote": "An option's price is called the premium and is priced at a per share basis. The option holder’s potential loss is limited to the initial premium paid for the contract. Alternately, the writer collects the premium and has theoretically unlimited loss potential for a call option and substantial loss potential for a put o"
+        },
+        {
+          "chunk_id": "chunk.29c6803b676f86e8b4ad",
+          "source_document_id": "32b651721de087d4",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-basics",
+          "heading": "Expiration Friday",
+          "line_start": 50,
+          "line_end": 58,
+          "quote": "Most equity options that expire in a given month usually expire on the third Friday of the month. Therefore, this third Friday is the last trading day for all standard expiring equity options.\nIf there is an exchange holiday that falls on a Friday, expiration is then moved to the Thursday immediately preceding this hol"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "concept.option_contract",
+      "type": "concept",
+      "title": "Option contract",
+      "aliases": [
+        "option",
+        "call",
+        "put",
+        "option writer"
+      ],
+      "summary": "An option gives its holder a contract right; the writer has the corresponding obligation if assigned. Calls and puts express opposite buy or sell rights in the underlying.",
+      "terms": [
+        "underlying",
+        "strike price",
+        "expiration",
+        "call",
+        "put",
+        "exercise",
+        "assignment",
+        "writer"
+      ],
+      "content": "For equity options, the underlying instrument is a stock, ETF or similar product. The contract itself is very precise. It establishes a specific price, called the strike price, at which the contract may be exercised, or acted upon.\nContracts also have an expiration date. When an option expires, it no longer has value and no longer exists.\nOptions come in two varieties, calls and puts. You can buy or sell either type. You decide whether to buy or sell and choose a call or a put based on objectives as an options investor.\n\nIf you buy a call, you have the right to buy the underlying instrument at the strike price on or before expiration. If you buy a put, you have the right to sell the underlying instrument on or before expiration. In either case, the option holder has the right to sell the option to another buyer during its term or to let it expire worthless.\nThe situation is different if you write or sell to open an option. Selling to open a short option position obligates the writer to fulfill their side of the contract if the option holder wishes to exercise.\nWhen you sell a call as an opening transaction, you're obligated to sell the underlying interest at the strike price, if assigned. When you sell a put as an opening transaction, you're obligated to buy the underlying interest, if assigned.\nAs a writer, you have no control over whether or not a contract is exercised, and you must recognize that exercise is possible at any time before expiration. However, just as the buyer can sell an option back into the market rather than exercising it, a writer can purchase an offsetting contract to end their obligation to meet the terms of a contract provided they have not been assigned. To offset a short option position, you would enter a buy to close transaction.\n\nWhen you buy an option, the purchase price is called the premium. If you sell, the premium is the amount you receive. The premium isn't fixed and changes constantly. The premium is likely to be higher or lower today than yesterday or tomorrow. Changing prices reflect the give and take between what buyers are willing to pay and what sellers are willing to accept for the option. The point of agreement becomes the price for that transaction. The process then begins again.\nIf you buy options, you begin with a net debit. That means you've spent money you might never recover if you don't sell your option at a profit or exercise it. If you do make money on a transaction, you must subtract the cost of the premium from any income to find net profit.\nAs a seller, you begin with a net credit because you collect the premium. If the option is never exercised, you keep the money. If the option is exercised, you still keep the premium but are obligated to buy or sell the underlying stock if assigned.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.fc07411f550865632a2f",
+          "source_document_id": "a82e55e852651d75",
+          "source_url": "https://www.optionseducation.org/optionsoverview/what-is-an-option",
+          "heading": "What is an Option?",
+          "line_start": 1,
+          "line_end": 8,
+          "quote": "For equity options, the underlying instrument is a stock, ETF or similar product. The contract itself is very precise. It establishes a specific price, called the strike price, at which the contract may be exercised, or acted upon.\nContracts also have an expiration date. When an option expires, it no longer has value a"
+        },
+        {
+          "chunk_id": "chunk.98a1020991591eb7126f",
+          "source_document_id": "a82e55e852651d75",
+          "source_url": "https://www.optionseducation.org/optionsoverview/what-is-an-option",
+          "heading": "Buying and Selling",
+          "line_start": 9,
+          "line_end": 18,
+          "quote": "If you buy a call, you have the right to buy the underlying instrument at the strike price on or before expiration. If you buy a put, you have the right to sell the underlying instrument on or before expiration. In either case, the option holder has the right to sell the option to another buyer during its term or to le"
+        },
+        {
+          "chunk_id": "chunk.5639d30001c4ad0f9bb4",
+          "source_document_id": "a82e55e852651d75",
+          "source_url": "https://www.optionseducation.org/optionsoverview/what-is-an-option",
+          "heading": "At a Premium",
+          "line_start": 19,
+          "line_end": 26,
+          "quote": "When you buy an option, the purchase price is called the premium. If you sell, the premium is the amount you receive. The premium isn't fixed and changes constantly. The premium is likely to be higher or lower today than yesterday or tomorrow. Changing prices reflect the give and take between what buyers are willing to"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "greek.delta",
+      "type": "greek",
+      "title": "Delta",
+      "aliases": [
+        "option delta"
+      ],
+      "summary": "Delta estimates how much an option premium may change for a one-dollar move in the underlying, all else equal. Delta itself changes with moneyness, time to expiration, and implied volatility.",
+      "terms": [
+        "delta",
+        "moneyness",
+        "underlying price",
+        "implied volatility",
+        "time to expiration"
+      ],
+      "content": "Delta is a theoretical estimate of how much an option’s premium may change given a $1 move in the underlying. For an option with a Delta of .50, an investor can expect about a $.50 move in that option’s premium given a $1 move, up or down, in the underlying. For purchased options owned by an investor, Delta is between 0 and 1.00 for calls and 0 and -1.00 for puts. For sold options, as the investor essentially has a negative quantity of contracts, we find that short puts have a positive Delta (technically a negative Delta multiplied by a negative number of contracts); short calls have negative Delta (technically a positive Delta times a negative number of contracts).\nFor example, with stock trading at $20.50, a $20 call option might be trading for a quoted premium of $2 and an option Delta of .50. If share prices rise $1 to $21.50, it would be expected for the value of the option to increase to $2.50 all other pricing factors remaining constant. As seen below:\n- $1 increase in underlying price x .50 Delta = $.50 anticipated change in option premium.\n- Original Premium: $2.00 + $.50 estimated change = $2.50 estimated new premium after $1 stock price increase.\nIf share prices fall by $1, this same $20 call option would be expected to lose $.50 in value, all other pricing factors remaining constant.\nAs the stock price rises and the call option goes deeper-in-the-money, Delta typically approaches 1.00 because of the increased likelihood the option will be in-the-money at expiration. As expiration approaches, in-the-money-option Deltas are also more likely to be moving slowly toward 1.00 because at expiration an option either has a Delta of either 0 or 1.00 with no time premium remaining.\n\n- On a given day, an OICX call has a Delta of .50 (50%)\n- Current value $3.50\n- OICX stock goes up $1:\n- Call will theoretically increase by 50% of stock move\n- $1.00 x .50 = $.50\n- Expected call value = $3.50 current + $.50 = $4.00\n- OICX stock goes up $.60:\n- Call will theoretically increase by $.60 x .50 = $0.30\n- Expected call value = $3.50 current + $.30 = $3.80\n\nCall Deltas range from 0.00 to 1.00 while put Delta ranges from 0.00 to -1.00. Remember long calls have positive Delta; conversely short calls have negative Delta. Long puts have negative Delta; short puts have positive Delta. The closer an option's Delta is to 1.00 or -1.00, the more the price of the option responds (in terms of dollars) to actual long or short stock when the underlying moves. Here is a quick chart for reference:\n- Calls have positive Deltas (as generated by model)\n- Positive correlation to underlying stock price change\n- Stock price ↑ then call Delta tends to go up ↑\n- Stock price ↓ then call Delta tends to go ↓\n- Call Deltas range from 0 to +1.00\n- Puts have negative Deltas (as generated by model)\n- Negative correlation to underlying stock price change\n- Stock price ↑ then put Delta tends to go ↓\n- Stock price ↓ then put Delta tends to go ↑\n- Put Deltas range from 0 to –1.00\nStock price, days remaining to expiration and implied volatility will impact Delta. With an increase in implied volatility, Delta gravitates toward .50 as more and more strikes are now considered possibilities for winding up in-the-money because of the perceived potential for movement in the underlying. For example, the 20 strike call in XYZ may have a .60 Delta with the stock at $21 and implied volatility at 30%. If implied volatility were to increase to 40%, the Delta may decrease to .55 as traders perceive an increased likelihood that the strike might be out-of-the-money at expiration.\n\nAbove we can see that higher implied volatilities lead to more strikes being ‘in play’ and more Deltas closer to .50. Low implied volatility stocks will tend to have higher Delta for the in-the-money options and lower Delta for out-of-the-money options.\nSome traders view Delta as a percentage probability an option will wind up in-the-money at expiration. Therefore, an at-the-money option would have a .50 Delta or 50% chance of being in-the-money at expiration. Deep-in-the-money options will have a much larger Delta or much higher probability of expiring in-the-money.\nLooking at the Delta of a far-out-of-the-money option might give an investor an idea of its likelihood of having value at expiration. An option with less than a .10 Delta (or less than 10% probability of being in-the-money) is not viewed as very likely to be in-the-money at any point and will need a strong move from the underlying to have value at expiration.\nTime remaining until expiration will also have an effect on Delta. Looking at the same strike, an in-the-money call with longer time until expiration will always have a lower Delta than the same strike call with less time until expiration. It is just the opposite for out-of-the-money calls; the call with a longer amount of time until expiration will have the higher Delta than the option with less time.\nAs expiration nears, in-the-money call Deltas increase toward 1.00, at-the-money call Deltas remain around .50 and out-of-the-money call Deltas fall toward 0 provided other inputs remain constant.\nIt is important to remember that Delta is constantly changing during market hours and will typically not accurately predict the exact change in an option’s premium.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.2226dd8effdbfc0236f2",
+          "source_document_id": "306dfc82d7afd0de",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/delta",
+          "heading": "Options Delta",
+          "line_start": 1,
+          "line_end": 12,
+          "quote": "Delta is a theoretical estimate of how much an option’s premium may change given a $1 move in the underlying. For an option with a Delta of .50, an investor can expect about a $.50 move in that option’s premium given a $1 move, up or down, in the underlying. For purchased options owned by an investor, Delta is between "
+        },
+        {
+          "chunk_id": "chunk.396f1a4fa77a26d0fc7f",
+          "source_document_id": "306dfc82d7afd0de",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/delta",
+          "heading": "Here is a look at a call Delta and how it might move:",
+          "line_start": 13,
+          "line_end": 24,
+          "quote": "- On a given day, an OICX call has a Delta of .50 (50%)\n- Current value $3.50\n- OICX stock goes up $1:\n- Call will theoretically increase by 50% of stock move\n- $1.00 x .50 = $.50\n- Expected call value = $3.50 current + $.50 = $4.00\n- OICX stock goes up $.60:\n- Call will theoretically increase by $.60 x .50 = $0.30\n- E"
+        },
+        {
+          "chunk_id": "chunk.a78c7a2899d0f0ca5dbc",
+          "source_document_id": "306dfc82d7afd0de",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/delta",
+          "heading": "The following graph illustrates how Delta might be plotted against stock price:",
+          "line_start": 25,
+          "line_end": 43,
+          "quote": "Call Deltas range from 0.00 to 1.00 while put Delta ranges from 0.00 to -1.00. Remember long calls have positive Delta; conversely short calls have negative Delta. Long puts have negative Delta; short puts have positive Delta. The closer an option's Delta is to 1.00 or -1.00, the more the price of the option responds ("
+        },
+        {
+          "chunk_id": "chunk.575a85127dca7309c0bb",
+          "source_document_id": "306dfc82d7afd0de",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/delta",
+          "heading": "Here is a look at how implied volatility changes can alter Delta:",
+          "line_start": 44,
+          "line_end": 60,
+          "quote": "Above we can see that higher implied volatilities lead to more strikes being ‘in play’ and more Deltas closer to .50. Low implied volatility stocks will tend to have higher Delta for the in-the-money options and lower Delta for out-of-the-money options.\nSome traders view Delta as a percentage probability an option will"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "greek.gamma",
+      "type": "greek",
+      "title": "Gamma",
+      "aliases": [
+        "option gamma"
+      ],
+      "summary": "Gamma estimates how Delta may change when the underlying moves. It is generally highest around at-the-money options and closer to expiration, where Delta changes more quickly.",
+      "terms": [
+        "gamma",
+        "delta",
+        "at-the-money",
+        "expiration",
+        "implied volatility"
+      ],
+      "content": "How Delta is expected to change given a $1 move in the underlying is called Gamma. An investor can see how the Delta will affect an option's price given a $1 move in the underlying, but to see how the Delta on that option might change given the same $1.00 move, we refer to Gamma.\nLooking at a hypothetical example, OICX is trading at $50 per share. The OICX Jan $50 call is trading for $2, has a Delta of .50 and a Gamma of .06. Should OICX go up to $51, an investor can estimate that the $50 strike call will now be worth around $2.50. The new Delta of this $50 strike call at an OICX price of $51 should be around 0.56 (simply adding the Gamma of .06 to the old Delta of .50).\n\nFor the purpose of adjusting Delta amounts, round Gamma to two decimal places\n- A call has a Delta of .54 and Gamma of .0400 (.04)\n- Stock goes up $1\n- Delta will become more positive by the Gamma amount\n- New Delta value: .58\n- Another call has a Delta of .75 and Gamma of .0340 (.03)\n- Stock is down $1\n- Delta will become less positive by Gamma amount\n- New approximate Delta value: .72\nLong options, either calls or puts, always yield positive Gamma. Short calls and short puts will have negative Gamma. Underlying stock positions will not have Gamma because their Delta is always 1.00 (long) or -1.00 (short) and will not change. Positive Gamma means that the Delta of long calls will become more positive and move toward +1.00 when the stock price rises, and less positive and move toward 0 when the stock price falls. Long Gamma also means that the Delta of a long put will become more negative and move toward –1.00 if the stock price falls, and less negative and move toward 0 when the stock price rises. For a short call with negative Gamma, the Delta will become more negative as the stock rises, and less negative as it drops.\nGamma is higher for options that are at-the-money and closer to expiration. A front-month, at-the-money option will have more Gamma than a LEAPS® option with the same strike because the Delta of the near term options move toward either 0 or 1.00 is imminent. With higher Gamma, investors can see more dramatic shifts in Delta as the underlying moves, especially with the underlying around the strike at expiration.\nGamma is lower in the longer-dated LEAPS® as more strikes remain possibilities for being in-the-money at expiration because of the amount of time remaining. An at-the-money-option’s Delta is typically the most sensitive to moves in the underlying (hence higher Gamma). With the stock right at a strike at expiration, an option’s Gamma will be at its highest as the Delta will be potentially moving from 1.00 toward 0 or vice versa as the underlying crosses a strike. In these cases, the Gamma can be extremely high as the Delta changes rapidly with the underlying at the strike and expiration approaching.\nDeep-in-the-money or far-out-of-the-money options have lower Gamma than at- the-money options. The deep-in-the-money options already have a high positive or negative Delta. If the options become deeper in-the-money, the Delta will move toward 1.00 (or -1.00 for puts) and the Gamma will decrease because the Delta cannot move past 1.00. If the stock were to move toward the strike of the deep-in-the-money option, the Gamma will increase and the Delta moves lower approximately by the amount of the current Gamma.\nFor example, let’s say OICX is trading at $30. A $25 strike call is trading for $5.80 and has a Delta around .85 and a Gamma of .03. If OICX were to drop to $29, the investor might expect the option premium to drop to $4.95 (as projected by Delta). With stock at $29, the Delta of the option will be decreasing by approximately the amount of the Gamma, so the new Delta at an OICX price of $29 might be .82 (here we subtract the Gamma from the old Delta as the stock price declined by $1). With the stock moving down toward the long strike, Gamma increases and impacts Delta. Should the stock decline to $25, we’d estimate Delta to be around .50. If the Gamma stayed around .03, the option would still have a .70 Delta with the stock at $25. However, since Gamma typically increases as options become closer to at-the-money, the new Gamma of this contract may be around .09.\nGamma is highest when the Delta is in the .40-.60 range, or typically when an option is at-the-money. Deeper-in-the-money or farther-out-of-the-money options have lower Gamma as their Deltas will not change as quickly with movement in the underlying. As Deltas approach 0 or 1.00 (or 0 or -1.00 for puts), Gamma is usually at its lowest point.\nImplied volatility changes will also have an effect on Gamma. As implied volatility decreases, Gamma of at-the-money calls and puts increases. When implied volatility goes higher, the Gamma of both in-the-money and out-of-the-money calls and puts will be decreasing. This occurs because low implied volatility options will have a more dramatic change in Delta when the underlying moves. A high implied volatility underlying product will see less of a Delta change with movement as the possibility of more movement is foreseen.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.d546ddd8e12d445b696f",
+          "source_document_id": "95636a10075badd7",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/gamma",
+          "heading": "Gamma",
+          "line_start": 1,
+          "line_end": 6,
+          "quote": "How Delta is expected to change given a $1 move in the underlying is called Gamma. An investor can see how the Delta will affect an option's price given a $1 move in the underlying, but to see how the Delta on that option might change given the same $1.00 move, we refer to Gamma.\nLooking at a hypothetical example, OICX"
+        },
+        {
+          "chunk_id": "chunk.1dba3cb22977345949e2",
+          "source_document_id": "95636a10075badd7",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/gamma",
+          "heading": "In other examples",
+          "line_start": 7,
+          "line_end": 36,
+          "quote": "For the purpose of adjusting Delta amounts, round Gamma to two decimal places\n- A call has a Delta of .54 and Gamma of .0400 (.04)\n- Stock goes up $1\n- Delta will become more positive by the Gamma amount\n- New Delta value: .58\n- Another call has a Delta of .75 and Gamma of .0340 (.03)\n- Stock is down $1\n- Delta will be"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "greek.theta",
+      "type": "greek",
+      "title": "Theta and time decay",
+      "aliases": [
+        "theta",
+        "time decay"
+      ],
+      "summary": "Theta estimates daily option-premium decay with other factors unchanged. Time decay is not linear and tends to accelerate as expiration approaches.",
+      "terms": [
+        "theta",
+        "time decay",
+        "time value",
+        "expiration",
+        "implied volatility"
+      ],
+      "content": "Both long and short option holders should be aware of the effects of Theta on an option premium. Theta is represented in an actual dollar or premium amount. Theta represents, in theory, how much an option’s premium may decay per day with all other pricing factors remaining the same.\nTheta or time decay is not linear. The theoretical rate of decay will tend to increase as time to expiration decreases. Thus, the amount of decay indicated by Theta tends to be gradual at first and accelerates as expiration approaches. Upon expiration, an option has no time value and is worth its intrinsic value only.. Pricing models take into account weekends, so options will tend to decay seven days over the course of five trading days. However, there is no industry-wide method for decaying options so different models show the impact of time decay differently. If a pricing model is decaying options too quickly, current markets may look too high when compared to the model’s theoretical values, and if the model is displaying the decay as too slowly, the current markets may look too cheap compared to your model’s theoretical values.\nIf stock was trading for $50 and a $50 strike call as trading at $3 with a Theta of .05, an investor would anticipate that option to lose about $.05 per day, all things being equal. If a day passed without a change in the option price, then one of the other variables must have changed. In most cases, it would likely have been an increase in implied volatility. If the option decreased more than $.05 an investor might deduce that implied volatility on that strike or product might have dropped as well. And as expiration approaches, it is likely Theta would become increasingly negative.\nHere is an example of how Theta tends to behave over time. A constant 40% implied volatility is being used on a 50 strike call option with OICX equal to $50. This example, which was derived using OIC pricing calculators, assumes an interest rate of 2% and no changes to implied volatility or the underlying price during the life of the option.\nNote how quickly time premium begins to decay around 30 days prior to expiration. We can see that Theta is not a linear progression as the option advances toward expiration. Rather, options with the least remaining time until expiration will tend to decay the most. The at-the-money call is the most vulnerable to a lack of movement in the underlying.\nThe implied volatility of a product will determine the amount of time premium, and in turn affect Theta amounts. In general, the higher the implied volatility levels, the higher the Theta amount. This does not mean that investors can sell options in high implied volatility stocks and expect to earn time decay right away. Many times, options trade at elevated implied volatility levels because of the actual historical volatility or because of an earnings announcement, product announcement, etc. Here is a chart that looks at general Theta amounts for different implied volatilities:\nAt-the-money options will have the most exposure to time decay. And, as the chart shows, options that are either deep-in-the-money or far out-of-the-money will have very little decay as they have less time premium. Also, because of the fact that calls have unlimited upside and that option premiums represent a hedged value (some institutional investors and market makers receive a credit for hedging their long calls with short stock, driving the call prices slightly higher) call prices will tend to trade slightly over put premiums.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.e2d86e0d443d321f0d84",
+          "source_document_id": "a0e82e52694688d2",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/theta",
+          "heading": "Theta",
+          "line_start": 1,
+          "line_end": 21,
+          "quote": "Both long and short option holders should be aware of the effects of Theta on an option premium. Theta is represented in an actual dollar or premium amount. Theta represents, in theory, how much an option’s premium may decay per day with all other pricing factors remaining the same.\nTheta or time decay is not linear. T"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "greek.vega",
+      "type": "greek",
+      "title": "Vega and implied volatility sensitivity",
+      "aliases": [
+        "vega",
+        "implied volatility sensitivity"
+      ],
+      "summary": "Vega measures the option premium's sensitivity to a one-percentage-point change in implied volatility. Longer-dated options generally have higher Vega than near-term options.",
+      "terms": [
+        "vega",
+        "implied volatility",
+        "option premium",
+        "term"
+      ],
+      "content": "Vega measures an option’s sensitivity to changes in implied volatility. Implied volatility is measured in percentage terms and is a key variable in pricing models. Implied volatility has no direct correlation to actual past historical or statistical volatility; rather it is a measure of predicted future movement. Implied volatility tends to increase when there is uncertainty or anticipated news, while it tends to decrease in times of calm. Some investors use a stock’s historical volatility as an indication of where the implied volatility should be, but the market is the ultimate determining factor of current implied volatility levels. Also, Vega and implied volatility can change without any movement in the underlying.\nIf we know what the current market premiums are for the calls and the puts on a certain strike, we can solve for the implied volatility using the OIC Calculators. The calculators provide the Greeks including Vega. If a large sell order came into the market and the price of the option declined due to lack of interested buyers at the current price, we would see a decline in the implied volatility if there were no change in the other assumptions. Increased demand and higher premiums mean an increase in implied volatility. Changes in implied volatility can also impact the other Greeks like Delta and Gamma so traders should be aware how the Greeks work together.\nVega measures the amount of increase or decrease in premium based on a 1% (100 basis points) change in the implied volatility assumption. Longer-term options tend to have higher Vega than near-term options. Longer-termed options are typically more expensive, and a 1% change in implied volatility will represent a larger dollar amount of that premium than an option with a lower premium. If OICX were trading $50 and front-month $50 call was trading $2 and the 12-month-out $50 call was trading $5, the more expensive call would be more profoundly affected by a 1% change in implied volatility. To increase in price by identical amounts, the near term option’s implied volatility would have to have gone up around 2.5x that of the longer-termed option.\nFor example, OICX is trading at $50, a call with 12 months until expiration has an implied volatility of 30%, a Vega of .15, and a current market value of $4. If implied volatility were to instantly rise 2% to 32%, the investor might expect the option premium to increase by: .15 X 2 = $.30 to around $4.30, all things being equal. A decrease in implied volatility by 5% may result in the option losing around: .15 X 5 = $.75 in value. As we can see, changes in implied volatility can have drastic effects on an option price, probably second only to underlying price in importance.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.de849b9fdbb34ce711d8",
+          "source_document_id": "b33e35b91e19dcfc",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/vega",
+          "heading": "Vega",
+          "line_start": 1,
+          "line_end": 9,
+          "quote": "Vega measures an option’s sensitivity to changes in implied volatility. Implied volatility is measured in percentage terms and is a key variable in pricing models. Implied volatility has no direct correlation to actual past historical or statistical volatility; rather it is a measure of predicted future movement. Impli"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "lifecycle.exercise_assignment",
+      "type": "lifecycle",
+      "title": "Exercise, assignment, and expiration",
+      "aliases": [
+        "option exercise",
+        "assignment",
+        "early assignment"
+      ],
+      "summary": "Exercise moves a contract into its delivery obligation, and assignment can be allocated to a short position before expiration. Closing a written option before the market close is the way to avoid assignment for that day.",
+      "terms": [
+        "exercise",
+        "assignment",
+        "American-style option",
+        "early exercise",
+        "expiration"
+      ],
+      "content": "They first must direct their brokerage firm to submit an exercise notice to OCC. For an option holder to ensure that they exercise the option on that particular day, the holder must notify his brokerage firm before that day’s cut-off time for accepting exercise instructions.\nThe brokerage firm notifies OCC that an option holder wishes to exercise an option. OCC then randomly assigns the exercise notice to a clearing member. For an investor, this is generally his brokerage firm chosen at random from a total pool of such firms. The firm must then assign one of its customers who has written (and not covered) that particular option.\nAssignment to a customer is either random or on a first-in-first-out basis. This depends on the firm’s method. Ask your brokerage firm which method it uses for assignments.\n\nThe holder of an American-style option contract can exercise the option at any time before expiration. Therefore, an option writer may be assigned an exercise notice on a short option position at any time before expiration. If an option writer is short an option that expires in-the-money, they should expect assignment on that contract, though assignment is not guaranteed as some long in-the-money option holders may elect not to exercise in-the-money options. In fact, some option writers are assigned on short contracts when they expire exactly at-the-money or even out-of-the money. This occurrence is usually not predictable.\nTo avoid assignment on a written option contract on a given day, the position must be closed out before that day's market close. Once assignment is received, an investor has no alternative but to fulfill assignment obligations per the terms of the contract.\nThere is generally no exercise or assignment activity on options that expire out-of-the-money. Owners usually let them expire with no value. Although this is not always the case as post-market underlying moves may lead to out-of-the-money options being exercised and in-the-money options not being exercised.\nREAD MORE ON ASSIGNMENT (PDF)\n\nFor call contracts, owners might exercise early to own the underlying stock to receive a dividend. Check with your brokerage firm on the advisability of early call exercise.\nIt is extremely important to realize that assignment of exercise notices can occur early, days or weeks in advance of expiration day. Investors should expect this as expiration nears with a call considerably in-the-money and a sizeable dividend payment approaching. Call writers should be aware of dividend dates and the possibility of early assignment.\nWhen puts become deep in-the-money, most professional option traders exercise before expiration. Therefore, investors with short positions in deep in-the-money puts should be prepared for the possibility of early assignment on these contracts.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.a9153ef71253af3102ef",
+          "source_document_id": "fb8ce48c80fbd468",
+          "source_url": "https://www.optionseducation.org/optionsoverview/exercising-options",
+          "heading": "Exercising Options",
+          "line_start": 1,
+          "line_end": 8,
+          "quote": "They first must direct their brokerage firm to submit an exercise notice to OCC. For an option holder to ensure that they exercise the option on that particular day, the holder must notify his brokerage firm before that day’s cut-off time for accepting exercise instructions.\nThe brokerage firm notifies OCC that an opti"
+        },
+        {
+          "chunk_id": "chunk.418e2469436fe34da11e",
+          "source_document_id": "fb8ce48c80fbd468",
+          "source_url": "https://www.optionseducation.org/optionsoverview/exercising-options",
+          "heading": "Assignment",
+          "line_start": 9,
+          "line_end": 18,
+          "quote": "The holder of an American-style option contract can exercise the option at any time before expiration. Therefore, an option writer may be assigned an exercise notice on a short option position at any time before expiration. If an option writer is short an option that expires in-the-money, they should expect assignment "
+        },
+        {
+          "chunk_id": "chunk.70ea97617bef47372039",
+          "source_document_id": "fb8ce48c80fbd468",
+          "source_url": "https://www.optionseducation.org/optionsoverview/exercising-options",
+          "heading": "Early Exercise/Assignment",
+          "line_start": 25,
+          "line_end": 31,
+          "quote": "For call contracts, owners might exercise early to own the underlying stock to receive a dividend. Check with your brokerage firm on the advisability of early call exercise.\nIt is extremely important to realize that assignment of exercise notices can occur early, days or weeks in advance of expiration day. Investors sh"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "pricing.option_premium",
+      "type": "pricing",
+      "title": "Option premium and pricing drivers",
+      "aliases": [
+        "options pricing",
+        "intrinsic value",
+        "time value"
+      ],
+      "summary": "An option premium is composed of intrinsic value and time value. Underlying price, strike, time to expiration, implied volatility, dividends, and interest rates affect the premium.",
+      "terms": [
+        "premium",
+        "intrinsic value",
+        "time value",
+        "implied volatility",
+        "strike",
+        "expiration"
+      ],
+      "content": "An option’s premium has two main components: intrinsic value and time value.\n\nA call option is in-the-money when the underlying security's price is higher than the strike price.\n\nA put option is in-the-money if the underlying security's price is less than the strike price. Only in-the-money options have intrinsic value. It represents the difference between the current price of the underlying security and the option's exercise price, or strike price.\n\nTime value is any premium in excess of intrinsic value before expiration. Time value is often explained as the amount an investor is willing to pay for an option above its intrinsic value. This amount reflects hope that the option’s value increases before expiration due to a favorable change in the underlying security’s price. The longer the amount of time available for market conditions to work to an investor's benefit, the greater the time value.\n\nFactors having a significant effect on options premium include:\n- Underlying price\n- Strike\n- Time until expiration\n- Implied volatility\n- Dividends\n- Interest rate\nDividends and risk-free interest rate have a lesser effect.\nChanges in the underlying security price can increase or decrease the value of an option. These price changes have opposite effects on calls and puts. For instance, as the value of the underlying security rises, a call will generally increase. However, the value of a put will generally decrease in price. A decrease in the underlying security's value generally has the opposite effect.\nThe strike price determines whether an option has intrinsic value. An option's premium (intrinsic value plus time value) generally increases as the option becomes further in-the-money. It decreases as the option becomes more deeply out-of-the-money.\nTime until expiration, as discussed above, affects the time value component of an option's premium. Generally, as expiration approaches, the levels of an option's time value decrease or erode for both puts and calls. This effect is most noticeable with at-the-money options.\nThe effect of implied volatility is subjective and difficult to quantify. It can significantly affect the time value portion of an option's premium. Volatility is a measure of risk (uncertainty), or variability of price of an option's underlying security. Higher volatility estimates indicate greater expected fluctuations (in either direction) in underlying price levels. This expectation generally results in higher option premiums for puts and calls alike. It is most noticeable with at-the-money options.\nThe effect of an underlying security's dividends and the current risk-free interest rate has a small but measurable effect on option premiums. This effect reflects the cost to carry shares in an underlying security. Cost of carry is the potential interest paid for margin or received from alternative investments (such as a Treasury bill) and the dividends from owning shares outright. Pricing takes into account an option’s hedged value so dividends from stock and interest paid or received for stock positions used to hedge options are a factor.\nPlease visit our learning resources by topic pages to learn more about Options Pricing.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.9c22a744a6e9928561da",
+          "source_document_id": "4a631c9d54364d94",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-pricing",
+          "heading": "Options Pricing",
+          "line_start": 1,
+          "line_end": 4,
+          "quote": "An option’s premium has two main components: intrinsic value and time value."
+        },
+        {
+          "chunk_id": "chunk.16846770ebeef576d809",
+          "source_document_id": "4a631c9d54364d94",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-pricing",
+          "heading": "Intrinsic Value (Calls)",
+          "line_start": 5,
+          "line_end": 10,
+          "quote": "A call option is in-the-money when the underlying security's price is higher than the strike price."
+        },
+        {
+          "chunk_id": "chunk.2896cb8af54b9655022e",
+          "source_document_id": "4a631c9d54364d94",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-pricing",
+          "heading": "Intrinsic Value (Puts)",
+          "line_start": 11,
+          "line_end": 14,
+          "quote": "A put option is in-the-money if the underlying security's price is less than the strike price. Only in-the-money options have intrinsic value. It represents the difference between the current price of the underlying security and the option's exercise price, or strike price."
+        },
+        {
+          "chunk_id": "chunk.d3bcf3f6e1432fc8b41e",
+          "source_document_id": "4a631c9d54364d94",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-pricing",
+          "heading": "Time Value",
+          "line_start": 15,
+          "line_end": 18,
+          "quote": "Time value is any premium in excess of intrinsic value before expiration. Time value is often explained as the amount an investor is willing to pay for an option above its intrinsic value. This amount reflects hope that the option’s value increases before expiration due to a favorable change in the underlying security’"
+        },
+        {
+          "chunk_id": "chunk.bb0173f5b0991b2434a2",
+          "source_document_id": "4a631c9d54364d94",
+          "source_url": "https://www.optionseducation.org/optionsoverview/options-pricing",
+          "heading": "Major Factors Influencing Options Premium",
+          "line_start": 19,
+          "line_end": 42,
+          "quote": "Factors having a significant effect on options premium include:\n- Underlying price\n- Strike\n- Time until expiration\n- Implied volatility\n- Dividends\n- Interest rate\nDividends and risk-free interest rate have a lesser effect.\nChanges in the underlying security price can increase or decrease the value of an option. These"
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "risk_rule.options_risk_and_hedging",
+      "type": "risk_rule",
+      "title": "Options risk, leverage, and hedging",
+      "aliases": [
+        "option risk",
+        "options hedging",
+        "leverage"
+      ],
+      "summary": "Options can hedge an existing position, but all option positions carry risk. A holder can lose the premium paid, while certain uncovered writer positions can have much larger or unlimited loss exposure.",
+      "terms": [
+        "hedging",
+        "leverage",
+        "premium loss",
+        "uncovered call",
+        "principal risk"
+      ],
+      "content": "Transactions generally require less capital than equivalent stock transactions. They may return smaller dollar figures but a potentially greater percentage of the investment than equivalent stock transactions.\nEven investors who use options in speculative strategies such as writing uncovered calls don't usually realize dramatic returns. The potential profit is limited to the premium received for the contract. The potential loss is often unlimited. While leverage means the percentage returns can be significant, the amount of cash required is smaller than equivalent stock transactions.\nAlthough options may not be appropriate for all investors, they're among the most flexible of investment choices. Depending on the contract, options can protect or enhance the portfolios of many different kinds of investors in rising, falling and neutral markets.\n\nFor many investors, options are useful tools of risk management. They act as insurance policies against a drop in stock prices.For example, if an investor is concerned that the price of their shares are about to drop, they can purchase puts that give the right to sell the stock at the strike price, no matter how low the market price drops before expiration. At the cost of the option's premium, the investor has insured themselves against losses below the strike price. This type of option practice is also known as hedging.\nWhile hedging with options may help manage risk, it's important to remember that all investments carry some risk. Returns are never guaranteed. Investors who use options to manage risk look for ways to limit potential loss. They may choose to purchase options, since loss is limited to the price paid for the premium. In return, they gain the right to buy or sell the underlying security at an acceptable price. They can also profit from a rise in the value of the option's premium, if they choose to sell it back to the market rather than exercise it. Since writers of options are sometimes forced into buying or selling stock at an unfavorable price, the risk associated with certain short positions may be higher.\nMany options strategies are designed to minimize risk by hedging existing portfolios. While options act as safety nets, they're not risk free. Since transactions usually open and close in the short term, gains can be realized quickly. Losses can mount as quickly as gains. It's important to understand risks associated with holding, writing, and trading options before you include them in your investment portfolio.\n\nLike other securities including stocks, bonds and mutual funds, options carry no guarantees. Be aware that it's possible to lose the entire principal invested, and sometimes more. As an options holder, you risk the entire amount of the premium you pay.\nBut as an options writer, you take on a much higher level of risk. For example, if you write an uncovered call, you face unlimited potential loss, since there is no cap on how high a stock price can rise.\nSince initial options investments usually require less capital than equivalent stock positions, your potential cash losses as an options investor are usually smaller than if you'd bought the underlying stock or sold the stock short. The exception to this general rule occurs when you use options to provide leverage. Percentage returns are often high, but percentage losses can be high as well.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.e1b8951c41932409ea14",
+          "source_document_id": "ee77ad9374aabbe8",
+          "source_url": "https://www.optionseducation.org/optionsoverview/what-are-the-benefits-risks",
+          "heading": "What are the Benefits & Risks?",
+          "line_start": 1,
+          "line_end": 8,
+          "quote": "Transactions generally require less capital than equivalent stock transactions. They may return smaller dollar figures but a potentially greater percentage of the investment than equivalent stock transactions.\nEven investors who use options in speculative strategies such as writing uncovered calls don't usually realize"
+        },
+        {
+          "chunk_id": "chunk.0b54ad78091a9bdd2f80",
+          "source_document_id": "ee77ad9374aabbe8",
+          "source_url": "https://www.optionseducation.org/optionsoverview/what-are-the-benefits-risks",
+          "heading": "Reducing Your Risk",
+          "line_start": 9,
+          "line_end": 16,
+          "quote": "For many investors, options are useful tools of risk management. They act as insurance policies against a drop in stock prices.For example, if an investor is concerned that the price of their shares are about to drop, they can purchase puts that give the right to sell the stock at the strike price, no matter how low th"
+        },
+        {
+          "chunk_id": "chunk.1aab641d07608f7cfe0f",
+          "source_document_id": "ee77ad9374aabbe8",
+          "source_url": "https://www.optionseducation.org/optionsoverview/what-are-the-benefits-risks",
+          "heading": "Risking Your Principal",
+          "line_start": 17,
+          "line_end": 23,
+          "quote": "Like other securities including stocks, bonds and mutual funds, options carry no guarantees. Be aware that it's possible to lose the entire principal invested, and sometimes more. As an options holder, you risk the entire amount of the premium you pay.\nBut as an options writer, you take on a much higher level of risk. "
+        }
+      ],
+      "status": "published"
+    },
+    {
+      "id": "strategy_principles.option_strategy_design",
+      "type": "strategy",
+      "title": "Option strategy design and payoff principles",
+      "aliases": [
+        "risk-defined strategy",
+        "unlimited-risk strategy",
+        "payoff diagram"
+      ],
+      "summary": "Option strategies can be used to hedge, generate income, or express a directional or neutral view. Risk-defined and uncovered positions differ materially in maximum loss, margin needs, and payoff shape.",
+      "terms": [
+        "risk-defined",
+        "unlimited risk",
+        "payoff diagram",
+        "spread",
+        "hedging",
+        "income"
+      ],
+      "content": "Options enable investors to use many different strategies to achieve their desired financial goals. There are three primary reasons to trade options: to protect or “hedge” a position, to generate income, or to speculate on the future price movement of an asset.\nOptions traders can purchase or sell different options contracts to tailor positions to their market expectations. Options strategies can benefit from directional moves or from stock prices staying within a defined range. Strategies vary significantly from single-leg options to more complex multi-leg positions with long and short options.\n\nRisk defined strategies are positions where the maximum loss is defined at trade entry. Risk defined strategies can be used to create a maximum loss scenario and help investors manage downside exposure. Single-leg long options have a maximum loss limited to the cost when the position is opened.\nFor example, purchasing a long call or put option for $2.50 means the most that can be lost on the position is $250 per contract, no matter what happens with the underlying asset.\nMulti-leg options can be used to define risk by simultaneously buying and selling long and short contracts. With multi-leg options strategies, profit potential may also be defined. With net debit multi-leg strategies, the loss is still limited to the original debit paid, and profit may be limited to the width of the spread minus the cost of the trade.\nFor example, a $5 wide debit spread that costs $2.00 has a max loss of $200 and a max gain of $300 per contract. Short multi-leg options collect a credit when the contract is opened. The credit received is the maximum amount that can be gained. The maximum loss in a risk defined strategy is the width of the spread minus the credit received.\nRisk defined options strategies have lower margin requirements than unlimited risk strategies, reducing the capital needed to initiate the position.\n\nUnlimited risk strategies have an undefined or unlimited risk of loss at trade entry. Unlimited risk is a possibility with naked or uncovered options selling.\nFor example, when selling a naked call option, the option writer is required to sell shares at the strike price if assigned stock. Because stock can potentially go up indefinitely, the risk is not defined. Selling a call option with a $100 strike price for $2.00 has $200 of potential profit but unlimited maximum loss if the underlying stock rises significantly.\nUnlike risk defined strategies, naked options require more margin to be held in the account and more capital to hold the position. The margin needed to hold an unlimited risk strategy may not be static. If volatility in the market rises, margin requirements may increase because the brokerage firm wants to ensure enough money is in the account to cover an assignment in the underlying asset.\n\nPayoff diagrams illustrate where options strategies will make or lose money at expiration based on the underlying asset’s different price points. Profit and loss diagrams are visual aids that can be used with single-leg and multi-leg strategies. Payoff diagrams help to explain all potential profit and loss outcomes of a strategy including break-even points, maximum loss, and maximum gain.\nThe green portion of the payoff diagram line shows where the position is profitable at expiration relative to the underlying security’s price. The red portion of the payoff diagram line shows where the position is at a loss at expiration relative to the underlying security’s price.\nThe further above or below the payoff diagram line is from the x-axis, the greater the profit or loss at expiration. The point (or points) where the payoff diagram line crosses the x-axis is the break-even price at expiration.\nBefore expiration, the position’s profit or loss will differ from the payoff diagram because of extrinsic factors like time value and volatility.\n\nAn option is a leveraged financial instrument that derives its value from an underlying security. An option contract is an agreement between a buyer and a seller that gives the buyer the right, but no obligation, to buy or sell the underlying security at a specific price on or before a specific date.\nOption contracts consist of three main components that determine their premium, or cost: the underlying security's price, the option contract's strike price, and an expiration date.\nOptions trading enable investors to be more dynamic than buying and selling stocks. Traders typically use options to generate income, speculate on future price, and hedge existing positions in their portfolio. Options are available for a wide variety of stocks and ETFs.\n\nMost investors are familiar with stocks, and they are relatively straightforward: buy stock from a company, and hope to sell the shares at a higher price in the future. Options are more complex, but also give investors more flexibility and make it easier to capitalize on bullish, bearish, and neutral market conditions.\nOne key difference is every options contract has an expiration date, which introduces a time component to every position. Options pricing is determined by multiple factors and is constantly changing based on market conditions and the underlying's price movement.\nStocks and options can be combined to hedge positions or generate passive income.\n\nMany new options traders start with covered calls. Covered calls are a natural bridge for investors because they combine stock ownership with options trading to generate income on long equity positions.\nLong calls and long puts are popular single-leg strategies that offer traders a cost-effective, risk-defined alternative to buying or selling stock.\nTraders can also use slightly more complex multi-let strategies known as spreads. Spreads include two, three, or four legs and typically have defined risk and limited profit potential. Selling options spreads, such as iron condors and iron butterflies, can be used to generate income.\n\nSingle-leg call and put options are generally a great place to start if you're new to options trading. Debit spreads and credit spreads are also good for beginners looking to take the next step and build slightly more complex strategies with defined risk/reward profiles.",
+      "evidence": [
+        {
+          "chunk_id": "chunk.f8041db8bc357b135b1f",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "About Options Strategies",
+          "line_start": 3,
+          "line_end": 8,
+          "quote": "Options enable investors to use many different strategies to achieve their desired financial goals. There are three primary reasons to trade options: to protect or “hedge” a position, to generate income, or to speculate on the future price movement of an asset.\nOptions traders can purchase or sell different options con"
+        },
+        {
+          "chunk_id": "chunk.2006e4a35ba0faafd624",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "Risk Defined Strategies",
+          "line_start": 9,
+          "line_end": 20,
+          "quote": "Risk defined strategies are positions where the maximum loss is defined at trade entry. Risk defined strategies can be used to create a maximum loss scenario and help investors manage downside exposure. Single-leg long options have a maximum loss limited to the cost when the position is opened.\nFor example, purchasing "
+        },
+        {
+          "chunk_id": "chunk.3897d9b9f63ef97b6860",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "Unlimited Risk Strategies",
+          "line_start": 21,
+          "line_end": 28,
+          "quote": "Unlimited risk strategies have an undefined or unlimited risk of loss at trade entry. Unlimited risk is a possibility with naked or uncovered options selling.\nFor example, when selling a naked call option, the option writer is required to sell shares at the strike price if assigned stock. Because stock can potentially "
+        },
+        {
+          "chunk_id": "chunk.30ce65cbbc318dcfbf4d",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "Payoff Diagrams",
+          "line_start": 29,
+          "line_end": 38,
+          "quote": "Payoff diagrams illustrate where options strategies will make or lose money at expiration based on the underlying asset’s different price points. Profit and loss diagrams are visual aids that can be used with single-leg and multi-leg strategies. Payoff diagrams help to explain all potential profit and loss outcomes of "
+        },
+        {
+          "chunk_id": "chunk.eeb279415cded9f93a15",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "What is options trading?",
+          "line_start": 39,
+          "line_end": 46,
+          "quote": "An option is a leveraged financial instrument that derives its value from an underlying security. An option contract is an agreement between a buyer and a seller that gives the buyer the right, but no obligation, to buy or sell the underlying security at a specific price on or before a specific date.\nOption contracts c"
+        },
+        {
+          "chunk_id": "chunk.31aaaddaf7314f3c4d08",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "Stocks vs. options",
+          "line_start": 47,
+          "line_end": 54,
+          "quote": "Most investors are familiar with stocks, and they are relatively straightforward: buy stock from a company, and hope to sell the shares at a higher price in the future. Options are more complex, but also give investors more flexibility and make it easier to capitalize on bullish, bearish, and neutral market conditions."
+        },
+        {
+          "chunk_id": "chunk.4e344f472f1289749583",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "Most popular options strategies",
+          "line_start": 71,
+          "line_end": 78,
+          "quote": "Many new options traders start with covered calls. Covered calls are a natural bridge for investors because they combine stock ownership with options trading to generate income on long equity positions.\nLong calls and long puts are popular single-leg strategies that offer traders a cost-effective, risk-defined alternat"
+        },
+        {
+          "chunk_id": "chunk.e0fa14a1a72deb520de5",
+          "source_document_id": "5cfb6746f1551213",
+          "source_url": "https://optionalpha.com/options-strategies",
+          "heading": "Best option strategies for beginners",
+          "line_start": 79,
+          "line_end": 82,
+          "quote": "Single-leg call and put options are generally a great place to start if you're new to options trading. Debit spreads and credit spreads are also good for beginners looking to take the next step and build slightly more complex strategies with defined risk/reward profiles."
+        }
+      ],
+      "status": "published"
+    }
+  ]
+}

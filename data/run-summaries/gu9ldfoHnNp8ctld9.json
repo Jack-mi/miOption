@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "run_id": "gu9ldfoHnNp8ctld9",
+  "status": "SUCCEEDED",
+  "exit_code": 0,
+  "started_at": "2026-09-01T22:15:21.054Z",
+  "finished_at": "2026-09-01T22:17:46.574Z",
+  "cost_usd": 0.05655664908456306,
+  "page_budget": 12,
+  "documents": [
+    {
+      "id": "39cf19c3847173bf",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/cash-secured-put"
+    },
+    {
+      "id": "782b7a9a0ab384db",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-call"
+    },
+    {
+      "id": "99f90a9319955ad7",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-put"
+    },
+    {
+      "id": "48341041772ecac4",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/bull-call-spread-debit-call-spread"
+    },
+    {
+      "id": "b00b8cf6d87474e6",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/bear-put-spread"
+    },
+    {
+      "id": "96498860d7dd62e8",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/collar-protective-collar"
+    },
+    {
+      "id": "78525508e2d3a96e",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-straddle"
+    },
+    {
+      "id": "3ac9fc92b49bd0eb",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/short-straddle"
+    },
+    {
+      "id": "ebdbd768e5e8e3de",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-strangle-long-combination"
+    },
+    {
+      "id": "77eec3ea8d9b0a94",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/short-strangle"
+    },
+    {
+      "id": "9ad231da67f7ddbd",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/short-iron-butterfly"
+    },
+    {
+      "id": "bc0d02b1f3b6bc5a",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/short-condor"
+    }
+  ],
+  "generated_at": "2026-09-01T22:17:53.848195+00:00"
+}

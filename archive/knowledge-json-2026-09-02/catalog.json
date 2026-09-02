@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "built_at": "2026-09-01T23:47:51.641513+00:00",
+  "architecture": {
+    "evidence_layer": "data/raw/pages plus knowledge/index.json",
+    "knowledge_layer": "knowledge/chunks.jsonl and knowledge/items.json",
+    "strategy_layer": "knowledge/strategies.json",
+    "relationship_layer": "knowledge/relations.json",
+    "provenance_layer": "knowledge/evidence-index.json"
+  },
+  "source_documents": {
+    "total": 39,
+    "body_eligible": 31,
+    "catalog_only": 8,
+    "by_source": {
+      "cboe": 1,
+      "cme": 3,
+      "oic": 30,
+      "optionalpha": 5
+    }
+  },
+  "knowledge_records": {
+    "chunks": 393,
+    "items": 10,
+    "strategies": 22,
+    "relations": 5,
+    "by_type": {
+      "concept": 2,
+      "greek": 4,
+      "lifecycle": 1,
+      "pricing": 1,
+      "risk_rule": 1,
+      "strategy": 1
+    }
+  },
+  "entry_points": {
+    "taxonomy": "knowledge/taxonomy.json",
+    "source_catalog": "knowledge/source-catalog.json",
+    "chunks": "knowledge/chunks.jsonl",
+    "items": "knowledge/items.json",
+    "strategies": "knowledge/strategies.json",
+    "relations": "knowledge/relations.json",
+    "evidence_index": "knowledge/evidence-index.json"
+  }
+}

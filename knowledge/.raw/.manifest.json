@@ -1,0 +1,280 @@
+{
+  "address_map": {},
+  "description": "Ingest delta tracker. Source payloads are create-only.",
+  "sources": {
+    ".raw/captured/104109d5ed17fae973d421294b4cfa6b9ed1743fe04def5443339487cf1ff024.md": {
+      "hash": "104109d5ed17fae973d421294b4cfa6b9ed1743fe04def5443339487cf1ff024",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Free Neutral Options Strategies Course - Option Alpha (catalog only).md"
+      ]
+    },
+    ".raw/captured/1430ba0de31deae6f8446a20537d504173dae10f00cfb1655a566e2e7b250d18.md": {
+      "hash": "1430ba0de31deae6f8446a20537d504173dae10f00cfb1655a566e2e7b250d18",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Free Volatility and Options Pricing Course - Option Alpha (catalog only).md"
+      ]
+    },
+    ".raw/captured/19f500c8f24fcbd4352d5c1b6ed6b00653662c5e55c6cf0fb953e04d17c53d25.md": {
+      "hash": "19f500c8f24fcbd4352d5c1b6ed6b00653662c5e55c6cf0fb953e04d17c53d25",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Bear Call Spread (Credit Call Spread).md"
+      ]
+    },
+    ".raw/captured/1e187ad761bb0f60ee623ac3071ccc70287326681242ee3dc4d2472d00ffde3b.md": {
+      "hash": "1e187ad761bb0f60ee623ac3071ccc70287326681242ee3dc4d2472d00ffde3b",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Put.md"
+      ]
+    },
+    ".raw/captured/204c4aa8a7399b28a321fb0de3dd1be21220ba9cfb151c6f0040f957f7ab18f3.md": {
+      "hash": "204c4aa8a7399b28a321fb0de3dd1be21220ba9cfb151c6f0040f957f7ab18f3",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Short Straddle.md"
+      ]
+    },
+    ".raw/captured/2e5bdb5cb8f1655a2220ea8ab75ca5ad94f9210ca59c74c8bc0f546f1427d77f.md": {
+      "hash": "2e5bdb5cb8f1655a2220ea8ab75ca5ad94f9210ca59c74c8bc0f546f1427d77f",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — What are the Benefits & Risks-.md"
+      ]
+    },
+    ".raw/captured/2ef4d7d614fe980ca5f9d1d39b40613c1c7c53caf1b1feadca9a29d9a492836e.md": {
+      "hash": "2ef4d7d614fe980ca5f9d1d39b40613c1c7c53caf1b1feadca9a29d9a492836e",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Bull Put Spread (Credit Put Spread).md"
+      ]
+    },
+    ".raw/captured/2f0a3f4614cb379d721762b5215c24fba36d30ed93425668d9c9e674c53ec8a1.md": {
+      "hash": "2f0a3f4614cb379d721762b5215c24fba36d30ed93425668d9c9e674c53ec8a1",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Complete Guide to Options Strategies - Option Alpha.md"
+      ]
+    },
+    ".raw/captured/2f6f834ae11c1bce0744f3753f88f1db0e6856859301d79bdc583ff499c26a12.md": {
+      "hash": "2f6f834ae11c1bce0744f3753f88f1db0e6856859301d79bdc583ff499c26a12",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Put Condor.md"
+      ]
+    },
+    ".raw/captured/45675f0d1623687b019cd4d48993df36390728a780cb6386ddcf4e0236eee34a.md": {
+      "hash": "45675f0d1623687b019cd4d48993df36390728a780cb6386ddcf4e0236eee34a",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Free Options Basics Course - Option Alpha (catalog only).md"
+      ]
+    },
+    ".raw/captured/467e29cc1ee711885bb6cbfac3c6e88505c14d49b7de3efc2de92b32e3d0134f.md": {
+      "hash": "467e29cc1ee711885bb6cbfac3c6e88505c14d49b7de3efc2de92b32e3d0134f",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Options Delta.md"
+      ]
+    },
+    ".raw/captured/48e58664a560fddd1d10289519bb99525a614ef2b679969748d21ca60543d1ca.md": {
+      "hash": "48e58664a560fddd1d10289519bb99525a614ef2b679969748d21ca60543d1ca",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Short Condor (Iron Condor).md"
+      ]
+    },
+    ".raw/captured/4db9c227cbec26197661dbe88083abc6ed2da5cf4af8c9d187808dbf907f231a.md": {
+      "hash": "4db9c227cbec26197661dbe88083abc6ed2da5cf4af8c9d187808dbf907f231a",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Options Basics.md"
+      ]
+    },
+    ".raw/captured/51db45e48278bff1ab539e0f5b1fea07481363f76055292d2f69d525437e7cea.md": {
+      "hash": "51db45e48278bff1ab539e0f5b1fea07481363f76055292d2f69d525437e7cea",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Collar Protective Collar - Options Education.md"
+      ]
+    },
+    ".raw/captured/5797898a19b4c19a8a54ca489d8a52ab0e6c6e92cd82d2d941979ec800dbe1d3.md": {
+      "hash": "5797898a19b4c19a8a54ca489d8a52ab0e6c6e92cd82d2d941979ec800dbe1d3",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Short Iron Butterfly.md"
+      ]
+    },
+    ".raw/captured/5d2bb570ffde446c7ceb0e4c3ebf1f5ca88677f76d8f16db175daae03f1cab01.md": {
+      "hash": "5d2bb570ffde446c7ceb0e4c3ebf1f5ca88677f76d8f16db175daae03f1cab01",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Call.md"
+      ]
+    },
+    ".raw/captured/5ff2da77ae933184a87ee42ea4d751e01d55d3fb189a09b089290ebf3bb53c91.md": {
+      "hash": "5ff2da77ae933184a87ee42ea4d751e01d55d3fb189a09b089290ebf3bb53c91",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Option Greeks - CME Group (catalog only).md"
+      ]
+    },
+    ".raw/captured/65d1e24f97ea1a10c331dddc891d87f91eba700e1a251cd9ef68bcf9911d1ac4.md": {
+      "hash": "65d1e24f97ea1a10c331dddc891d87f91eba700e1a251cd9ef68bcf9911d1ac4",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Exercising Options.md"
+      ]
+    },
+    ".raw/captured/7c20181efc42d6c73842ac34bd75e3eaa8ca4b501793e81a67f8fa87bc6adc83.md": {
+      "hash": "7c20181efc42d6c73842ac34bd75e3eaa8ca4b501793e81a67f8fa87bc6adc83",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — What is an Option-.md"
+      ]
+    },
+    ".raw/captured/7d16e6079e878a73de4226f94093e98b6fa82f504b04825961d5ea8656fe7251.md": {
+      "hash": "7d16e6079e878a73de4226f94093e98b6fa82f504b04825961d5ea8656fe7251",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Bull Call Spread (Debit Call Spread).md"
+      ]
+    },
+    ".raw/captured/95b39a891ea712e653ba79c99df70186bde68ef986dd8a4f253dfebf7e02706e.md": {
+      "hash": "95b39a891ea712e653ba79c99df70186bde68ef986dd8a4f253dfebf7e02706e",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Cash-Secured Put.md"
+      ]
+    },
+    ".raw/captured/a5c8b3458da025828a1c376897b16e126ba3e6a8c847d001590f4bdf312e893e.md": {
+      "hash": "a5c8b3458da025828a1c376897b16e126ba3e6a8c847d001590f4bdf312e893e",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Gamma.md"
+      ]
+    },
+    ".raw/captured/b827d93a1b28c32d1392e4b80f932d62aba26d0eb17cb8943756675948102bd6.md": {
+      "hash": "b827d93a1b28c32d1392e4b80f932d62aba26d0eb17cb8943756675948102bd6",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Call Condor.md"
+      ]
+    },
+    ".raw/captured/b8621aa10da743cb90f63bb6c733aede0cfd8db29b9e8fc81555b2a0c35d381b.md": {
+      "hash": "b8621aa10da743cb90f63bb6c733aede0cfd8db29b9e8fc81555b2a0c35d381b",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Naked Call (Uncovered Call, Short Call).md"
+      ]
+    },
+    ".raw/captured/b9194f640fc39096c80060b484be0b64d5ba9efdab624fe748952434caf4aa8c.md": {
+      "hash": "b9194f640fc39096c80060b484be0b64d5ba9efdab624fe748952434caf4aa8c",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Straddle.md"
+      ]
+    },
+    ".raw/captured/c0af39a3c87dd16463c253787e8337ccd776beee44c38ad8ed52f03c67a0c18b.md": {
+      "hash": "c0af39a3c87dd16463c253787e8337ccd776beee44c38ad8ed52f03c67a0c18b",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Free Options Expiration Course - Option Alpha (catalog only).md"
+      ]
+    },
+    ".raw/captured/c1a2904ca9db4ac583b56ad633eedbdb05ecdf465ff27c7f780d58a0487bfd13.md": {
+      "hash": "c1a2904ca9db4ac583b56ad633eedbdb05ecdf465ff27c7f780d58a0487bfd13",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Covered Call (Buy-Write).md"
+      ]
+    },
+    ".raw/captured/c1fcaeb76b473008bfbf7846d2f7b43116ff3c68fcd5b7edd14c7778af16ac31.md": {
+      "hash": "c1fcaeb76b473008bfbf7846d2f7b43116ff3c68fcd5b7edd14c7778af16ac31",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Vega.md"
+      ]
+    },
+    ".raw/captured/c28d75940a4a050f8c5bc8635658f43a669f9ce29d18eedc390ee1ad3dcc6dfc.md": {
+      "hash": "c28d75940a4a050f8c5bc8635658f43a669f9ce29d18eedc390ee1ad3dcc6dfc",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Call Calendar Spread (Call Horizontal).md"
+      ]
+    },
+    ".raw/captured/c3ee400f1c2acf7bdd776e17136011de2ed59446069f90ca43c6e19db33d1f96.md": {
+      "hash": "c3ee400f1c2acf7bdd776e17136011de2ed59446069f90ca43c6e19db33d1f96",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — The Options Institute Options 101 - Cboe (catalog only).md"
+      ]
+    },
+    ".raw/captured/c494d438d6eee1f9eb4d2eff7afe3d1da95ce31498b9d6fdde5d08b9e0f49376.md": {
+      "hash": "c494d438d6eee1f9eb4d2eff7afe3d1da95ce31498b9d6fdde5d08b9e0f49376",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Strangle (Long Combination).md"
+      ]
+    },
+    ".raw/captured/cd5308069beb0ee8dd22fcb96a67dd94f94a8bf6d77cfaf3ebb0ef2da35a406b.md": {
+      "hash": "cd5308069beb0ee8dd22fcb96a67dd94f94a8bf6d77cfaf3ebb0ef2da35a406b",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Introduction to Options - CME Group (catalog only).md"
+      ]
+    },
+    ".raw/captured/d4522097e0131cd937fb7e28e04575ee2a4e11de4f6f77659ce6bc6f53482f4a.md": {
+      "hash": "d4522097e0131cd937fb7e28e04575ee2a4e11de4f6f77659ce6bc6f53482f4a",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Theta.md"
+      ]
+    },
+    ".raw/captured/e2e23526c639db0d10d9457f9134a319a1adf257a46b05b2a54ecca78a4b4dda.md": {
+      "hash": "e2e23526c639db0d10d9457f9134a319a1adf257a46b05b2a54ecca78a4b4dda",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Options Pricing.md"
+      ]
+    },
+    ".raw/captured/eb5d590d89ca595bae9087ceaed32b2a65f654f918650d80f8366373dffa4159.md": {
+      "hash": "eb5d590d89ca595bae9087ceaed32b2a65f654f918650d80f8366373dffa4159",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Curriculum- All About Options - CME Group (catalog only).md"
+      ]
+    },
+    ".raw/captured/f8c5577c535df7a919bd42d12b4d9086a881ff4b9ee14dd91215cff1fe785c99.md": {
+      "hash": "f8c5577c535df7a919bd42d12b4d9086a881ff4b9ee14dd91215cff1fe785c99",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Protective Put (Married Put).md"
+      ]
+    },
+    ".raw/captured/fbf7124a24d7553ca1d114e52684ef77cf26b884db40554816035ef900ea6911.md": {
+      "hash": "fbf7124a24d7553ca1d114e52684ef77cf26b884db40554816035ef900ea6911",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Bear Put Spread.md"
+      ]
+    },
+    ".raw/captured/fd669fa4930db5ba328332deb1e8dcb411729730bf9aa6d4d316dc19e14991c1.md": {
+      "hash": "fd669fa4930db5ba328332deb1e8dcb411729730bf9aa6d4d316dc19e14991c1",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Short Strangle.md"
+      ]
+    },
+    ".raw/captured/ffef2eb4456f5ed0971aab48034e76f78119984fea0a2dff2fb4569beda12fe8.md": {
+      "hash": "ffef2eb4456f5ed0971aab48034e76f78119984fea0a2dff2fb4569beda12fe8",
+      "ingested_at": "2026-09-01",
+      "pages_created": [
+        "wiki/sources/Source — Long Call Butterfly.md"
+      ]
+    }
+  },
+  "version": 1
+}

@@ -1,137 +1,184 @@
-# miOption 期权知识库当前状态
+# miOption：当前项目现状
 
-更新时间：2026-09-01
+更新时间：2026-09-02
+状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。10 张概念笔记 + 21 张 evergreen 策略实体 + 5 条关系 wikilink 已导入；对角策略仍为 developing；无待抓批次。
 
-## 一、当前结论
+## 1. 结论
 
-项目已从“小样本探测”进入“受控小批量验证”阶段，但尚未开始批量建设或结构化知识抽取。
+项目已经从“收集网页 URL”转入“构建可引用的期权知识”的阶段。URL 和原始页面只负责提供证据与追溯。**当前知识成品是 Obsidian vault**（`knowledge/wiki/`），不是 JSON 文件。Agent 应使用 wiki / wiki-query，而不是 `items.json`。
 
-已验证链路：
+当前链路已跑通：
 
-1. 使用 Apify Actor `apify/website-content-crawler` 抓取固定 URL 批次。
-2. 使用 Apify CLI 下载 dataset。
-3. 将页面规范化为本地 JSON + Markdown。
-4. 生成/合并 `knowledge/index.json` 文档索引。
-5. 将来源 host/path 白名单、页数、状态、HTTP 状态、内容长度与实际成本校验放在入库前。
+```text
+原始期权页面 → 页面准入 → vault `.raw/captured` → wiki 源笔记 / 概念 / 策略实体 → wikilink
+```
 
-当前索引共有 16 条文档：OIC 9、Cboe 1、Option Alpha 4、CME 2。Investopedia 明确排除，原因是其 robots 和条款禁止自动化抓取、构建数据集及 AI/RAG 用途；只保留人工整理的概念索引和外部链接，不存正文。
+产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖已对齐**富途官方策略菜单**（自定义除外）：清单用富途，证据用 OIC。vault 内 10 张概念、**22** 张策略实体、5 条关系。除对角策略外均为 evergreen。
 
-## 二、已完成的运行
+## 2. 范围与准入边界
 
-| 批次 | Run ID | 结果 | 页数 | 成本 |
+### 收录范围
+
+- 期权基础、定价、Greeks、交易生命周期、风险规则和策略；
+- 页面主体是期权的期货期权（options on futures）内容；
+- 有独立、可引用文字正文，并能填充明确知识字段的内容。
+
+### 排除范围
+
+- 与期权无实质关联的纯期货教育、交易或产品内容；
+- 视频、webinar、podcast、playlist、视频课入口、交互式课程、课程目录、营销/导航页；
+- 只有 URL、不能形成可验证知识字段的页面；
+- 富途「自定义策略」：产品功能，不做标准策略卡。
+
+课程和视频页可保留在来源目录中作为导航线索，但不会生成 chunk、知识卡、策略卡或进入知识检索。
+
+## 3. 当前数据快照
+
+| 层级 | 数量 | 含义 |
+|---|---:|---|
+| 原始来源页面 | 39 | 每页保留 JSON 与 Markdown 证据 |
+| 正文证据页 | 31 | 满足主题与文字正文准入 |
+| 仅目录/课程/视频页 | 8 | 保留来源，不进入知识抽取 |
+| 可引用知识片段（chunks，归档 JSON） | 393 | 含标题、行号、内容哈希和来源 URL；不单独做成笔记 |
+| vault 源笔记 | 39 | `knowledge/wiki/sources/` |
+| vault 概念笔记 | 10 | 概念、定价、Greeks、生命周期、风险、策略原则 |
+| vault 策略实体 | 22 | 对齐富途 12 类 + 方向变体；含 Covered Call |
+| 有证据的知识关系 | 5 | 已写成笔记间 wikilink（3 条 requires、2 条 affects） |
+
+### 来源构成
+
+| 来源 | 原始页 | 正文证据页 | 仅目录/课程页 |
+|---|---:|---:|---:|
+| OIC | 30 | 30 | 0 |
+| Option Alpha | 5 | 1 | 4 |
+| CME | 3 | 0 | 3 |
+| Cboe | 1 | 0 | 1 |
+| 合计 | 39 | 31 | 8 |
+
+### 富途策略覆盖
+
+详见 [wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md)。每张策略笔记含含义（腿/目标）、适配场景、做法（最大收益/损失、盈亏平衡、指派或到期），并挂 OIC 段落证据。JSON 快照在 [archive/knowledge-json-2026-09-02/strategy-coverage.json](archive/knowledge-json-2026-09-02/strategy-coverage.json)。
+
+| 富途类别 | 状态 | 策略卡 |
+|---|---|---|
+| 单腿期权 | ready | Long Call、Long Put、Naked Call、Protective Put |
+| 垂直策略 | ready | Bull/Bear Call Spread、Bull/Bear Put Spread |
+| 股票担保 | ready | Covered Call（原有）、Cash-Secured Put |
+| 领口策略 | ready | Collar |
+| 跨式策略 | ready | Long / Short Straddle |
+| 宽跨式策略 | ready | Long / Short Strangle |
+| 日历策略 | ready | Long Call Calendar |
+| 对角策略 | partial | Diagonal 仍为 developing（无独立 OIC 页；盈亏字段暂用日历同名段落） |
+| 蝶式策略 | ready | Long Call Butterfly |
+| 鹰式策略 | ready | Long Call / Long Put Condor |
+| 铁蝶式策略 | ready | Short Iron Butterfly |
+| 铁鹰式策略 | ready | Short Condor (Iron Condor) |
+| 自定义策略 | 跳过 | 不做卡 |
+
+## 4. 知识库架构
+
+```text
+原始证据
+  data/raw/pages/<document_id>.json / .md
+  data/raw/index.json
+        │
+        ▼
+页面准入（归档）
+  archive/knowledge-json-2026-09-02/source-catalog.json
+        │
+        ▼
+vault 不可变源
+  knowledge/.raw/captured/<sha256>.md
+        │
+        ▼
+wiki
+  knowledge/wiki/sources/
+  knowledge/wiki/concepts/
+  knowledge/wiki/strategies/
+```
+
+真正供后续使用的入口是 vault 笔记。JSON 层保留在 `archive/knowledge-json-2026-09-02/` 供回滚和 `build_knowledge.py --check`。构建脚本允许不同页面出现相同 boilerplate 段落，但同一文档内正文片段仍不得重复。
+
+### 已形成的知识内容
+
+- **概念笔记**：10 张，均为 evergreen。
+- **策略实体**：22 张；其中 21 张 evergreen，Diagonal Call Spread 保持 developing。
+- **关系**：5 条已写成 wikilink（Gamma↔Delta；Covered Call 与基础/行权/Theta/Vega）。新策略之间的关系尚未补。
+- **抽查记录**：代表性卡（Covered Call、Cash-Secured Put、Long Call、Protective Put、Bull Call Spread、Iron Condor、Collar、Long Straddle、Call Calendar、Diagonal）字段与证据引用均通过；全量 22 张策略卡证据链完整。对角策略定义有日历页 Description/Variations 支撑，但 max gain/loss/breakeven 仍是同执行价日历口径，故未升 evergreen。
+
+## 5. 抓取、成本与约束
+
+### 历史运行
+
+| 批次 | Run ID | 结果 | 页面 | 成本 |
 |---|---|---:|---:|---:|
 | 初始小样本 | `eFrLt82BtQqJZQQXV` | `SUCCEEDED` | 4 | `$0.0458169692` |
 | 固定 URL pilot | `uciKhdZjhHKjs0ytM` | `SUCCEEDED` | 12 | `$0.0558161734` |
-| 意外重复 run（已强制终止） | `BJvDpPGhHnHlwSM1I` | `ABORTED` | 1/12 | `$0.0043485752` |
+| 重复运行（已终止） | `BJvDpPGhHnHlwSM1I` | `ABORTED` | 1 / 12 | `$0.0043485752` |
+| 三页跟进批次 | `z89ZwcnZUNwpJf6QA` | `SUCCEEDED` | 3 | `$0.0155027516` |
+| 富途策略 A | `gu9ldfoHnNp8ctld9` | `SUCCEEDED` | 12 | `$0.0565566491` |
+| 富途策略 B | `PUZYbnrk9cH2qOIMW` | `SUCCEEDED` | 8 | `$0.0315424827` |
 
-受控 pilot 使用 12 个已审核候选 URL，深度 `0`、单并发、单次重试、启用 robots.txt、不用 sitemap 或链接发现，并将远端 timeout 限为 300 秒。它运行 121.442 秒，所有 12 条结果均为批准来源、路径匹配、HTTP 200。
+- 已记录总成本：约 `$0.2095836011`。
+- `$1` 探索额度中（pilot + 终止跑 + followup + A + B）累计约 `$0.1637666320`，约余 `$0.836`。
+- 候选队列 35 个 URL 均为 `ingested`；没有 `approved` 待抓批次。
+- 另有 4 篇初始小样本页面不在候选队列中且缺 `run_id`（legacy）。
 
-本次新增的 pilot 与已终止重复 run 合计成本为 `$0.0601647486`，低于用户授权的 `$1`；连同此前小样本，当前已记录 run 的总成本为 `$0.1059817178`。没有继续启动后续批次。
+### 实际采集护栏
 
-## 三、当前项目产物
+`scripts/probe.py` 只允许固定且审核过的 URL 批次：HTTPS、来源和路径白名单、深度 `0`、robots.txt、单并发、单次重试、远端 300 秒超时，以及结果数量、HTTP 状态、内容长度和成本校验。新抓取必须走 `approved` 候选，不能直接传 URL。
 
-### 配置与说明
+## 6. 关键文件索引
 
-- `README.md`：项目说明、验证方式、pilot 结果和下一阶段。
-- `sources.json`：来源、路径 allowlist、页面/超时/质量和成本防护策略。
-- `knowledge/url-candidates.json` 与 `.csv`：候选 URL、主题、优先级、审核状态、批次和备注。
-- `STATUS.md`：当前状态与待办。
+| 文件 | 作用 |
+|---|---|
+| [README.md](README.md) | 项目总览 |
+| [STATUS.md](STATUS.md) | 本文件 |
+| [sources.json](sources.json) | 白名单与运行限制 |
+| [data/pipeline/url-candidates.json](data/pipeline/url-candidates.json) / [.csv](data/pipeline/url-candidates.csv) | 候选队列 |
+| [knowledge/](knowledge/) | Obsidian vault（知识成品） |
+| [knowledge/wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md) | 富途清单 ↔ 策略笔记 |
+| [archive/knowledge-json-2026-09-02/](archive/knowledge-json-2026-09-02/) | 迁移前 JSON 快照 |
+| [vendor/claude-obsidian/](vendor/claude-obsidian/) | 知识库运行时（技能/CLI） |
+| [scripts/probe.py](scripts/probe.py) | 抓取（默认索引 `data/raw/index.json`） |
+| [scripts/build_knowledge.py](scripts/build_knowledge.py) | 重建归档 JSON |
+| [scripts/export_vault_notes.py](scripts/export_vault_notes.py) | JSON → vault Markdown |
 
-### 脚本
-
-- `scripts/probe.py`：固定 URL 批次的抓取与入库脚本。
-
-当前能力：
-
-- 生成 Apify Actor 输入并可用 `--print-input` 做无费用预检。
-- 拒绝非 HTTPS、未知 host、未允许 path、深度非 0、页数不匹配或预估成本超额的批次。
-- 传递 `includeUrlGlobs`、robots.txt、并发、重试和远端 timeout。
-- 当本地等待失败时尝试强制终止仍在运行的远端 run。
-- 校验完成状态、退出码、实际成本、结果页数、HTTP 状态、最终 URL 和内容长度后，才写页面/索引。
-- 为短内容记录标记 `quality.requires_manual_review`。
-- 支持 `--run-id` 复用已完成的、输入策略匹配的 run；普通新 run 会拒绝索引中已有的 URL，避免重复计费。
-
-自检命令：
+## 7. 已验证项与已知缺口
 
 ```bash
+python3 -m py_compile scripts/probe.py scripts/build_knowledge.py scripts/export_vault_notes.py
 python3 scripts/probe.py --check
+python3 scripts/build_knowledge.py --check
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py doctor --vault knowledge
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-02
 ```
 
-### 数据与安全
+当前 `build_knowledge.py --check` 预期：
 
-- `data/raw/pages/`：16 个页面的结构化 JSON 和 Markdown，共 32 个文件。
-- `knowledge/index.json`：16 条文档索引。
-- `data/run-summaries/`：提交不含签名 URL 或密钥的运行摘要。
-- `data/raw/runs/`：本地完整运行元数据，始终由 `.gitignore` 排除。
+```json
+{"ok": true, "chunks": 393, "items": 10, "strategies": 22, "relations": 5}
+```
 
-完整 Apify run 元数据曾包含运行时签名材料与带签名 URL，因此不得提交；历史完整原始文件仍只在本地、已被 Git 忽略。若它曾被仓库外分享，应按凭据暴露处理并在 Apify 侧轮换/失效相关访问能力。
+已知缺口：
 
-## 四、数据质量结果
+- Diagonal Call Spread 仍为 developing：需独立对角文字页，或按对角口径改写盈亏字段后再升 evergreen。
+- 新策略卡之间尚未补 requires / related_to 等关系。
+- taxonomy 的 `options_on_futures` 仍为空；流动性、保证金、期货期权结算仍未做。
+- 短 chunk 与 taxonomy 100 字门槛仍未强制对齐（可选后续处理）。
+- Cboe canonical `/en/optionsinstitute/` 路径策略未定。
 
-pilot 新增：OIC 8 页、Option Alpha 3 页、CME 1 页。
+## 8. 下一步待办
 
-OIC 和 CME 的新增页面正文长度为约 799–5,468 字符。下列 Option Alpha 课程入口页内容较薄，已入库为可追溯入口，但必须人工复核，不能直接作为高质量课程正文：
+1. 对角策略：找独立文字证据页，或收窄字段只保留有对角原文支撑的含义/场景后再发布。
+2. 按需补策略关系（例如垂直四向互为 `related_to`，铁鹰依赖垂直概念）。
+3. 流动性、保证金、期货期权结算等专题另开缺口后再批候选。
+4. 不做整站抓取；Investopedia 仍不自动采。
 
-| URL | 内容字符数 |
-|---|---:|
-| `https://optionalpha.com/courses/options-basics` | 179 |
-| `https://optionalpha.com/courses/pricing-volatility` | 461 |
-| `https://optionalpha.com/courses/options-expiration` | 188 |
+## 9. 交接注意事项
 
-## 五、已确认的抓取范围
-
-### OIC
-
-公开 sitemap 当前可提取 106 个核心 allowlist URL（`/optionsoverview/`、`/strategies/`、`/advancedconcepts/`、`/referencelibrary/`）。当前已抓取基础、定价、行权、风险和四项 Greeks；策略页留待结构化抽取设计完成后再分批审核。
-
-### Option Alpha
-
-公开 sitemap 当前可提取 17 个教育/课程/策略/handbook allowlist URL。课程入口中存在内容较薄的页面，需要先做人工质量筛选，再决定是否深入其公开子页面。
-
-### Cboe
-
-已保留 1 个成功样本。其入口发现的部分链接直连为 403，且 canonical 路径可能落在 `/en/optionsinstitute/`，与当前 `/optionsinstitute/` 白名单不一致；在修订来源策略并重新验证前不扩展。
-
-### CME
-
-已保留课程入口和 `Introduction to Options` 两页。后续仅从已审核课程入口建立固定 URL 批次，不使用站内深度发现。
-
-## 六、当前 Todo
-
-### P0：已完成
-
-1. 建立候选 URL 清单和分类字段。
-2. 将来源 host/path allowlist 实际传给 Actor 并在本地 fail-closed 校验。
-3. 固定批次上限、预估成本、远端 timeout、状态/结果校验和短内容复核标记。
-4. 添加 `.gitignore`，排除 Python 缓存、环境文件和完整 run 元数据。
-5. 完成首次提交项目骨架（待本轮最终验证后执行）。
-
-### P1：下一批前的人工决策
-
-1. 审核 3 个 Option Alpha 短内容入口页，确认是否应保留、替换或仅作链接目录。
-2. 审核 `knowledge/url-candidates.json` 中 `pending` 的下一批候选（包含策略和 CME Greeks）；已完成的 pilot-12 记录已标为 `ingested`，普通新 run 会拒绝重跑。
-3. 明确 Cboe `/en/optionsinstitute/` 是否可加入白名单。
-4. 每批保持固定 URL、深度 0，并复核实际成本后再批准下一批。
-
-### P2：结构化抽取
-
-1. 从 OIC 策略页提取结构化策略数据。
-2. 从 OIC 和 Cboe 提取术语表。
-3. 从 OIC Advanced Concepts 提取 Greeks 知识。
-4. 从 CME 提取期货期权差异、保证金和结算知识。
-5. 生成课程路径和依赖关系。
-
-### P3：面向自动交易系统
-
-1. 将策略库转换为机器可读模板。
-2. 为策略加入生命周期状态机。
-3. 建立交易前检查清单、持仓监控、调整规则与风险/禁用条件引擎。
-
-## 七、风险与注意事项
-
-1. 不做整站抓取；仅允许固定、审核后的 URL 批次。
-2. 不抓取 Investopedia。
-3. Apify 该 Actor 的计费模型不提供可验证的美元硬封顶；真正的硬防线是页数、深度、并发和远端 timeout，成本阈值只用于发起前和完成后的拒收校验。
-4. 原始 run 元数据可能含签名 URL/运行时密钥，禁止提交。
-5. 版权与使用边界：保留来源、URL 和用途说明，避免将商业内容重新发布为自有数据。
-6. 先审质量、再扩量；短页面和课程目录不能直接当作可用知识正文。
+- 不做整站抓取，不绕过 robots；Investopedia 明确不做自动采集。
+- 原始页面是带版权约束的证据材料，不重新发布为自有内容。
+- 完整 Apify 运行元数据在 `data/raw/runs/`（Git 忽略）；仓库内为脱敏 `data/run-summaries/`。
+- 产品仓库 `vendor/claude-obsidian` 不是 vault；不要往里面写知识。
+- 工作区含大量未提交的知识层与新原始页；不要用 `reset` / `checkout` 丢弃。

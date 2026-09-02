@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "purpose": "The knowledge layer stores source-backed option knowledge. URLs and raw pages are evidence, not the primary retrieval unit.",
+  "knowledge_types": [
+    {
+      "id": "concept",
+      "description": "Contract terms, rights, obligations, and basic mechanics."
+    },
+    {
+      "id": "pricing",
+      "description": "Intrinsic value, time value, and premium drivers."
+    },
+    {
+      "id": "greek",
+      "description": "Sensitivity measures such as Delta, Gamma, Theta, and Vega."
+    },
+    {
+      "id": "lifecycle",
+      "description": "Opening, exercise, assignment, expiration, and settlement mechanics."
+    },
+    {
+      "id": "risk_rule",
+      "description": "Risk, suitability, leverage, margin, or position constraints."
+    },
+    {
+      "id": "strategy",
+      "description": "A defined option position with legs, payoff, outlook, and risks."
+    },
+    {
+      "id": "options_on_futures",
+      "description": "Option-specific mechanics for options whose underlying is a futures product."
+    }
+  ],
+  "relation_types": [
+    "defines",
+    "requires",
+    "affects",
+    "has_component",
+    "related_to"
+  ],
+  "record_statuses": [
+    "source_extracted",
+    "reviewed",
+    "published",
+    "rejected"
+  ],
+  "admission_rules": {
+    "text_required": true,
+    "minimum_text_chars": 1200,
+    "minimum_chunk_chars": 100,
+    "source_evidence_required": true,
+    "strategy_required_fields": [
+      "legs",
+      "market_outlook",
+      "max_gain",
+      "max_loss",
+      "breakeven",
+      "assignment_or_expiration_risk"
+    ],
+    "exclude": [
+      "video",
+      "video course landing page",
+      "webinar",
+      "podcast",
+      "playlist",
+      "interactive course",
+      "course catalog",
+      "marketing or navigation page",
+      "standalone futures material"
+    ]
+  }
+}

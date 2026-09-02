@@ -1,0 +1,333 @@
+{
+  "version": 1,
+  "updated_at": "2026-09-02T07:47:58.039938+08:00",
+  "purpose": "Align the knowledge base to Futu's official option-strategy menu. Content is filled from OIC text pages, not from Futu. Custom is product UI only.",
+  "presentation_fields": {
+    "meaning": [
+      "definition_meaning",
+      "legs",
+      "objective"
+    ],
+    "scenario": [
+      "market_outlook",
+      "suitability_constraints"
+    ],
+    "method": [
+      "legs",
+      "max_gain",
+      "max_loss",
+      "breakeven",
+      "assignment_or_expiration_risk"
+    ]
+  },
+  "taxonomy_required_fields": [
+    "legs",
+    "market_outlook",
+    "max_gain",
+    "max_loss",
+    "breakeven",
+    "assignment_or_expiration_risk"
+  ],
+  "skip": [
+    {
+      "futu_name_zh": "自定义策略",
+      "futu_name_en": "Custom",
+      "reason": "Product feature for arbitrary multi-leg builds, not a named standard strategy card."
+    }
+  ],
+  "categories": [
+    {
+      "futu_name_zh": "单腿期权",
+      "futu_name_en": "Single Option",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.long_call",
+          "name": "Long Call",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-call",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.long_put",
+          "name": "Long Put",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-put",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.naked_call",
+          "name": "Naked / Uncovered Call",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/naked-call-uncovered-call-short-call",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.protective_put",
+          "name": "Protective / Married Put",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/protective-put-married-put",
+          "url_verified": true,
+          "notes": "Stock + long put hedge; complements single-leg put usage."
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "垂直策略",
+      "futu_name_en": "Vertical Spread",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.bull_call_spread",
+          "name": "Bull Call Spread (Debit Call Spread)",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/bull-call-spread-debit-call-spread",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.bear_put_spread",
+          "name": "Bear Put Spread",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/bear-put-spread",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.bear_call_spread",
+          "name": "Bear Call Spread (Credit Call Spread)",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/bear-call-spread-credit-call-spread",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.bull_put_spread",
+          "name": "Bull Put Spread (Credit Put Spread)",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/bull-put-spread-credit-put-spread",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "股票担保",
+      "futu_name_en": "Covered Stock",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.covered_call",
+          "name": "Covered Call (Buy/Write)",
+          "status": "ready",
+          "batch": null,
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "url_verified": true,
+          "notes": "Already ingested and extracted as a reviewed strategy card."
+        },
+        {
+          "id": "strategy.cash_secured_put",
+          "name": "Cash-Secured Put",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/cash-secured-put",
+          "url_verified": true,
+          "notes": "Linked from the existing Covered Call page as a comparable position."
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "领口策略",
+      "futu_name_en": "Collar",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.collar",
+          "name": "Collar (Protective Collar)",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/collar-protective-collar",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "跨式策略",
+      "futu_name_en": "Straddle",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.long_straddle",
+          "name": "Long Straddle",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-straddle",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.short_straddle",
+          "name": "Short Straddle",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/short-straddle",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "宽跨式策略",
+      "futu_name_en": "Strangle",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.long_strangle",
+          "name": "Long Strangle",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-strangle-long-combination",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.short_strangle",
+          "name": "Short Strangle",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/short-strangle",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "日历策略",
+      "futu_name_en": "Calendar Spread",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.long_call_calendar",
+          "name": "Long Call Calendar Spread",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-call-calendar-spread-call-horizontal",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "对角策略",
+      "futu_name_en": "Diagonal Spread",
+      "status": "partial",
+      "cards": [
+        {
+          "id": "strategy.diagonal_spread",
+          "name": "Diagonal Spread",
+          "status": "reviewed",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-call-calendar-spread-call-horizontal",
+          "url_verified": true,
+          "notes": "Held at reviewed: no standalone OIC diagonal page; P/L fields still reflect same-strike calendar. Definition supported by calendar Description/Variations."
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "蝶式策略",
+      "futu_name_en": "Butterfly",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.long_call_butterfly",
+          "name": "Long Call Butterfly",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-call-butterfly",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "鹰式策略",
+      "futu_name_en": "Condor",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.long_call_condor",
+          "name": "Long Call Condor",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-call-condor",
+          "url_verified": true
+        },
+        {
+          "id": "strategy.long_put_condor",
+          "name": "Long Put Condor",
+          "status": "ready",
+          "batch": "futu-strategies-b",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/long-put-condor",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "铁蝶式策略",
+      "futu_name_en": "Iron Butterfly",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.short_iron_butterfly",
+          "name": "Short Iron Butterfly",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/short-iron-butterfly",
+          "url_verified": true
+        }
+      ]
+    },
+    {
+      "futu_name_zh": "铁鹰式策略",
+      "futu_name_en": "Iron Condor",
+      "status": "ready",
+      "cards": [
+        {
+          "id": "strategy.short_iron_condor",
+          "name": "Short Condor (Iron Condor)",
+          "status": "ready",
+          "batch": "futu-strategies-a",
+          "evidence_url": "https://www.optionseducation.org/strategies/all-strategies/short-condor",
+          "url_verified": true,
+          "notes": "OIC titles this page Short Condor (Iron Condor)."
+        }
+      ]
+    }
+  ],
+  "proposed_batches": {
+    "futu-strategies-a": {
+      "priority": 1,
+      "pages": 12,
+      "estimated_cost_usd_cap": 0.36,
+      "focus": "Covered Stock remainder, Single Option long legs, Vertical debit spreads, Collar, Straddle, Strangle, Iron Butterfly, Iron Condor",
+      "crawl_status": "ingested",
+      "run_id": "gu9ldfoHnNp8ctld9",
+      "cost_usd": 0.05655664908456306
+    },
+    "futu-strategies-b": {
+      "priority": 2,
+      "pages": 8,
+      "estimated_cost_usd_cap": 0.24,
+      "focus": "Single Option short/protective, Vertical credit spreads, Calendar (+ diagonal extract), Butterfly, Condor",
+      "crawl_status": "ingested",
+      "run_id": "PUZYbnrk9cH2qOIMW",
+      "cost_usd": 0.031542482682997974
+    }
+  },
+  "publish_summary": {
+    "items_published": 10,
+    "strategies_published": 21,
+    "strategies_held_reviewed": [
+      "strategy.diagonal_spread"
+    ],
+    "relations_published": 5
+  }
+}

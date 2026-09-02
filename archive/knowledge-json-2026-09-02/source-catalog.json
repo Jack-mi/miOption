@@ -1,0 +1,324 @@
+{
+  "version": 1,
+  "purpose": "Classify every captured source document before it can enter the knowledge layer. source_document_id resolves to knowledge/index.json and then to the immutable raw evidence.",
+  "documents": [
+    {
+      "source_document_id": "09eb50206912b0be",
+      "source_id": "optionalpha",
+      "content_kind": "video_course_landing",
+      "knowledge_type": "concept",
+      "body_eligible": false,
+      "reason": "Video-course promotion with too little standalone text."
+    },
+    {
+      "source_document_id": "19339290b8c1f453",
+      "source_id": "optionalpha",
+      "content_kind": "video_course_landing",
+      "knowledge_type": "strategy",
+      "body_eligible": false,
+      "reason": "Video-course promotion rather than a textual strategy explanation."
+    },
+    {
+      "source_document_id": "27879bf81e791259",
+      "source_id": "cme",
+      "content_kind": "course_landing",
+      "knowledge_type": "options_on_futures",
+      "body_eligible": false,
+      "reason": "Course overview and accreditation text; retain only as learning-path metadata."
+    },
+    {
+      "source_document_id": "306dfc82d7afd0de",
+      "source_id": "oic",
+      "content_kind": "reference",
+      "knowledge_type": "greek",
+      "body_eligible": true,
+      "reason": "Substantive text reference for Delta and its pricing drivers."
+    },
+    {
+      "source_document_id": "32b651721de087d4",
+      "source_id": "oic",
+      "content_kind": "article",
+      "knowledge_type": "concept",
+      "body_eligible": true,
+      "reason": "Substantive equity-option definitions, calls, puts, premium, and expiration mechanics."
+    },
+    {
+      "source_document_id": "39cf19c3847173bf",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.cash_secured_put."
+    },
+    {
+      "source_document_id": "3ac9fc92b49bd0eb",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.short_straddle."
+    },
+    {
+      "source_document_id": "48341041772ecac4",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.bull_call_spread."
+    },
+    {
+      "source_document_id": "4a631c9d54364d94",
+      "source_id": "oic",
+      "content_kind": "reference",
+      "knowledge_type": "pricing",
+      "body_eligible": true,
+      "reason": "Substantive explanation of intrinsic value, time value, and premium drivers."
+    },
+    {
+      "source_document_id": "4b3ae3e36b510b23",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.naked_call."
+    },
+    {
+      "source_document_id": "4db52269dc07f371",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_put_condor."
+    },
+    {
+      "source_document_id": "5cfb6746f1551213",
+      "source_id": "optionalpha",
+      "content_kind": "article",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "excluded_sections": [
+        "Options trading account types",
+        "Best brokers for options",
+        "Options trading commissions",
+        "Options trading market hours"
+      ],
+      "reason": "Substantive strategy and payoff text; broker, account, and market-hours promotion is excluded."
+    },
+    {
+      "source_document_id": "5ea68202321fc862",
+      "source_id": "optionalpha",
+      "content_kind": "video_course_landing",
+      "knowledge_type": "pricing",
+      "body_eligible": false,
+      "reason": "Video-course promotion with too little standalone text."
+    },
+    {
+      "source_document_id": "6f34560bcaef42b5",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.protective_put."
+    },
+    {
+      "source_document_id": "714d7700cf6f9c08",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.bull_put_spread."
+    },
+    {
+      "source_document_id": "77eec3ea8d9b0a94",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.short_strangle."
+    },
+    {
+      "source_document_id": "782b7a9a0ab384db",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_call."
+    },
+    {
+      "source_document_id": "78525508e2d3a96e",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_straddle."
+    },
+    {
+      "source_document_id": "91e58ed887affc8c",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_call_condor."
+    },
+    {
+      "source_document_id": "94f27ca3e21a8670",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Complete Covered Call source with legs, payoff, outlook, and risk sections."
+    },
+    {
+      "source_document_id": "95636a10075badd7",
+      "source_id": "oic",
+      "content_kind": "reference",
+      "knowledge_type": "greek",
+      "body_eligible": true,
+      "reason": "Substantive text reference for Gamma and its risk drivers."
+    },
+    {
+      "source_document_id": "96498860d7dd62e8",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.collar."
+    },
+    {
+      "source_document_id": "99f90a9319955ad7",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_put."
+    },
+    {
+      "source_document_id": "9ad231da67f7ddbd",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.short_iron_butterfly."
+    },
+    {
+      "source_document_id": "a0e82e52694688d2",
+      "source_id": "oic",
+      "content_kind": "reference",
+      "knowledge_type": "greek",
+      "body_eligible": true,
+      "reason": "Substantive text reference for Theta and time decay."
+    },
+    {
+      "source_document_id": "a82e55e852651d75",
+      "source_id": "oic",
+      "content_kind": "article",
+      "knowledge_type": "concept",
+      "body_eligible": true,
+      "reason": "Substantive option-contract definition, buyer/writer rights, and premium mechanics."
+    },
+    {
+      "source_document_id": "b00b8cf6d87474e6",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.bear_put_spread."
+    },
+    {
+      "source_document_id": "b33e35b91e19dcfc",
+      "source_id": "oic",
+      "content_kind": "reference",
+      "knowledge_type": "greek",
+      "body_eligible": true,
+      "reason": "Substantive text reference for Vega and implied volatility sensitivity."
+    },
+    {
+      "source_document_id": "bc0d02b1f3b6bc5a",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.short_iron_condor."
+    },
+    {
+      "source_document_id": "bfbc4fe807ca86ea",
+      "source_id": "cme",
+      "content_kind": "course_landing",
+      "knowledge_type": "options_on_futures",
+      "body_eligible": false,
+      "reason": "Course overview and accreditation text; retain only as learning-path metadata."
+    },
+    {
+      "source_document_id": "e4122df78e2e862a",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_call_butterfly."
+    },
+    {
+      "source_document_id": "e7a9b4b532cb277a",
+      "source_id": "cme",
+      "content_kind": "course_catalog",
+      "knowledge_type": "options_on_futures",
+      "body_eligible": false,
+      "reason": "Curriculum and resource navigation rather than a textual knowledge article."
+    },
+    {
+      "source_document_id": "eb8f6aeedfbc450f",
+      "source_id": "cboe",
+      "content_kind": "course_catalog",
+      "knowledge_type": "concept",
+      "body_eligible": false,
+      "reason": "Interactive-course and course-directory landing page."
+    },
+    {
+      "source_document_id": "ebdbd768e5e8e3de",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_strangle."
+    },
+    {
+      "source_document_id": "ee77ad9374aabbe8",
+      "source_id": "oic",
+      "content_kind": "article",
+      "knowledge_type": "risk_rule",
+      "body_eligible": true,
+      "reason": "Substantive text on hedging, leverage, and holder/writer risk."
+    },
+    {
+      "source_document_id": "f249989064487144",
+      "source_id": "optionalpha",
+      "content_kind": "video_course_landing",
+      "knowledge_type": "lifecycle",
+      "body_eligible": false,
+      "reason": "Video-course promotion with too little standalone text."
+    },
+    {
+      "source_document_id": "f363d7c4fb655224",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.bear_call_spread."
+    },
+    {
+      "source_document_id": "fb8ce48c80fbd468",
+      "source_id": "oic",
+      "content_kind": "article",
+      "knowledge_type": "lifecycle",
+      "body_eligible": true,
+      "reason": "Substantive exercise, assignment, early-exercise, and expiration-risk mechanics."
+    },
+    {
+      "source_document_id": "fce977a3b3f27c10",
+      "source_id": "oic",
+      "content_kind": "strategy",
+      "knowledge_type": "strategy",
+      "body_eligible": true,
+      "reason": "Substantive OIC strategy text for strategy.long_call_calendar."
+    }
+  ]
+}

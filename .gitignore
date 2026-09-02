@@ -4,3 +4,8 @@ __pycache__/
 .env.*
 !.env.example
 /data/raw/runs/
+
+# claude-obsidian vault runtime (also listed in knowledge/.gitignore)
+knowledge/.vault-meta/
+knowledge/.mcp.json
+knowledge/.obsidian/workspace*.json

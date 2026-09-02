@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "run_id": "PUZYbnrk9cH2qOIMW",
+  "status": "SUCCEEDED",
+  "exit_code": 0,
+  "started_at": "2026-09-01T22:18:01.510Z",
+  "finished_at": "2026-09-01T22:19:22.987Z",
+  "cost_usd": 0.031542482682997974,
+  "page_budget": 8,
+  "documents": [
+    {
+      "id": "4b3ae3e36b510b23",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/naked-call-uncovered-call-short-call"
+    },
+    {
+      "id": "6f34560bcaef42b5",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/protective-put-married-put"
+    },
+    {
+      "id": "f363d7c4fb655224",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/bear-call-spread-credit-call-spread"
+    },
+    {
+      "id": "714d7700cf6f9c08",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/bull-put-spread-credit-put-spread"
+    },
+    {
+      "id": "fce977a3b3f27c10",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-call-calendar-spread-call-horizontal"
+    },
+    {
+      "id": "e4122df78e2e862a",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-call-butterfly"
+    },
+    {
+      "id": "91e58ed887affc8c",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-call-condor"
+    },
+    {
+      "id": "4db52269dc07f371",
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-put-condor"
+    }
+  ],
+  "generated_at": "2026-09-01T22:19:30.578877+00:00"
+}

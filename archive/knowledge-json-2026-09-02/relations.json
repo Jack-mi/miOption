@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "relations": [
+    {
+      "from_id": "strategy.covered_call",
+      "relation_type": "affects",
+      "to_id": "greek.vega",
+      "status": "published",
+      "id": "relation.1b0527fdf279a3570015",
+      "source_document_id": "94f27ca3e21a8670",
+      "evidence": [
+        {
+          "chunk_id": "chunk.e917160522e903694b4e",
+          "source_document_id": "94f27ca3e21a8670",
+          "source_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "heading": "Volatility",
+          "line_start": 92,
+          "line_end": 97,
+          "quote": "An increase in implied volatility would have a neutral to slightly negative impact on this strategy, all other things being equal. It would tend to increase the cost of buying the short call back to close the position. In that sense, greater volatility hurts this strategy as it does all short option positions.\nHowever,"
+        }
+      ]
+    },
+    {
+      "from_id": "strategy.covered_call",
+      "relation_type": "requires",
+      "to_id": "concept.equity_options_basics",
+      "status": "published",
+      "id": "relation.1f642babbe17c2e1f37c",
+      "source_document_id": "94f27ca3e21a8670",
+      "evidence": [
+        {
+          "chunk_id": "chunk.038cef00974a99f2f606",
+          "source_document_id": "94f27ca3e21a8670",
+          "source_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "heading": "Description",
+          "line_start": 5,
+          "line_end": 18,
+          "quote": "An investor who buys or owns stock and writes call options in the equivalent amount can earn premium income without taking on additional risk. The premium received adds to the investor's bottom line regardless of outcome. It offers a small downside 'cushion' in the event the stock slides downward and can boost returns "
+        },
+        {
+          "chunk_id": "chunk.19be46cb0b6f62f5da73",
+          "source_document_id": "94f27ca3e21a8670",
+          "source_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "heading": "Example",
+          "line_start": 19,
+          "line_end": 35,
+          "quote": "- Long 100 shares XYZ stock\n- Short 1 XYZ 60 call\nMAXIMUM GAIN\n- Strike price - stock purchase price + premium received\nMAXIMUM LOSS\n- Stock purchase price - premium received (substantial)\nThe covered call writer could select a higher, out-of-the-money strike price and preserve more of the stock's upside potential for "
+        }
+      ]
+    },
+    {
+      "from_id": "strategy.covered_call",
+      "relation_type": "affects",
+      "to_id": "greek.theta",
+      "status": "published",
+      "id": "relation.59cf1cf10efeed4b4ed3",
+      "source_document_id": "94f27ca3e21a8670",
+      "evidence": [
+        {
+          "chunk_id": "chunk.c9363fc7a89e4b99cf65",
+          "source_document_id": "94f27ca3e21a8670",
+          "source_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "heading": "Time Decay",
+          "line_start": 98,
+          "line_end": 103,
+          "quote": "The passage of time has a positive impact on this strategy, all other things being equal. It tends to reduce the time value (and therefore overall price) of the short call, which would make it less expensive to close out if desired. As expiration approaches, an option tends to converge on its intrinsic value, which for"
+        }
+      ]
+    },
+    {
+      "from_id": "greek.gamma",
+      "relation_type": "requires",
+      "to_id": "greek.delta",
+      "status": "published",
+      "id": "relation.84cfb1a53b7591c3282d",
+      "source_document_id": "95636a10075badd7",
+      "evidence": [
+        {
+          "chunk_id": "chunk.d546ddd8e12d445b696f",
+          "source_document_id": "95636a10075badd7",
+          "source_url": "https://www.optionseducation.org/advancedconcepts/gamma",
+          "heading": "Gamma",
+          "line_start": 1,
+          "line_end": 6,
+          "quote": "How Delta is expected to change given a $1 move in the underlying is called Gamma. An investor can see how the Delta will affect an option's price given a $1 move in the underlying, but to see how the Delta on that option might change given the same $1.00 move, we refer to Gamma.\nLooking at a hypothetical example, OICX"
+        }
+      ]
+    },
+    {
+      "from_id": "strategy.covered_call",
+      "relation_type": "requires",
+      "to_id": "lifecycle.exercise_assignment",
+      "status": "published",
+      "id": "relation.d21bfdf63074dabfa686",
+      "source_document_id": "94f27ca3e21a8670",
+      "evidence": [
+        {
+          "chunk_id": "chunk.45891d42bb36f4896515",
+          "source_document_id": "94f27ca3e21a8670",
+          "source_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "heading": "Assignment Risk",
+          "line_start": 104,
+          "line_end": 111,
+          "quote": "If the strategy was selected appropriately, there should be no problem here. A covered call strategy implicitly assumes the investor is willing and able to sell stock at the strike price (premium, in effect). Therefore, assignment simply allows the investor to liquidate the stock at the pre-set price and put the cash t"
+        },
+        {
+          "chunk_id": "chunk.bfecda41f318cd28fb43",
+          "source_document_id": "94f27ca3e21a8670",
+          "source_url": "https://www.optionseducation.org/strategies/all-strategies/covered-call-buy-write",
+          "heading": "Expiration Risk",
+          "line_start": 112,
+          "line_end": 119,
+          "quote": "For reasons described in 'Assignment Risk', there should be no issue with expiration risk, either. The appropriate use of this strategy implicitly assumes the investor is willing and able to sell stock at the strike price.\nIt should not matter whether the option is exercised at expiration. If it is not, the investor is"
+        }
+      ]
+    }
+  ]
+}
