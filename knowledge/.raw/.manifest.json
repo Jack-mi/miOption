@@ -2,11 +2,25 @@
   "address_map": {},
   "description": "Ingest delta tracker. Source payloads are create-only.",
   "sources": {
+    ".raw/captured/100887f9d4fdf532760d8106dada0c4bfeb1be8ef5bd0baf18bc6eb535cad855.md": {
+      "hash": "100887f9d4fdf532760d8106dada0c4bfeb1be8ef5bd0baf18bc6eb535cad855",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Long Put Calendar Spread (Put Horizontal).md"
+      ]
+    },
     ".raw/captured/104109d5ed17fae973d421294b4cfa6b9ed1743fe04def5443339487cf1ff024.md": {
       "hash": "104109d5ed17fae973d421294b4cfa6b9ed1743fe04def5443339487cf1ff024",
       "ingested_at": "2026-09-01",
       "pages_created": [
         "wiki/sources/Source — Free Neutral Options Strategies Course - Option Alpha (catalog only).md"
+      ]
+    },
+    ".raw/captured/10a4e73a4ab36fc26fe16c0f7d35e18a8f2585e87fe29c6e1fe320ed67fcc09d.md": {
+      "hash": "10a4e73a4ab36fc26fe16c0f7d35e18a8f2585e87fe29c6e1fe320ed67fcc09d",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Futu 常用期权组合简介.md"
       ]
     },
     ".raw/captured/1430ba0de31deae6f8446a20537d504173dae10f00cfb1655a566e2e7b250d18.md": {
@@ -147,6 +161,13 @@
       "ingested_at": "2026-09-01",
       "pages_created": [
         "wiki/sources/Source — Cash-Secured Put.md"
+      ]
+    },
+    ".raw/captured/97691f511d0400c9a3b48d82632bf52eea3fdbb01255042157b9a5400b5a91da.md": {
+      "hash": "97691f511d0400c9a3b48d82632bf52eea3fdbb01255042157b9a5400b5a91da",
+      "ingested_at": "2026-09-02",
+      "pages_created": [
+        "wiki/sources/Source — Long Put Butterfly.md"
       ]
     },
     ".raw/captured/a5c8b3458da025828a1c376897b16e126ba3e6a8c847d001590f4bdf312e893e.md": {

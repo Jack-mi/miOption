@@ -15,7 +15,9 @@ aliases:
   - time spread
 sources:
   - "[[Source — Long Call Calendar Spread (Call Horizontal)]]"
-related: []
+related:
+  - "[[Long Put Calendar Spread]]"
+  - "[[Diagonal Call Spread]]"
 ---
 
 # Long Call Calendar Spread
@@ -125,5 +127,9 @@ For traders comfortable managing the front-month expiration and the remaining lo
 - [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Comments` · lines 76–81
   > The difference in time to expiration of these two call options results in their having a different Theta, Delta and Gamma. Obviously, the near-term call suffers more from time decay, i.e., has a greater Theta. Less intuitively, the near-term call has a lower Delta but a higher Gamma (if the strike is at-the-money). Thi
 
+## See also
+
+- related to: [[Long Put Calendar Spread]]
+- related to: [[Diagonal Call Spread]]
 
 See the [[index|Wiki Index]].

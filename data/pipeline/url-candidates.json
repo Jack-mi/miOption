@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-09-01T22:50:00+08:00",
-  "policy": "Only approved HTTPS URLs matching sources.json host and path allowlists may be run. proposed candidates are staged for human approval and cannot be crawled until crawl_status becomes approved. The corpus covers options, including options on futures when the page is about options; standalone futures material is out of scope. Strategy coverage targets the Futu strategy menu, filled from OIC text pages.",
+  "generated_at": "2026-09-02T10:50:00+08:00",
+  "policy": "Only approved HTTPS URLs matching sources.json host and path allowlists may be run. proposed candidates are staged for human approval and cannot be crawled until crawl_status becomes approved. The corpus covers options, including options on futures when the page is about options; standalone futures material is out of scope. Strategy coverage is one set merged from the Futu App menu and help topic474, filled from OIC text pages.",
   "candidates": [
     {
       "url": "https://www.optionseducation.org/optionsoverview/what-is-an-option",
@@ -652,6 +652,56 @@
       ],
       "target_card_id": "strategy.long_put_condor",
       "notes": "Futu coverage; Condor / Long Put; HTTP 200 verified 2026-09-01; awaiting approval before crawl; ingested after futu-strategies-b crawl"
+    },
+    {
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-put-butterfly",
+      "source_id": "oic",
+      "topic": "strategy",
+      "priority": 5,
+      "crawl_status": "proposed",
+      "allowed": true,
+      "batch": "futu-topic474-gaps",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs",
+        "market_outlook",
+        "suitability_constraints",
+        "max_gain",
+        "max_loss",
+        "breakeven",
+        "assignment_or_expiration_risk"
+      ],
+      "target_card_id": "strategy.long_put_butterfly",
+      "notes": "topic474 butterfly call-or-put gap; vault note written from local capture 2026-09-02; not yet in data/raw/pages"
+    },
+    {
+      "url": "https://www.optionseducation.org/strategies/all-strategies/long-put-calendar-spread-put-horizontal",
+      "source_id": "oic",
+      "topic": "strategy",
+      "priority": 5,
+      "crawl_status": "proposed",
+      "allowed": true,
+      "batch": "futu-topic474-gaps",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs",
+        "market_outlook",
+        "suitability_constraints",
+        "max_gain",
+        "max_loss",
+        "breakeven",
+        "assignment_or_expiration_risk"
+      ],
+      "target_card_id": "strategy.long_put_calendar",
+      "notes": "topic474 calendar call-or-put gap; vault note written from local capture 2026-09-02; not yet in data/raw/pages"
     }
   ]
 }

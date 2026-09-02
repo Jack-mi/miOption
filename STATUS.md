@@ -1,7 +1,7 @@
 # miOption：当前项目现状
 
 更新时间：2026-09-02
-状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。10 张概念笔记 + 21 张 evergreen 策略实体 + 5 条关系 wikilink 已导入；对角策略仍为 developing；无待抓批次。
+状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。10 张概念笔记 + 23 张 evergreen 策略实体 + 3 张 developing（对角、Strap、Strip）+ 5 条关系 wikilink。App 菜单与 topic474 已合并为一套覆盖。OIC put butterfly / put calendar 为 `proposed` 候选（vault 已有本地捕获，尚未进 `data/raw/pages`）。
 
 ## 1. 结论
 
@@ -13,7 +13,7 @@
 原始期权页面 → 页面准入 → vault `.raw/captured` → wiki 源笔记 / 概念 / 策略实体 → wikilink
 ```
 
-产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖已对齐**富途官方策略菜单**（自定义除外）：清单用富途，证据用 OIC。vault 内 10 张概念、**22** 张策略实体、5 条关系。除对角策略外均为 evergreen。
+产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)（自定义除外）。清单用富途，P/L 证据用 OIC；Strap/Strip 仅有富途腿结构。vault 内 10 张概念、**26** 张策略实体（23 evergreen + 3 developing）、5 条关系。
 
 ## 2. 范围与准入边界
 
@@ -36,13 +36,14 @@
 
 | 层级 | 数量 | 含义 |
 |---|---:|---|
-| 原始来源页面 | 39 | 每页保留 JSON 与 Markdown 证据 |
+| 原始来源页面 | 39 | 每页保留 JSON 与 Markdown 证据（Apify 抓取） |
 | 正文证据页 | 31 | 满足主题与文字正文准入 |
 | 仅目录/课程/视频页 | 8 | 保留来源，不进入知识抽取 |
+| vault 本地捕获（未进 raw pages） | 3 | put butterfly、put calendar、Futu topic474 |
 | 可引用知识片段（chunks，归档 JSON） | 393 | 含标题、行号、内容哈希和来源 URL；不单独做成笔记 |
-| vault 源笔记 | 39 | `knowledge/wiki/sources/` |
+| vault 源笔记 | 42 | `knowledge/wiki/sources/`（39 crawl + 3 local） |
 | vault 概念笔记 | 10 | 概念、定价、Greeks、生命周期、风险、策略原则 |
-| vault 策略实体 | 22 | 对齐富途 12 类 + 方向变体；含 Covered Call |
+| vault 策略实体 | 26 | 合并覆盖；含 Covered Call、put butterfly/calendar、Strap/Strip |
 | 有证据的知识关系 | 5 | 已写成笔记间 wikilink（3 条 requires、2 条 affects） |
 
 ### 来源构成
@@ -67,9 +68,10 @@
 | 领口策略 | ready | Collar |
 | 跨式策略 | ready | Long / Short Straddle |
 | 宽跨式策略 | ready | Long / Short Strangle |
-| 日历策略 | ready | Long Call Calendar |
+| 带式 / 条式 | partial | Strap、Strip（topic474 腿结构；无独立 OIC 页，developing） |
+| 日历策略 | ready | Long Call Calendar、Long Put Calendar |
 | 对角策略 | partial | Diagonal 仍为 developing（无独立 OIC 页；盈亏字段暂用日历同名段落） |
-| 蝶式策略 | ready | Long Call Butterfly |
+| 蝶式策略 | ready | Long Call Butterfly、Long Put Butterfly |
 | 鹰式策略 | ready | Long Call / Long Put Condor |
 | 铁蝶式策略 | ready | Short Iron Butterfly |
 | 铁鹰式策略 | ready | Short Condor (Iron Condor) |
@@ -102,9 +104,9 @@ wiki
 ### 已形成的知识内容
 
 - **概念笔记**：10 张，均为 evergreen。
-- **策略实体**：22 张；其中 21 张 evergreen，Diagonal Call Spread 保持 developing。
-- **关系**：5 条已写成 wikilink（Gamma↔Delta；Covered Call 与基础/行权/Theta/Vega）。新策略之间的关系尚未补。
-- **抽查记录**：代表性卡（Covered Call、Cash-Secured Put、Long Call、Protective Put、Bull Call Spread、Iron Condor、Collar、Long Straddle、Call Calendar、Diagonal）字段与证据引用均通过；全量 22 张策略卡证据链完整。对角策略定义有日历页 Description/Variations 支撑，但 max gain/loss/breakeven 仍是同执行价日历口径，故未升 evergreen。
+- **策略实体**：26 张；23 张 evergreen，Diagonal / Strap / Strip 保持 developing。
+- **关系**：5 条已写成 wikilink（Gamma↔Delta；Covered Call 与基础/行权/Theta/Vega）。已补 butterfly / calendar / straddle↔strap/strip 的 related。
+- **抽查记录**：代表性卡（Covered Call、Cash-Secured Put、Long Call、Protective Put、Bull Call Spread、Iron Condor、Collar、Long Straddle、Call Calendar、Diagonal）字段与证据引用均通过。对角策略定义有日历页 Description/Variations 支撑，但 max gain/loss/breakeven 仍是同执行价日历口径，故未升 evergreen。Strap/Strip 不写 P/L 数字。
 
 ## 5. 抓取、成本与约束
 
@@ -121,7 +123,7 @@ wiki
 
 - 已记录总成本：约 `$0.2095836011`。
 - `$1` 探索额度中（pilot + 终止跑 + followup + A + B）累计约 `$0.1637666320`，约余 `$0.836`。
-- 候选队列 35 个 URL 均为 `ingested`；没有 `approved` 待抓批次。
+- 候选队列 35 个 URL 为 `ingested`；另 2 个 OIC URL（put butterfly、put calendar）为 `proposed` 批次 `futu-topic474-gaps`，尚无 `approved` 待抓批次。
 - 另有 4 篇初始小样本页面不在候选队列中且缺 `run_id`（legacy）。
 
 ### 实际采集护栏
@@ -163,17 +165,20 @@ python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge
 已知缺口：
 
 - Diagonal Call Spread 仍为 developing：需独立对角文字页，或按对角口径改写盈亏字段后再升 evergreen。
-- 新策略卡之间尚未补 requires / related_to 等关系。
+- Strap / Strip 仍为 developing：仅有 Futu topic474 腿结构，无独立 OIC 页，不写 P/L。
+- Put butterfly / put calendar 的 vault 笔记来自本地捕获，尚未经 Apify 写入 `data/raw/pages`。
 - taxonomy 的 `options_on_futures` 仍为空；流动性、保证金、期货期权结算仍未做。
 - 短 chunk 与 taxonomy 100 字门槛仍未强制对齐（可选后续处理）。
 - Cboe canonical `/en/optionsinstitute/` 路径策略未定。
+- 归档 JSON（`build_knowledge.py --check`）仍为迁移前 22 张策略，vault 已领先。
 
 ## 8. 下一步待办
 
 1. 对角策略：找独立文字证据页，或收窄字段只保留有对角原文支撑的含义/场景后再发布。
-2. 按需补策略关系（例如垂直四向互为 `related_to`，铁鹰依赖垂直概念）。
-3. 流动性、保证金、期货期权结算等专题另开缺口后再批候选。
-4. 不做整站抓取；Investopedia 仍不自动采。
+2. 批准并抓取 `futu-topic474-gaps`（put butterfly / put calendar），把捕获写入 `data/raw/pages`。
+3. Strap/Strip：找到独立文字页后再写 P/L 并升 evergreen。
+4. 流动性、保证金、期货期权结算等专题另开缺口后再批候选。
+5. 不做整站抓取；Investopedia 仍不自动采。
 
 ## 9. 交接注意事项
 

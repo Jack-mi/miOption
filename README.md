@@ -14,8 +14,8 @@ This project builds a source-backed local knowledge base for options education a
 See [STATUS.md](STATUS.md) for the live snapshot, known gaps, and sequenced to-dos.
 
 - The raw evidence layer has 39 normalized source documents; 31 substantive text pages are eligible, while 8 video/course/catalog pages are retained only as navigation metadata.
-- The vault contains 39 source notes, 10 concept notes, 21 evergreen strategy entities plus one developing Diagonal card, and five relations as wikilinks. Coverage follows Futu's 12 named strategy types (Custom excluded).
-- There is no `approved` crawl batch remaining; Futu-coverage batches A and B are ingested.
+- The vault contains 42 source notes, 10 concept notes, 23 evergreen strategy entities plus three developing cards (Diagonal, Strap, Strip), and five relations as wikilinks. Coverage is one set: Futu App menu ∪ topic474 (Custom excluded).
+- There is no `approved` crawl batch. Batches A and B are ingested. Two OIC URLs (put butterfly, put calendar) are `proposed` as `futu-topic474-gaps`.
 - Crawl scope is enforced in code: HTTPS-only source/path allowlists, fixed URL batches, depth `0`, robots.txt checks, and post-run validation of page count, status, source path, and cost.
 - Investopedia is excluded from automated crawling because its robots/terms prohibit automated scraping and AI dataset use.
 - Complete Apify run metadata is local-only and ignored by Git because it can contain signed URLs and runtime secrets. The repository contains only sanitized run summaries.
@@ -76,6 +76,6 @@ The source URL stays attached to each source note for verification. Retrieval sh
 
 Full sequence is in [STATUS.md](STATUS.md). In short:
 
-1. Strategy coverage for Futu's 12 named types is in place (Custom excluded). See [wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md).
+1. Merged coverage is in [wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md). Put butterfly / put calendar are in the vault; Strap / Strip are developing.
 2. Finish Diagonal: find a dedicated text source or rewrite P/L fields before promoting that note from developing to evergreen.
-3. Optionally add relations among the new strategy cards; liquidity, margin, and options-on-futures settlement remain later gaps.
+3. Approve `futu-topic474-gaps` if those two OIC pages should land in `data/raw/pages`. Liquidity, margin, and options-on-futures settlement remain later gaps.

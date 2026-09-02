@@ -59,6 +59,25 @@
       "supersedes": null,
       "title": "Source — The Options Institute Options 101 - Cboe (catalog only)"
     },
+    "src-0de53d548843b6769421": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "10a4e73a4ab36fc26fe16c0f7d35e18a8f2585e87fe29c6e1fe320ed67fcc09d",
+      "independence_key": "futu",
+      "ingested_at": "2026-09-02",
+      "origin": {
+        "kind": "url",
+        "locator": "https://support.futunn.com/topic474"
+      },
+      "pages": [
+        "wiki/sources/Source — Futu 常用期权组合简介.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-02",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Futu 常用期权组合简介"
+    },
     "src-13fd54e237fa551c8890": {
       "authority": "official",
       "content_kind": "webpage",
@@ -458,6 +477,25 @@
       "supersedes": null,
       "title": "Source — Long Straddle"
     },
+    "src-711ff18ce5ac7d1a4e8f": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "97691f511d0400c9a3b48d82632bf52eea3fdbb01255042157b9a5400b5a91da",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-02",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-put-butterfly"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Put Butterfly.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-02",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Put Butterfly"
+    },
     "src-72e8c89b235834227830": {
       "authority": "official",
       "content_kind": "webpage",
@@ -742,6 +780,25 @@
       "review_status": "active",
       "supersedes": null,
       "title": "Source — Options Delta"
+    },
+    "src-f6ab08520a65a5bb6f86": {
+      "authority": "official",
+      "content_kind": "webpage",
+      "content_sha256": "100887f9d4fdf532760d8106dada0c4bfeb1be8ef5bd0baf18bc6eb535cad855",
+      "independence_key": "oic",
+      "ingested_at": "2026-09-02",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionseducation.org/strategies/all-strategies/long-put-calendar-spread-put-horizontal"
+      },
+      "pages": [
+        "wiki/sources/Source — Long Put Calendar Spread (Put Horizontal).md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-02",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Long Put Calendar Spread (Put Horizontal)"
     }
   }
 }

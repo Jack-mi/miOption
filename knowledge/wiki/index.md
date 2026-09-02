@@ -25,6 +25,7 @@ miOption options knowledge: source-backed concepts and named strategies.
 - [[Source — Covered Call (Buy-Write)]]
 - [[Source — Curriculum- All About Options - CME Group (catalog only)]]
 - [[Source — Exercising Options]]
+- [[Source — Futu 常用期权组合简介]]
 - [[Source — Free Neutral Options Strategies Course - Option Alpha (catalog only)]]
 - [[Source — Free Options Basics Course - Option Alpha (catalog only)]]
 - [[Source — Free Options Expiration Course - Option Alpha (catalog only)]]
@@ -36,6 +37,8 @@ miOption options knowledge: source-backed concepts and named strategies.
 - [[Source — Long Call Calendar Spread (Call Horizontal)]]
 - [[Source — Long Call Condor]]
 - [[Source — Long Put]]
+- [[Source — Long Put Butterfly]]
+- [[Source — Long Put Calendar Spread (Put Horizontal)]]
 - [[Source — Long Put Condor]]
 - [[Source — Long Straddle]]
 - [[Source — Long Strangle (Long Combination)]]
@@ -83,6 +86,8 @@ miOption options knowledge: source-backed concepts and named strategies.
 - [[Long Call Calendar Spread]]
 - [[Long Call Condor]]
 - [[Long Put]]
+- [[Long Put Butterfly]]
+- [[Long Put Calendar Spread]]
 - [[Long Put Condor]]
 - [[Long Straddle]]
 - [[Long Strangle (Long Combination)]]
@@ -92,6 +97,8 @@ miOption options knowledge: source-backed concepts and named strategies.
 - [[Short Iron Butterfly]]
 - [[Short Straddle]]
 - [[Short Strangle]]
+- [[Strap]]
+- [[Strip]]
 
 ## Coverage
 

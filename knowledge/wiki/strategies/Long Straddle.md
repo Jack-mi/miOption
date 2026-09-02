@@ -14,7 +14,10 @@ aliases:
   - straddle
 sources:
   - "[[Source — Long Straddle]]"
-related: []
+related:
+  - "[[Strap]]"
+  - "[[Strip]]"
+  - "[[Long Strangle (Long Combination)]]"
 ---
 
 # Long Straddle
@@ -124,5 +127,10 @@ For investors who can afford two premiums and need a sufficiently large move bef
 - [[Source — Long Straddle]] · `Comments` · lines 84–87
   > This strategy could be seen as a race between time decay and volatility. The passage of time erodes the position's value a little bit every day, often at an accelerating rate. The hoped-for volatility increase might come at any moment or might never occur at all.
 
+## See also
+
+- related to: [[Strap]]
+- related to: [[Strip]]
+- related to: [[Long Strangle (Long Combination)]]
 
 See the [[index|Wiki Index]].

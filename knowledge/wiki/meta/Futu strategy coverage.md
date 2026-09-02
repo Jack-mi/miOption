@@ -9,16 +9,20 @@ tags:
   - coverage
 ---
 
-
 # Futu strategy coverage
 
-Align the knowledge base to Futu's official option-strategy menu. Content is filled from OIC text pages, not from Futu. Custom is product UI only.
+One merged set from two Futu surfaces:
 
-The menu follows Futu; the evidence is OIC text pages, not Futu pages.
+- App strategy menu (product categories, including single-leg, covered, collar, diagonal, iron butterfly, custom)
+- Help article [常用期权组合简介](https://support.futunn.com/topic474) (combo structures #1–12)
+
+Evidence for P/L and Greeks is OIC text, except Strap/Strip (Futu structure only) and Diagonal (still partial).
+
+Positioning source: [[Source — Futu 常用期权组合简介]]
 
 ## 单腿期权 / Single Option
 
-Category status: `ready`.
+Category status: `ready`. App menu; not in topic474.
 
 - [[Long Call]] — `ready`
 - [[Long Put]] — `ready`
@@ -27,74 +31,83 @@ Category status: `ready`.
 
 ## 垂直策略 / Vertical Spread
 
-Category status: `ready`.
+Category status: `ready`. topic474 #1–4.
 
-- [[Bull Call Spread (Debit Call Spread)]] — `ready`
-- [[Bear Put Spread]] — `ready`
-- [[Bear Call Spread (Credit Call Spread)]] — `ready`
-- [[Bull Put Spread (Credit Put Spread)]] — `ready`
+- [[Bull Call Spread (Debit Call Spread)]] — `ready` — Bull call spread
+- [[Bull Put Spread (Credit Put Spread)]] — `ready` — Bull put spread
+- [[Bear Call Spread (Credit Call Spread)]] — `ready` — Bear call spread
+- [[Bear Put Spread]] — `ready` — Bear put spread
 
 ## 股票担保 / Covered Stock
 
-Category status: `ready`.
+Category status: `ready`. App menu; not in topic474.
 
 - [[Covered Call (Buy-Write)]] — `ready`
 - [[Cash-Secured Put]] — `ready`
 
 ## 领口策略 / Collar
 
-Category status: `ready`.
+Category status: `ready`. App menu; not in topic474.
 
 - [[Collar (Protective Collar)]] — `ready`
 
 ## 跨式策略 / Straddle
 
-Category status: `ready`.
+Category status: `ready`. topic474 #10 (buy or sell).
 
 - [[Long Straddle]] — `ready`
 - [[Short Straddle]] — `ready`
 
 ## 宽跨式策略 / Strangle
 
-Category status: `ready`.
+Category status: `ready`. topic474 #11 (buy or sell).
 
 - [[Long Strangle (Long Combination)]] — `ready`
 - [[Short Strangle]] — `ready`
 
+## 带式 / 条式 / Strap and Strip
+
+Category status: `partial`. topic474 #8–9. No standalone OIC pages.
+
+- [[Strap]] — `reviewed` — 买 2 call + 买 1 put，同行权价同到期
+- [[Strip]] — `reviewed` — 买 2 put + 买 1 call，同行权价同到期
+
 ## 日历策略 / Calendar Spread
 
-Category status: `ready`.
+Category status: `ready`. topic474 #12 (sell near, buy far, same strike).
 
 - [[Long Call Calendar Spread]] — `ready`
+- [[Long Put Calendar Spread]] — `ready`
 
 ## 对角策略 / Diagonal Spread
 
-Category status: `partial`.
+Category status: `partial`. App menu; not in topic474.
 
 - [[Diagonal Call Spread]] — `reviewed`
 
 ## 蝶式策略 / Butterfly
 
-Category status: `ready`.
+Category status: `ready`. topic474 #5 (call or put).
 
 - [[Long Call Butterfly]] — `ready`
+- [[Long Put Butterfly]] — `ready`
 
 ## 鹰式策略 / Condor
 
-Category status: `ready`.
+Category status: `ready`. topic474 #6 (call or put).
 
 - [[Long Call Condor]] — `ready`
 - [[Long Put Condor]] — `ready`
 
 ## 铁蝶式策略 / Iron Butterfly
 
-Category status: `ready`.
+Category status: `ready`. App menu; not in topic474.
 
 - [[Short Iron Butterfly]] — `ready`
 
 ## 铁鹰式策略 / Iron Condor
 
-Category status: `ready`.
+Category status: `ready`. topic474 #7.
 
 - [[Short Condor (Iron Condor)]] — `ready`
 

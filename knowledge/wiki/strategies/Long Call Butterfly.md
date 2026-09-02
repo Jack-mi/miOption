@@ -14,7 +14,8 @@ aliases:
   - butterfly
 sources:
   - "[[Source — Long Call Butterfly]]"
-related: []
+related:
+  - "[[Long Put Butterfly]]"
 ---
 
 # Long Call Butterfly
@@ -125,5 +126,8 @@ For investors seeking defined-risk short-volatility style payoff who accept high
 - [[Source — Long Call Butterfly]] · `Comments` · lines 81–84
   > N/A
 
+## See also
+
+- related to: [[Long Put Butterfly]]
 
 See the [[index|Wiki Index]].

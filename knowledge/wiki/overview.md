@@ -25,9 +25,9 @@ This vault is the miOption options knowledge base. URLs and raw pages are eviden
 2. Immutable copies used by vault skills live in `.raw/captured/`.
 3. Source notes, concepts, and strategy entities live in `wiki/`.
 
-- Source notes: 39
+- Source notes: 42
 - Concept notes: 10
-- Strategy entities: 22
+- Strategy entities: 26
 - Published relations migrated as wikilinks: 5
 
 See [[index]], [[Futu strategy coverage]], and [[log]].
