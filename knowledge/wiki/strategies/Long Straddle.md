@@ -3,7 +3,7 @@ type: entity
 title: Long Straddle
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -14,6 +14,7 @@ aliases:
   - straddle
 sources:
   - "[[Source — Long Straddle]]"
+  - "[[Source — Optionistics Chapter 5 Straddles]]"
 related:
   - "[[Strap]]"
   - "[[Strip]]"
@@ -22,7 +23,7 @@ related:
 
 # Long Straddle
 
-Profit from a large move in either direction or a sharp rise in implied volatility.
+Profit from a large move in either direction or a sharp rise in implied volatility. Optionistics: equal number of puts and calls on the same stock at the same strike. P/L stays OIC.
 
 - Underlying: equity option
 - Knowledge id: `strategy.long_straddle`
@@ -66,6 +67,8 @@ For investors who can afford two premiums and need a sufficiently large move bef
   > A long straddle is a combination of buying a call and buying a put, both with the same strike price and expiration. Together, they produce a position that should profit if the stock makes a big move either up or down. Typically, investors buy the straddle because they predict a big price move and/or a great deal of vol
 - [[Source — Long Straddle]] · `Summary` · lines 15–22
   > This strategy consists of buying a call option and a put option with the same strike price and expiration. The combination generally profits if the stock price moves sharply in either direction during the life of the options. ; Max loss at 60, profit increases as price moves away from 60 in either direction") Net Posit
+- [[Source — Optionistics Chapter 5 Straddles]] · `Straddles`
+  > A straddle consists of an equal number of puts and calls on the same stock at the same strike. The objective of a long straddle is to profit from a large swing in the price of the underlying stock.
 
 ### Legs
 

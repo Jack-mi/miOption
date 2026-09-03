@@ -3,7 +3,7 @@ type: meta
 title: Hot Cache
 status: developing
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - meta
   - hot-cache
@@ -13,7 +13,7 @@ tags:
 
 ## Last Updated
 
-JSON knowledge cards were imported into wiki notes on 2026-09-02.
+Optionistics Learning Center lessons ingested 2026-09-03 (19 source notes; conversions/synthetics not strategy entities).
 
 ## Key Recent Facts
 
@@ -32,3 +32,5 @@ JSON knowledge cards were imported into wiki notes on 2026-09-02.
 - Wikipedia handling for Diagonal / Strap / Strip is in the vault.
 - Naked Put card is published from OIC.
 - New-topic crawl `dwOriSJHmglF1wbJA` succeeded (~$0.004); margin / futures-option / bid-ask notes are in the wiki.
+- Four-site matching (~$0.18 of $5): Optionistics cheerio, OPC/OptionStrat firefox, SharePredictions adaptive. Fusion samples: Optionistics Ch.5 spreads + OptionStrat builder tutorial.
+- Optionistics LC continuation: 19 qualifying cheerio lessons captured; 7 short pages skipped at the 1200-char gate. Covered call / straddle fused for structure only; conversions and synthetics stay source notes.

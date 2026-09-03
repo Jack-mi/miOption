@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-02T07:00:00Z",
+  "generated_at": "2026-09-03T04:00:00Z",
   "schema": "claude-obsidian.source-ledger.v1",
   "sources": {
     "src-03bd7de4e5f322945c19": {
@@ -932,6 +932,405 @@
       "review_status": "active",
       "supersedes": null,
       "title": "Source — Long Put Calendar Spread (Put Horizontal)"
+    },
+    "src-57140bca6b858c123b9d": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "f02cf7134179afd8de6d1baf26bc764595d4c3d77f14199f1df1d6ca71d8a76d",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-02",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter5/3_spreads.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 5 Spreads.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-02",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 5 Spreads"
+    },
+    "src-754e9ac95cbe1489e104": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "c8e1493c69107738556f01e823882e5cae275cdb55d0b66d6157296911eca004",
+      "independence_key": "optionstrat",
+      "ingested_at": "2026-09-02",
+      "origin": {
+        "kind": "url",
+        "locator": "https://optionstrat.com/tutorials/options-builder"
+      },
+      "pages": [
+        "wiki/sources/Source — Options Builder Tutorial.md"
+      ],
+      "refresh_due": "2027-09-02",
+      "retrieved_at": "2026-09-02",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Options Builder Tutorial"
+    },
+    "src-92ad50a392ef93d80bcd": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "fb556829a7f1f5d08ca9057557d8ad77f11c3f33e20b16a161ca88846c73d11e",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 1 What Is An Option.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 1 What Is An Option"
+    },
+    "src-70402a18a73aa0d38869": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "7d72227f28191028f9e4869f559c8edbc88552de6a9e1e9761e1f0eaf44b0ae8",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter1/3_definition_of_option_terms.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 1 Definition of Option Terms.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 1 Definition of Option Terms"
+    },
+    "src-3307beac7a00f65e1b1a": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "cc141e770c326d1a272145025d3efa99f2d19185083710eb9e5b3c15c2914b2d",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter2/1_objectives_of_option_trading.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 2 Objectives of Option Trading.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 2 Objectives of Option Trading"
+    },
+    "src-bf3544114feeaa258f92": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "a9f04bfa7a2a78d132bb2e64b0ef64c8f48aa22c29d06a3fe08dba6204a48c9b",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter2/3_leverage.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 2 Leverage.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 2 Leverage"
+    },
+    "src-b9b9b8f68710273f6e23": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "93455e90f813c3d04f8ea9dc22f183d5bf13a17b49f53064efa43b4f399e8a0c",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter2/4_growth.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 2 Growth.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 2 Growth"
+    },
+    "src-9b83e4e5164bee6d513e": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "b4a07498b37b9612577809515647c6fd81d5fba0edc3c936ea8bdbdc9b96e925",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter2/6_more_definitions.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 2 More Definitions.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 2 More Definitions"
+    },
+    "src-bb6e6a94f9a7e9c250bf": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "03576151ba5fc3d92af17cef51dfb3c5e35ca4894269f6d137d3c16f351a255a",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter3/1_option_pricing.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 3 Option Pricing.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 3 Option Pricing"
+    },
+    "src-38fb88a867ebe78e6c85": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "88f5720d703225fe9990a0636dd938a015ca4fa57efbd4b7d8ff3e8c86681411",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter3/2_underlying_price_vs_strike.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 3 Underlying Price vs Strike.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 3 Underlying Price vs Strike"
+    },
+    "src-9cc2fc94a4d2011f3c2d": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "e671ad9057ccaf5377633cac275db646aa02c209c1d317150ac6d4719412e968",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter3/4_volatility.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 3 Volatility.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 3 Volatility"
+    },
+    "src-1429f9ab7db5794de0b8": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "ca0de9c96a641355394a5d7cb822d6a727ff7443f85d681f4e98d277ed72b06e",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter3/5_dividends.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 3 Dividends.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 3 Dividends"
+    },
+    "src-f9bfff676a4e801df173": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "5da59b8bf0deed4dc33566bd4359747bdc6b920fe5ad288d70bb039898cbb435",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter4/1_pricing_an_option.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 4 Pricing an Option.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 4 Pricing an Option"
+    },
+    "src-856151c322b1a2e9b92b": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "ec273501157e878b273990a07941aea933a87226333aaf94d314be6d06d89e5f",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter4/2_the_significance_of_volatility.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 4 Significance of Volatility.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 4 Significance of Volatility"
+    },
+    "src-ca42494a84faf2d81af6": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "ab8ea6c05b3980b72cb6578d8e1e06b6fec4634cef2e5f48efea81ad26265a6a",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter4/3_data_quality_and_models.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 4 Data Quality and Models.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 4 Data Quality and Models"
+    },
+    "src-326ad9b69cefb0d47ee3": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "3a1dabc484d1a03acd63df83e7f57578418c5103abb491b2e55eb17b6791a83a",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter4/4_expected_returns.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 4 Expected Returns.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 4 Expected Returns"
+    },
+    "src-ad382f0a1002d0f67f4e": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "a110d0e100b888c19f0486bb32622be4f611a3d113543cff68cc97ae2a1ba940",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter4/5_identifying_unusual_volatility.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 4 Identifying Unusual Volatility.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 4 Identifying Unusual Volatility"
+    },
+    "src-2456be1ecdbbfdf4c6a9": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "db6327c7a5c0a4a1e5f2e5dca860485383db713609579dda68f344d13acbf5a1",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter5/2_covered_calls.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 5 Covered Calls.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 5 Covered Calls"
+    },
+    "src-a9d89ccfef76ba3f4e8c": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "3ed372513b8d3fe418357a07a76589f752c4d2340335c69cd8c05ec80df3e652",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter5/4_straddles.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 5 Straddles.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 5 Straddles"
+    },
+    "src-f22a6240c903bf03194e": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "40e2ce26f364c632e994800fa3231c3e46f65ebfa2927f09d621ea6b56e1dcd7",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter5/8_conversions.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 5 Conversions.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 5 Conversions"
+    },
+    "src-d0c28cf7e3b3db51f374": {
+      "authority": "secondary",
+      "content_kind": "webpage",
+      "content_sha256": "7634b831d25352223554b961a5ae91cd1ef9ee555fcceeaaacc4151b42d26090",
+      "independence_key": "optionistics",
+      "ingested_at": "2026-09-03",
+      "origin": {
+        "kind": "url",
+        "locator": "https://www.optionistics.com/s/chapter5/9_synthetic_positions.html"
+      },
+      "pages": [
+        "wiki/sources/Source — Optionistics Chapter 5 Synthetic Positions.md"
+      ],
+      "refresh_due": "2027-09-03",
+      "retrieved_at": "2026-09-03",
+      "review_status": "active",
+      "supersedes": null,
+      "title": "Source — Optionistics Chapter 5 Synthetic Positions"
     }
   }
 }

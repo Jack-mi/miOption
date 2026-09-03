@@ -3,7 +3,7 @@ type: concept
 title: Vega and implied volatility sensitivity
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - concept
   - greek
@@ -13,6 +13,8 @@ aliases:
   - implied volatility sensitivity
 sources:
   - "[[Source — Vega]]"
+  - "[[Source — Optionistics Chapter 2 More Definitions]]"
+  - "[[Source — Optionistics Chapter 4 Significance of Volatility]]"
 related:
   - "[[Covered Call (Buy-Write)]]"
 ---
@@ -35,10 +37,16 @@ If we know what the current market premiums are for the calls and the puts on a 
 Vega measures the amount of increase or decrease in premium based on a 1% (100 basis points) change in the implied volatility assumption. Longer-term options tend to have higher Vega than near-term options. Longer-termed options are typically more expensive, and a 1% change in implied volatility will represent a larger dollar amount of that premium than an option with a lower premium. If OICX were trading $50 and front-month $50 call was trading $2 and the 12-month-out $50 call was trading $5, the more expensive call would be more profoundly affected by a 1% change in implied volatility. To increase in price by identical amounts, the near term option’s implied volatility would have to have gone up around 2.5x that of the longer-termed option.
 For example, OICX is trading at $50, a call with 12 months until expiration has an implied volatility of 30%, a Vega of .15, and a current market value of $4. If implied volatility were to instantly rise 2% to 32%, the investor might expect the option premium to increase by: .15 X 2 = $.30 to around $4.30, all things being equal. A decrease in implied volatility by 5% may result in the option losing around: .15 X 5 = $.75 in value. As we can see, changes in implied volatility can have drastic effects on an option price, probably second only to underlying price in importance.
 
+Optionistics (secondary): historical volatility is an annualized standard deviation of past price changes; implied volatility is backed out from the current market price given the other model inputs. With strike and expiry fixed, implied volatility is the comparison of relative expense across a chain.
+
 ## Evidence
 
 - [[Source — Vega]] · `Vega` · lines 1–9
   > Vega measures an option’s sensitivity to changes in implied volatility. Implied volatility is measured in percentage terms and is a key variable in pricing models. Implied volatility has no direct correlation to actual past historical or statistical volatility; rather it is a measure of predicted future movement. Impli
+- [[Source — Optionistics Chapter 2 More Definitions]] · `More Definitions`
+  > Historical Volatility - the measure of the likelihood of a stock price to change. This is typically expressed as the annualized standard deviation of price changes in the underlying stock for a period of 3,6 or 12 months. Implied volatility - the volatility which is computed using the current market price, and other known, fixed model inputs.
+- [[Source — Optionistics Chapter 4 Significance of Volatility]] · `The Significance Of Volatility`
+  > An effective method of computing the relative expense of different options is to compute the implied volatility. The implied volatility is the measure of the likelihood that the underlying stock price will change based on the price of the option.
 
 ## See also
 

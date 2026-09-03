@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-09-02T10:50:00+08:00",
+  "generated_at": "2026-09-03T11:30:00+08:00",
   "policy": "Only approved HTTPS URLs matching sources.json host and path allowlists may be run. proposed candidates are staged for human approval and cannot be crawled until crawl_status becomes approved. The corpus covers options, including options on futures when the page is about options; standalone futures material is out of scope. Strategy coverage is one set merged from the Futu App menu and help topic474, filled from OIC text pages.",
   "candidates": [
     {
@@ -785,6 +785,713 @@
       ],
       "target_card_id": "concept.option_liquidity",
       "notes": "New platform trial: Wikipedia bid-ask spread as liquidity measure (mentions options). User-authorized $1 trial 2026-09-02. ingested run dwOriSJHmglF1wbJA"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/3_spreads.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs",
+        "market_outlook"
+      ],
+      "target_card_id": "strategy.diagonal_spread",
+      "notes": "Winner WCC cheerio; ingested run itzKzBM0lWaksMgcS. Vertical/horizontal/diagonal taxonomy."
+    },
+    {
+      "url": "https://www.optionistics.com/s/option_spreads",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Winner WCC cheerio; ingested run itzKzBM0lWaksMgcS. Names diagonal put/call among spread types."
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/7_butterflies_condors_and_wingspreads.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs",
+        "market_outlook"
+      ],
+      "notes": "Winner WCC cheerio; ingested run itzKzBM0lWaksMgcS."
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/1_common_complex_strategies.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Winner WCC cheerio; ingested run itzKzBM0lWaksMgcS."
+    },
+    {
+      "url": "https://www.optionsprofitcalculator.com/faq.html",
+      "source_id": "opc",
+      "topic": "concept",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Winner WCC firefox; ingested run xdu5fXpb4WAy08NJ0. Calculator methodology/FAQ, not strategy P/L."
+    },
+    {
+      "url": "https://www.optionsprofitcalculator.com/calculator/long-call.html",
+      "source_id": "opc",
+      "topic": "strategy",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs",
+        "market_outlook"
+      ],
+      "target_card_id": "strategy.long_call",
+      "notes": "Flaky SPA; smoke run fubGXWqWdHRkOwJd1 stored 5714 chars. Repeat runs often fall below 1200."
+    },
+    {
+      "url": "https://www2.optionsprofitcalculator.com/calculator/diagonal-spread.html",
+      "source_id": "opc",
+      "topic": "strategy",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "target_card_id": "strategy.diagonal_spread",
+      "notes": "www2 host; smoke run QTfPtb6GCrJGg33Ap. Plain www diagonal-spread.html is usually a nav shell."
+    },
+    {
+      "url": "https://optionstrat.com/tutorials/strategy-optimizer",
+      "source_id": "optionstrat",
+      "topic": "curriculum",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Winner WCC firefox; stored from smoke ZNbfM1By9eDBXrQrO. Tool tutorial, not strategy-card P/L."
+    },
+    {
+      "url": "https://optionstrat.com/tutorials/options-builder",
+      "source_id": "optionstrat",
+      "topic": "curriculum",
+      "priority": 7,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Winner WCC firefox; salvaged from batch RojKQg6c6fChnXVLV (11341 chars)."
+    },
+    {
+      "url": "https://sharepredictions.com/",
+      "source_id": "sharepredictions",
+      "topic": "meta",
+      "priority": 8,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "article",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Winner WCC adaptive; ingested run cID3Ylt992qsANWc9. Product FAQ only; do not fill strategy cards."
+    },
+    {
+      "url": "https://optionstrat.com/build/strap",
+      "source_id": "optionstrat",
+      "topic": "strategy",
+      "priority": 8,
+      "crawl_status": "proposed",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "target_card_id": "strategy.strap",
+      "notes": "Build stub ~400–500 chars; fails knowledge_policy 1200. Keep proposed until threshold or richer page."
+    },
+    {
+      "url": "https://optionstrat.com/build/diagonal-call-spread",
+      "source_id": "optionstrat",
+      "topic": "strategy",
+      "priority": 8,
+      "crawl_status": "proposed",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "target_card_id": "strategy.diagonal_spread",
+      "notes": "Build stub ~400 chars; fails 1200-char gate. Do not approve until body is longer."
+    },
+    {
+      "url": "https://www.optionsprofitcalculator.com/calculator/diagonal-spread.html",
+      "source_id": "opc",
+      "topic": "strategy",
+      "priority": 8,
+      "crawl_status": "proposed",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "strategy",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "target_card_id": "strategy.diagonal_spread",
+      "notes": "www host usually returns ~169-char nav shell. Use www2 URL instead."
+    },
+    {
+      "url": "https://www.optionistics.com/s/tutorial",
+      "source_id": "optionistics",
+      "topic": "curriculum",
+      "priority": 8,
+      "crawl_status": "proposed",
+      "allowed": true,
+      "batch": "four-site-match",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Learning Center hub; not crawled in winner batch. Needs approval before probe."
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter1/1_introduction_to_stock_options.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch1 intro; TOC-frozen 2026-09-03. Glossary letter index skipped (thin). TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: below 1200-char knowledge gate"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch1 what is an option. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run bYp1NpJN2RsVBHSRf"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter1/3_definition_of_option_terms.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch1 term definitions. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run bYp1NpJN2RsVBHSRf"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter2/1_objectives_of_option_trading.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch2 trading objectives. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run bYp1NpJN2RsVBHSRf"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter2/2_minimize_risk.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch2 minimize risk. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: below 1200-char knowledge gate"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter2/3_leverage.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch2 leverage. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run bYp1NpJN2RsVBHSRf"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter2/4_growth.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch2 growth. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run bYp1NpJN2RsVBHSRf"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter2/5_capture_market_volatility.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch2 capture volatility. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: below 1200-char knowledge gate"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter2/6_more_definitions.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-1",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch2 more definitions. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run bYp1NpJN2RsVBHSRf"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter3/1_option_pricing.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch3 option pricing. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter3/2_underlying_price_vs_strike.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch3 underlying vs strike. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter3/3_option_term.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch3 option term / time. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: too-short"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter3/4_volatility.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch3 volatility. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter3/5_dividends.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch3 dividends. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter3/6_interest_rates.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch3 interest rates. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: too-short"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter4/1_pricing_an_option.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch4 pricing an option. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter4/2_the_significance_of_volatility.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch4 significance of volatility. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter4/3_data_quality_and_models.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch4 data quality and models. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter4/4_expected_returns.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch4 expected returns. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter4/5_identifying_unusual_volatility.html",
+      "source_id": "optionistics",
+      "topic": "concept",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-2",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning"
+      ],
+      "notes": "Ch4 unusual volatility. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run Sgdh96rxVEeKOGf22"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-3",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Ch5 covered calls. Structure only; P/L stays OIC. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run AWXfMSfWk9gkOdbaT",
+      "target_card_id": "strategy.covered_call"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/4_straddles.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-3",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Ch5 straddles. Structure only; P/L stays OIC. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run AWXfMSfWk9gkOdbaT",
+      "target_card_id": "strategy.long_straddle"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/5_strangles.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-3",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Ch5 strangles. Structure only; P/L stays OIC. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: too-short",
+      "target_card_id": "strategy.long_strangle"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/6_collars.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 9,
+      "crawl_status": "skipped",
+      "allowed": true,
+      "batch": "optionistics-lc-3",
+      "knowledge_eligible": true,
+      "knowledge_type": "strategy",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Ch5 collars. Structure only; P/L stays OIC. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). skipped: too-short",
+      "target_card_id": "strategy.collar"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/8_conversions.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-3",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Ch5 conversions. Source note only; not a Futu coverage entity. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run AWXfMSfWk9gkOdbaT"
+    },
+    {
+      "url": "https://www.optionistics.com/s/chapter5/9_synthetic_positions.html",
+      "source_id": "optionistics",
+      "topic": "strategy",
+      "priority": 9,
+      "crawl_status": "ingested",
+      "allowed": true,
+      "batch": "optionistics-lc-3",
+      "knowledge_eligible": true,
+      "knowledge_type": "concept",
+      "content_kind": "text_lesson",
+      "video": false,
+      "expected_fields": [
+        "definition_meaning",
+        "legs"
+      ],
+      "notes": "Ch5 synthetics. Source note only; not a Futu coverage entity. TOC-frozen 2026-09-03; glossary /g/* skipped (letter index). ingested run AWXfMSfWk9gkOdbaT"
     }
   ]
 }

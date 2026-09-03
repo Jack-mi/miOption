@@ -1,0 +1,35 @@
+{
+  "id": "7185f646fdb6cf00",
+  "source_id": "optionistics",
+  "source_name": "Optionistics",
+  "url": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+  "title": "Chapter1/2 What Is An Option",
+  "description": "Optionistics",
+  "language": null,
+  "text": "Chapter1/2 What Is An Option\nFirst the basics: there are two basic types of options, CALLS and PUTS. \nA CALL is the right, but not the obligation, to buy a security at a specified price for a predetermined period of time. \nA PUT is the right, but not the obligation, to sell a security at a specified price for a predetermined period of time. \nCalls and puts are contracts between a buyer and a seller. The buyer of the option has the right, but not the obligation to take delivery of an underlying asset. The option buyer is also called the holder. \nThe seller of the option has the obligation to deliver the underlying asset. The seller has written the contract to deliver the underlying asset and is referred to as the writer. \nOptions can be American style or European style, chooser options, employee stock options, options on stocks, indexes, futures, or have a myriad of other twists. We'll keep this discussion simple by limiting it to CALL options on stocks. \nLet's start with an example, Apple Computers stock (AAPL) is trading at $51 and you feel strongly AAPL will rise in price. You could buy 1000 shares for $51,000. If your predictions are right you will profit, but if you're wrong, you stand to lose $1,000 for each point the stock drops. Although your gains are potentially unlimited, you can potentially lose the entire $51,000. \nWhat if you could reap the benefits of AAPL moving up without incurring the risk of loss if the stock goes down? If you purchase the right to buy the stock at a specified price, say $50, you would still profit if the stock price rises. If the stock rises to $60 before the option expires, your option would be worth at least $10, (your option gives you the right to buy the stock at $50 and you could immediately sell the stock for $60). If the stock goes down in price you would not be obligated to buy the stock, therefore you would not suffer the loss, your option simply expires worthless. Sounds great, but there's one catch - the option is not free. The amount paid for an option is called the premium. The premium paid for the option is the most the option buyer can lose, therefore the risk is limited. The probability that some or all of the premium will be lost is relatively high, so the risk factor is high. \nThe seller of the option has taken on a much larger risk. If the stock rises in price the option seller is obligated to deliver the stock at $50. If the stock goes to $60 the option holder will exercise the rights, and the option seller must sell the $60 stock for $50, losing $10 a share. There is no limit to the option seller's risk. \nWhich trader, the writer or the holder, has a better chance of profiting from the trade? The answer is neither, the option should be priced such that the option seller receives enough premium to offset the risk of the stock rising above the current price. This calculation involves a number of factors which are discussed later in Chapter 3.",
+  "markdown": "# Chapter1/2 What Is An Option\n\nFirst the basics: there are two basic types of options, CALLS and PUTS.\n\nA _CALL_ is the right, but not the obligation, to _buy_ a security at a specified price for a predetermined period of time.\n\nA _PUT_ is the right, but not the obligation, to _sell_ a security at a specified price for a predetermined period of time.\n\nCalls and puts are contracts between a buyer and a seller. The buyer of the option has the right, but not the obligation to take delivery of an underlying asset. The option buyer is also called the _holder_.\n\nThe seller of the option has the obligation to deliver the underlying asset. The seller has written the contract to deliver the underlying asset and is referred to as the _writer_.\n\nOptions can be American style or European style, chooser options, employee stock options, options on stocks, indexes, futures, or have a myriad of other twists. We'll keep this discussion simple by limiting it to CALL options on stocks.\n\nLet's start with an example, Apple Computers stock (AAPL) is trading at $51 and you feel strongly AAPL will rise in price. You could buy 1000 shares for $51,000. If your predictions are right you will profit, but if you're wrong, you stand to lose $1,000 for each point the stock drops. Although your gains are potentially unlimited, you can potentially lose the entire $51,000.\n\nWhat if you could reap the benefits of AAPL moving up without incurring the risk of loss if the stock goes down? If you purchase the right to buy the stock at a specified price, say $50, you would still profit if the stock price rises. If the stock rises to $60 before the option expires, your option would be worth at least $10, (your option gives you the right to buy the stock at $50 and you could immediately sell the stock for $60). If the stock goes down in price you would not be obligated to buy the stock, therefore you would not suffer the loss, your option simply expires worthless. Sounds great, but there's one catch - the option is not free. The amount paid for an option is called the _premium_. The premium paid for the option is the most the option buyer can lose, therefore the risk is limited. The probability that some or all of the premium will be lost is relatively high, so the risk factor is high.\n\nThe seller of the option has taken on a much larger risk. If the stock rises in price the option seller is obligated to deliver the stock at $50. If the stock goes to $60 the option holder will exercise the rights, and the option seller must sell the $60 stock for $50, losing $10 a share. There is no limit to the option seller's risk.\n\nWhich trader, the writer or the holder, has a better chance of profiting from the trade? The answer is neither, the option should be priced such that the option seller receives enough premium to offset the risk of the stock rising above the current price. This calculation involves a number of factors which are discussed later in Chapter 3.",
+  "crawl": {
+    "loadedUrl": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+    "loadedTime": "2026-09-03T03:31:23.023Z",
+    "referrerUrl": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+    "httpStatusCode": 200,
+    "depth": 0,
+    "contentLengthBytes": 17463,
+    "contentType": "text/html; charset=ISO-8859-1"
+  },
+  "metadata": {
+    "canonicalUrl": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+    "title": "Chapter1/2 What Is An Option",
+    "description": "Optionistics",
+    "author": null,
+    "keywords": "stocks, options, equities, volatility, covered calls, straddles, equity spreads",
+    "languageCode": null,
+    "jsonLd": null
+  },
+  "run_id": "bYp1NpJN2RsVBHSRf",
+  "quality": {
+    "content_chars": 2966,
+    "requires_manual_review": false
+  },
+  "ingested_at": "2026-09-03T03:32:12.244818+00:00"
+}

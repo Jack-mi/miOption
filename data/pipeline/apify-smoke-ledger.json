@@ -1,0 +1,343 @@
+{
+  "budget_usd": 5.0,
+  "spent_usd": 0.196755,
+  "runs": [
+    {
+      "site": "optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/3_spreads.html",
+      "spec": "wcc-cheerio",
+      "actor": "apify/website-content-crawler",
+      "run_id": "NCYOai3l0Pk3jSb5w",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.001744685749244359,
+      "chars": 6045,
+      "title": "Chapter5/3 Spreads",
+      "pass": true
+    },
+    {
+      "site": "opc",
+      "url": "https://www.optionsprofitcalculator.com/calculator/diagonal-spread.html",
+      "spec": "wcc-adaptive",
+      "actor": "apify/website-content-crawler",
+      "run_id": "m2jHrh7TOACgiOYQZ",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.0019279232288863923,
+      "chars": 169,
+      "title": "Diagonal Spread Calculator | Options Profit Calculator",
+      "pass": false
+    },
+    {
+      "site": "opc",
+      "url": "https://www.optionsprofitcalculator.com/calculator/diagonal-spread.html",
+      "spec": "wcc-firefox",
+      "actor": "apify/website-content-crawler",
+      "run_id": "lWC899j8RBuAPb1sL",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.0001371833817429013,
+      "chars": 169,
+      "title": "Diagonal Spread Calculator | Options Profit Calculator",
+      "pass": false
+    },
+    {
+      "site": "opc",
+      "url": "https://www.optionsprofitcalculator.com/faq.html",
+      "spec": "wcc-firefox-faq",
+      "actor": "apify/website-content-crawler",
+      "run_id": "kYcYlfgNCUbSml5gc",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.001990559561446309,
+      "chars": 3261,
+      "title": "Options Profit Calculator | Frequently asked questions",
+      "pass": true
+    },
+    {
+      "site": "optionstrat",
+      "url": "https://optionstrat.com/tutorials/strategy-optimizer",
+      "spec": "wcc-firefox",
+      "actor": "apify/website-content-crawler",
+      "run_id": "ZNbfM1By9eDBXrQrO",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.0001362944928540124,
+      "chars": 2197,
+      "title": "Options Strategy Optimizer Tutorial | OptionStrat",
+      "pass": true
+    },
+    {
+      "site": "sharepredictions",
+      "url": "https://sharepredictions.com/",
+      "spec": "wcc-adaptive",
+      "actor": "apify/website-content-crawler",
+      "run_id": "SKLV0DrST6WVaQadR",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.004418589663926098,
+      "chars": 4855,
+      "title": "Share Predictions - AI-Driven Stock, Options, and Crypto Market Forecasts | Share Predictions",
+      "pass": true
+    },
+    {
+      "site": "opc",
+      "url": "https://www.optionsprofitcalculator.com/faq.html",
+      "spec": "playwright",
+      "actor": "apify/playwright-scraper",
+      "run_id": "jX4lJQv4pzlVUaaBw",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.024725189461810723,
+      "chars": 0,
+      "title": "",
+      "pass": false
+    },
+    {
+      "site": "opc",
+      "url": "https://www2.optionsprofitcalculator.com/calculator/diagonal-spread.html",
+      "spec": "wcc-firefox-www2",
+      "actor": "apify/website-content-crawler",
+      "run_id": "QTfPtb6GCrJGg33Ap",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.0019822858284297916,
+      "chars": 2773,
+      "title": "Diagonal Spread Calculator | Options Profit Calculator",
+      "pass": true,
+      "preview": "Options profit Calculator \nHome\nOption Finder\nStrategy Calculators\nMembership\nBlog\nFAQ/help\nLogin\nSignup\nBasic\nLong Call (bullish)\nLong Put (bearish)\nCovered Call\nCash Secured Put\n"
+    },
+    {
+      "site": "opc",
+      "url": "https://www.optionsprofitcalculator.com/calculator/long-call.html",
+      "spec": "wcc-firefox-longcall",
+      "actor": "apify/website-content-crawler",
+      "run_id": "fubGXWqWdHRkOwJd1",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.004240721360552643,
+      "chars": 5714,
+      "title": "Long Call Calculator | Options Profit Calculator",
+      "pass": true,
+      "preview": "Options profit Calculator \nHome\nOption Finder\nStrategy Calculators\nMembership\nBlog\nFAQ/help\nLogin\nSignup\nBasic\nLong Call (bullish)\nLong Put (bearish)\nCovered Call\nCash Secured Put\n"
+    },
+    {
+      "site": "optionistics",
+      "url": "https://www.optionistics.com/s/option_spreads",
+      "spec": "wcc-cheerio-stable",
+      "actor": "apify/website-content-crawler",
+      "run_id": "53Zk6aaYRb8tKKk50",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.0017627166778097553,
+      "chars": 6923,
+      "title": "What Is An Option Spread?",
+      "pass": true,
+      "preview": "Option Calculators and Stock Screeners\t\n\t\nSymbol Lookup\t\n\t\t\n\t\n\t\n\t\n\t\n\t\nTools\nVolatility Quote\nOption Chains\nStock Price History\nOption Price History\nStrike Pegger\nVolatility Skew\nPo"
+    },
+    {
+      "site": "optionstrat",
+      "url": "https://optionstrat.com/build/strap",
+      "spec": "wcc-firefox-stable",
+      "actor": "apify/website-content-crawler",
+      "run_id": "Ol0pHngjT5iY2HyJv",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.04212263573682971,
+      "chars": 533,
+      "title": "Strap | OptionStrat Options Profit Calculator",
+      "pass": true,
+      "preview": "Build a Strap Strategy\nGo\nWhat is a strap?\nBullishDirectionalUnlimited ProfitLimited Loss\nSimilar to a straddle, but with a more bullish bias by buying double the amount of calls. "
+    },
+    {
+      "site": "sharepredictions",
+      "url": "https://sharepredictions.com/",
+      "spec": "wcc-adaptive-repeat",
+      "actor": "apify/website-content-crawler",
+      "run_id": "gLmSvqLsAdHjoMWul",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.0028542343546665377,
+      "chars": 6147,
+      "title": "Share Predictions - AI-Driven Stock, Options, and Crypto Market Forecasts | Share Predictions",
+      "pass": true,
+      "preview": "Join our Telegram channel for free daily stock & options signals Join Now × \nEmotional Trading ✗ \nData-Driven ✓ \n| \nDaily updated AI predictions for 5,000+ stocks, options & crypto"
+    },
+    {
+      "site": "optionistics",
+      "spec": "batch-winner",
+      "actor": "apify/website-content-crawler",
+      "run_id": "itzKzBM0lWaksMgcS",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.00622848134261701,
+      "chars": 22508,
+      "pass": true,
+      "urls": [
+        "https://www.optionistics.com/s/chapter5/3_spreads.html",
+        "https://www.optionistics.com/s/option_spreads",
+        "https://www.optionistics.com/s/chapter5/7_butterflies_condors_and_wingspreads.html",
+        "https://www.optionistics.com/s/chapter5/1_common_complex_strategies.html"
+      ]
+    },
+    {
+      "site": "opc",
+      "spec": "batch-partial",
+      "actor": "apify/website-content-crawler",
+      "run_id": "xdu5fXpb4WAy08NJ0",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.05363586597641806,
+      "chars": 3354,
+      "pass": true,
+      "urls": [
+        "https://www.optionsprofitcalculator.com/faq.html"
+      ],
+      "note": "partial salvage FAQ only"
+    },
+    {
+      "site": "sharepredictions",
+      "spec": "batch-winner",
+      "actor": "apify/website-content-crawler",
+      "run_id": "cID3Ylt992qsANWc9",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.006382142893420326,
+      "chars": 5623,
+      "pass": true,
+      "urls": [
+        "https://sharepredictions.com/"
+      ]
+    },
+    {
+      "site": "optionstrat",
+      "spec": "batch-salvage",
+      "actor": "apify/website-content-crawler",
+      "run_id": "RojKQg6c6fChnXVLV",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.019634266213403806,
+      "chars": 11341,
+      "pass": true,
+      "urls": [
+        "https://optionstrat.com/tutorials/options-builder"
+      ],
+      "skipped": [
+        {
+          "url": "https://optionstrat.com/tutorials/strategy-optimizer",
+          "reason": "already-indexed",
+          "chars": 2223
+        },
+        {
+          "url": "https://optionstrat.com/build/strap",
+          "reason": "too-short",
+          "chars": 445
+        },
+        {
+          "url": "https://optionstrat.com/build/diagonal-call-spread",
+          "reason": "too-short",
+          "chars": 408
+        }
+      ]
+    },
+    {
+      "site": "opc",
+      "spec": "batch-salvage",
+      "actor": "apify/website-content-crawler",
+      "run_id": "QkfJjFyC1MSoaXueC",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.007506442979145382,
+      "chars": 0,
+      "pass": false,
+      "urls": [],
+      "skipped": [
+        {
+          "url": "https://www.optionsprofitcalculator.com/calculator/long-call.html",
+          "reason": "already-indexed",
+          "chars": 732
+        }
+      ],
+      "note": "retry long-call; already indexed from smoke salvage; this run was 732 chars"
+    },
+    {
+      "site": "optionistics",
+      "spec": "optionistics-lc-1",
+      "actor": "apify/website-content-crawler",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.00946127030195958,
+      "chars": 18078,
+      "pass": true,
+      "urls": [
+        "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+        "https://www.optionistics.com/s/chapter1/3_definition_of_option_terms.html",
+        "https://www.optionistics.com/s/chapter2/1_objectives_of_option_trading.html",
+        "https://www.optionistics.com/s/chapter2/3_leverage.html",
+        "https://www.optionistics.com/s/chapter2/4_growth.html",
+        "https://www.optionistics.com/s/chapter2/6_more_definitions.html"
+      ],
+      "skipped": [
+        {
+          "url": "https://www.optionistics.com/s/chapter1/1_introduction_to_stock_options.html",
+          "reason": "too-short",
+          "chars": 926
+        },
+        {
+          "url": "https://www.optionistics.com/s/chapter2/2_minimize_risk.html",
+          "reason": "too-short",
+          "chars": 1149
+        },
+        {
+          "url": "https://www.optionistics.com/s/chapter2/5_capture_market_volatility.html",
+          "reason": "too-short",
+          "chars": 1027
+        }
+      ]
+    },
+    {
+      "site": "optionistics",
+      "spec": "optionistics-lc-2",
+      "actor": "apify/website-content-crawler",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.005709482734556,
+      "chars": 34471,
+      "pass": true,
+      "urls": [
+        "https://www.optionistics.com/s/chapter3/1_option_pricing.html",
+        "https://www.optionistics.com/s/chapter3/2_underlying_price_vs_strike.html",
+        "https://www.optionistics.com/s/chapter3/4_volatility.html",
+        "https://www.optionistics.com/s/chapter3/5_dividends.html",
+        "https://www.optionistics.com/s/chapter4/1_pricing_an_option.html",
+        "https://www.optionistics.com/s/chapter4/2_the_significance_of_volatility.html",
+        "https://www.optionistics.com/s/chapter4/3_data_quality_and_models.html",
+        "https://www.optionistics.com/s/chapter4/4_expected_returns.html",
+        "https://www.optionistics.com/s/chapter4/5_identifying_unusual_volatility.html"
+      ],
+      "skipped": [
+        {
+          "url": "https://www.optionistics.com/s/chapter3/3_option_term.html",
+          "reason": "too-short",
+          "chars": 999
+        },
+        {
+          "url": "https://www.optionistics.com/s/chapter3/6_interest_rates.html",
+          "reason": "too-short",
+          "chars": 1068
+        }
+      ]
+    },
+    {
+      "site": "optionistics",
+      "spec": "optionistics-lc-3",
+      "actor": "apify/website-content-crawler",
+      "run_id": "AWXfMSfWk9gkOdbaT",
+      "status": "SUCCEEDED",
+      "cost_usd": 0.00015460597801705202,
+      "chars": 16900,
+      "pass": true,
+      "urls": [
+        "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+        "https://www.optionistics.com/s/chapter5/4_straddles.html",
+        "https://www.optionistics.com/s/chapter5/8_conversions.html",
+        "https://www.optionistics.com/s/chapter5/9_synthetic_positions.html"
+      ],
+      "skipped": [
+        {
+          "url": "https://www.optionistics.com/s/chapter5/5_strangles.html",
+          "reason": "too-short",
+          "chars": 1058
+        },
+        {
+          "url": "https://www.optionistics.com/s/chapter5/6_collars.html",
+          "reason": "too-short",
+          "chars": 1112
+        }
+      ]
+    }
+  ]
+}

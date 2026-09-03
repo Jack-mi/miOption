@@ -1,7 +1,7 @@
 # miOption：当前项目现状
 
-更新时间：2026-09-02
-状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。**13** 张概念 + **27** 张策略（全部 evergreen：对角/Strap/Strip 已按 Wikipedia 落地结构；裸卖 put 已补）。App 菜单与 topic474 为一套覆盖。
+更新时间：2026-09-03
+状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。**13** 张概念 + **27** 张策略（全部 evergreen：对角/Strap/Strip 已按 Wikipedia 落地结构；裸卖 put 已补）。App 菜单与 topic474 为一套覆盖。Optionistics Learning Center 续爬已入库（19 课 Source 笔记；转换/合成不建第 28 张策略卡）。
 
 ## 1. 结论
 
@@ -13,7 +13,7 @@
 原始期权页面 → 页面准入 → vault `.raw/captured` → wiki 源笔记 / 概念 / 策略实体 → wikilink
 ```
 
-产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)。清单用富途；P/L 以 OIC 为准。对角用 Wikipedia：没有单一盈亏公式。Strap/Strip 用 Wikipedia+Futu 腿结构，不填具体最多赚/亏/打平数字。vault 内 **13** 张概念、**27** 张策略实体、5 条关系。
+产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)。清单用富途；P/L 以 OIC 为准。对角用 Wikipedia：没有单一盈亏公式。Strap/Strip 用 Wikipedia+Futu 腿结构，不填具体最多赚/亏/打平数字。vault 内 **13** 张概念、**27** 张策略实体、**70** 条源笔记、5 条关系。
 
 ## 2. 范围与准入边界
 
@@ -35,11 +35,11 @@
 
 | 层级 | 数量 | 含义 |
 |---|---:|---|
-| 原始来源页面 | 43 | Apify 抓取（含 new-topics-1usd 四页） |
-| 正文证据页 | 35 | 满足主题与文字正文准入 |
+| 原始来源页面 | 72 | Apify 抓取（含 new-topics、four-site-match、optionistics-lc） |
+| 正文证据页 | 64 | 满足主题与文字正文准入（含 Optionistics 续爬 19 课） |
 | 仅目录/课程/视频页 | 8 | 保留来源，不进入知识抽取 |
 | vault 本地捕获（未进 raw pages） | 6 | put butterfly/calendar、Futu topic474、Wikipedia 对角/跨式、Naked Put |
-| vault 源笔记 | 49 | `knowledge/wiki/sources/` |
+| vault 源笔记 | 70 | `knowledge/wiki/sources/`（+19 Optionistics LC） |
 | vault 概念笔记 | 13 | 原 10 张 + 保证金、买卖价差、期货期权行权 |
 | vault 策略实体 | 27 | 含 Naked Put；对角/Strap/Strip 已按 Wikipedia 落地 |
 | 有证据的知识关系 | 5 | 已写成笔记间 wikilink（3 条 requires、2 条 affects） |
@@ -53,7 +53,11 @@
 | CME | 4 | 1 | 3 |
 | Cboe | 1 | 0 | 1 |
 | Wikipedia | 2 | 2 | 0 |
-| 合计 | 43 | 35 | 8 |
+| Optionistics | 23 | 23 | 0 |
+| Options Profit Calculator | 3 | 3 | 0 |
+| OptionStrat | 2 | 2 | 0 |
+| Share Predictions | 1 | 1 | 0 |
+| 合计 | 72 | 64 | 8 |
 
 ### 富途策略覆盖
 
@@ -118,10 +122,15 @@ wiki
 | 富途策略 A | `gu9ldfoHnNp8ctld9` | `SUCCEEDED` | 12 | `$0.0565566491` |
 | 富途策略 B | `PUZYbnrk9cH2qOIMW` | `SUCCEEDED` | 8 | `$0.0315424827` |
 | 新专题 1usd | `dwOriSJHmglF1wbJA` | `SUCCEEDED` | 4 | `$0.0042865904` |
+| 四站匹配（合计，见 ledger） | 见 `data/pipeline/apify-smoke-ledger.json` | `SUCCEEDED` | 10 入库 | `~$0.18` of `$5` |
+| Optionistics LC-1 | `bYp1NpJN2RsVBHSRf` | salvage 6 / skip 3 short | 9 | `$0.009461` |
+| Optionistics LC-2 | `Sgdh96rxVEeKOGf22` | salvage 9 / skip 2 short | 11 | `$0.005709` |
+| Optionistics LC-3 | `AWXfMSfWk9gkOdbaT` | salvage 4 / skip 2 short | 6 | `$0.000155` |
 
-- 已记录总成本：约 `$0.2095836011`。
+- 四站试跑窗 + Optionistics LC 续爬账本 `spent_usd`：`$0.196755`（[`data/pipeline/apify-smoke-ledger.json`](data/pipeline/apify-smoke-ledger.json)）。Cheerio 课页远低于 `$1`/`run`。
 - `$1` 探索额度中（pilot + 终止跑 + followup + A + B）累计约 `$0.1637666320`，约余 `$0.836`。
-- 候选队列：原 ingested 之外，`new-topics-1usd` 四页已 ingested；`futu-topic474-gaps` 两页仍为 `proposed`。尚无 `approved` 待抓批次。
+- 候选队列：`optionistics-lc-1`–`3` 已收口（19 ingested / 7 skipped，未降 1200 字门槛）。`four-site-match` 10 页仍 ingested。另有若干 `proposed`（短 `/build` stub、OPC diagonal shell、futu-topic474-gaps）。尚无 `approved` 待抓批次。
+- 四站 Actor 赢家与成本账本：[`data/pipeline/apify-actor-matrix.md`](data/pipeline/apify-actor-matrix.md)。`crawl_policy.max_cost_usd` 已从试跑 `$5` 收回 `$1`。Optionistics `include_prefixes` 为 `/s/chapter1`–`/s/chapter5`、`/s/option_spreads`、`/g/`（不抓 TOC `/s/tutorial`）。
 - 另有 4 篇初始小样本页面不在候选队列中且缺 `run_id`（legacy）。
 
 ### 实际采集护栏
@@ -136,6 +145,7 @@ wiki
 | [STATUS.md](STATUS.md) | 本文件 |
 | [sources.json](sources.json) | 白名单与运行限制 |
 | [data/pipeline/url-candidates.json](data/pipeline/url-candidates.json) / [.csv](data/pipeline/url-candidates.csv) | 候选队列 |
+| [data/pipeline/apify-actor-matrix.md](data/pipeline/apify-actor-matrix.md) | 四站爬虫赢家与 `$5` 试跑账本 |
 | [knowledge/](knowledge/) | Obsidian vault（知识成品） |
 | [knowledge/wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md) | 富途清单 ↔ 策略笔记 |
 | [archive/knowledge-json-2026-09-02/](archive/knowledge-json-2026-09-02/) | 迁移前 JSON 快照 |
@@ -151,7 +161,7 @@ python3 -m py_compile scripts/probe.py scripts/build_knowledge.py scripts/export
 python3 scripts/probe.py --check
 python3 scripts/build_knowledge.py --check
 python3 vendor/claude-obsidian/scripts/claude-obsidian.py doctor --vault knowledge
-python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-02
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-03
 ```
 
 当前 `build_knowledge.py --check` 预期：
@@ -173,7 +183,8 @@ python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge
 
 1. 可选：把仍停在本地捕获的 OIC 页（put butterfly / put calendar / Naked Put）批进 `data/raw/pages`。
 2. 期权专用流动性（典型买卖价差宽度）还没有独立文字页。
-3. 不做整站抓取；Investopedia 仍不自动采。
+3. Optionistics LC 本轮已完成；转换/合成仅 Source 笔记。不要把 SharePredictions 信号灌进策略卡；OPC `/calculator/*` 需先烟雾再批准。
+4. 不做整站抓取；Investopedia 仍不自动采。
 
 ## 9. 交接注意事项
 

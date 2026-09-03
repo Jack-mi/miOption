@@ -3,7 +3,7 @@ type: entity
 title: Covered Call (Buy-Write)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -14,6 +14,8 @@ aliases:
   - buy/write
 sources:
   - "[[Source — Covered Call (Buy-Write)]]"
+  - "[[Source — Optionistics Chapter 5 Covered Calls]]"
+  - "[[Source — Optionistics Chapter 2 Growth]]"
 related:
   - "[[Vega and implied volatility sensitivity]]"
   - "[[Equity options basics]]"
@@ -23,7 +25,7 @@ related:
 
 # Covered Call (Buy-Write)
 
-Earn premium income while holding stock, accepting a cap on upside in exchange for a limited downside cushion.
+Earn premium income while holding stock, accepting a cap on upside in exchange for a limited downside cushion. Optionistics also names the simultaneous stock-and-call fill a buy-write, and says the covered call has the same risk profile as a short put. P/L numbers stay with OIC.
 
 - Underlying: equity stock
 - Knowledge id: `strategy.covered_call`
@@ -67,6 +69,12 @@ Appropriate only where the investor accepts the preset sale price and can mainta
   > An investor who buys or owns stock and writes call options in the equivalent amount can earn premium income without taking on additional risk. The premium received adds to the investor's bottom line regardless of outcome. It offers a small downside 'cushion' in the event the stock slides downward and can boost returns
 - [[Source — Covered Call (Buy-Write)]] · `Summary` · lines 40–43
   > This strategy consists of writing a call that is covered by an equivalent long stock position. It provides a small hedge on the stock and allows an investor to earn premium income, in return for temporarily forfeiting much of the stock's upside potential.
+- [[Source — Optionistics Chapter 5 Covered Calls]] · `Covered Calls`
+  > A covered call is a strategy consisting of two positions, or legs. The covered call writer holds the stock and sells call options on that stock. This strategy is considered a low risk strategy because the obligation incurred by writing the call can be fulfilled by delivering the underlying stock.
+- [[Source — Optionistics Chapter 5 Covered Calls]] · `Covered Calls`
+  > Covered calls can be traded in a single complex strategy transaction known as a buy-write. A covered call has the same risk profile as a short put.
+- [[Source — Optionistics Chapter 2 Growth]] · `Growth`
+  > The covered call strategy consists of the purchase of a stock and a simultaneous sale of a call on that stock. The advantage of covered call writing is a more predictable flow of income. The disadvantage is that potential gains from the stock position are limited.
 
 ### Legs
 

@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "run_id": "Sgdh96rxVEeKOGf22",
+  "status": "SUCCEEDED",
+  "exit_code": 0,
+  "started_at": "2026-09-03T03:32:22.896Z",
+  "finished_at": "2026-09-03T03:32:34.313Z",
+  "cost_usd": 0.005709482734556,
+  "page_budget": 9,
+  "documents": [
+    {
+      "id": "f6c384dbf9257bd9",
+      "url": "https://www.optionistics.com/s/chapter3/1_option_pricing.html"
+    },
+    {
+      "id": "51457252a316e715",
+      "url": "https://www.optionistics.com/s/chapter3/2_underlying_price_vs_strike.html"
+    },
+    {
+      "id": "572b856bd47ff314",
+      "url": "https://www.optionistics.com/s/chapter3/4_volatility.html"
+    },
+    {
+      "id": "3dc51927726f6763",
+      "url": "https://www.optionistics.com/s/chapter3/5_dividends.html"
+    },
+    {
+      "id": "22d33730858828a3",
+      "url": "https://www.optionistics.com/s/chapter4/1_pricing_an_option.html"
+    },
+    {
+      "id": "da2eb42ba32e8ccb",
+      "url": "https://www.optionistics.com/s/chapter4/2_the_significance_of_volatility.html"
+    },
+    {
+      "id": "937dd07d24921932",
+      "url": "https://www.optionistics.com/s/chapter4/3_data_quality_and_models.html"
+    },
+    {
+      "id": "2cbabbef4f53f652",
+      "url": "https://www.optionistics.com/s/chapter4/4_expected_returns.html"
+    },
+    {
+      "id": "d73d17252ae3d840",
+      "url": "https://www.optionistics.com/s/chapter4/5_identifying_unusual_volatility.html"
+    }
+  ],
+  "generated_at": "2026-09-03T03:33:14.439270+00:00"
+}

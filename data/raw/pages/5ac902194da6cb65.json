@@ -1,0 +1,35 @@
+{
+  "id": "5ac902194da6cb65",
+  "source_id": "optionistics",
+  "source_name": "Optionistics",
+  "url": "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+  "title": "Chapter5/2 Covered Calls",
+  "description": "Optionistics",
+  "language": null,
+  "text": "Chapter5/2 Covered Calls\nA covered call is a strategy consisting of two positions, or legs. The covered call writer holds the stock and sells call options on that stock. This strategy is considered a low risk strategy because the obligation incurred by writing the call can be fulfilled by delivering the underlying stock. The call is covered by the stock. \nCovered calls can be traded in a single complex strategy transaction known as a buy-write. The buy write trader buys the stock and writes the call in one simultaneous transaction. This has two advantages: the funds required to enter the transaction are less than those required to buy the stock. The amount required is equal to the cost of the stock minus the premium received from selling the call. The second advantage is there is no risk of the call price moving away from the desired price due to abrupt changes in the stock price or changing bid and ask quotes. If the stock transaction is separate from the call transaction, the stock price may subsequently fall, making the call cheaper after the stock is acquired and lowering the position's return. \nTrading covered calls is one of the few option strategies permitted in retirement accounts. Since naked calls are not permitted in many retirement accounts, covered call traders are forced to enter the stock leg first, then sell the option leg. However, it is generally advantageous to enter the option leg of the covered call first, since the option market is less liquid and has wider spreads than the stock market. As a result, it can be harder to fill a limit trade at the desired price in the option market. If a buy-write transaction is not supported by your broker consider selling the option as a limit order first, then buying the stock at the market price. \nIt is also typical to sell covered calls one or two months out. The time premium erodes much more rapidly as expiration approaches, so selling more short term calls yields more time premium than selling fewer long term calls. However, the extra premium can be offset by commissions for small trades, making selling a slightly longer term option more advantageous. \nA covered call has the same risk profile as a short put.",
+  "markdown": "# Chapter5/2 Covered Calls\n\nA covered call is a strategy consisting of two positions, or legs. The covered call writer holds the stock and sells call options on that stock. This strategy is considered a low risk strategy because the obligation incurred by writing the call can be fulfilled by delivering the underlying stock. The call is covered by the stock.\n\nCovered calls can be traded in a single complex strategy transaction known as a buy-write. The buy write trader buys the stock and writes the call in one simultaneous transaction. This has two advantages: the funds required to enter the transaction are less than those required to buy the stock. The amount required is equal to the cost of the stock minus the premium received from selling the call. The second advantage is there is no risk of the call price moving away from the desired price due to abrupt changes in the stock price or changing bid and ask quotes. If the stock transaction is separate from the call transaction, the stock price may subsequently fall, making the call cheaper after the stock is acquired and lowering the position's return.\n\nTrading covered calls is one of the few option strategies permitted in retirement accounts. Since naked calls are not permitted in many retirement accounts, covered call traders are forced to enter the stock leg first, then sell the option leg. However, it is generally advantageous to enter the option leg of the covered call first, since the option market is less liquid and has wider spreads than the stock market. As a result, it can be harder to fill a limit trade at the desired price in the option market. If a buy-write transaction is not supported by your broker consider selling the option as a limit order first, then buying the stock at the market price.\n\nIt is also typical to sell covered calls one or two months out. The time premium erodes much more rapidly as expiration approaches, so selling more short term calls yields more time premium than selling fewer long term calls. However, the extra premium can be offset by commissions for small trades, making selling a slightly longer term option more advantageous.\n\nA covered call has the same risk profile as a short put.",
+  "crawl": {
+    "loadedUrl": "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+    "loadedTime": "2026-09-03T03:33:30.017Z",
+    "referrerUrl": "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+    "httpStatusCode": 200,
+    "depth": 0,
+    "contentLengthBytes": 16205,
+    "contentType": "text/html; charset=ISO-8859-1"
+  },
+  "metadata": {
+    "canonicalUrl": "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+    "title": "Chapter5/2 Covered Calls",
+    "description": "Optionistics",
+    "author": null,
+    "keywords": "stocks, options, equities, volatility, covered calls, straddles, equity spreads",
+    "languageCode": null,
+    "jsonLd": null
+  },
+  "run_id": "AWXfMSfWk9gkOdbaT",
+  "quality": {
+    "content_chars": 2209,
+    "requires_manual_review": false
+  },
+  "ingested_at": "2026-09-03T03:34:35.879200+00:00"
+}

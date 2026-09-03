@@ -3,7 +3,7 @@ type: overview
 title: Vault Overview
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - overview
 ---
@@ -25,7 +25,7 @@ This vault is the miOption options knowledge base. URLs and raw pages are eviden
 2. Immutable copies used by vault skills live in `.raw/captured/`.
 3. Source notes, concepts, and strategy entities live in `wiki/`.
 
-- Source notes: 49
+- Source notes: 70
 - Concept notes: 13
 - Strategy entities: 27
 - Published relations migrated as wikilinks: 5

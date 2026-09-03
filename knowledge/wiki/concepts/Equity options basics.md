@@ -3,7 +3,7 @@ type: concept
 title: Equity options basics
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - concept
   - concept
@@ -14,6 +14,7 @@ aliases:
   - option premium
 sources:
   - "[[Source — Options Basics]]"
+  - "[[Source — Optionistics Chapter 1 Definition of Option Terms]]"
 related:
   - "[[Covered Call (Buy-Write)]]"
 ---
@@ -69,6 +70,8 @@ If there is an exchange holiday that falls on a Friday, expiration is then moved
 Many products now offer short-term options with weekly expirations, so investors should know the exact contract terms, including expiration dates, for all contracts they trade.
 After the option's expiration date, the contract ceases to exist. At that point, the owner of the option who does not exercise the contract has no right and the seller has no obligations as previously conveyed by the contract.
 
+Optionistics: listed contracts typically cover 100 shares, but that size can change after splits, mergers, spin-offs, large dividends, or other corporate actions. Premium is quoted per share (a $1.75 quote costs $175 plus commissions for one contract).
+
 ## Evidence
 
 - [[Source — Options Basics]] · `Options Basics` · lines 1–12
@@ -81,6 +84,8 @@ After the option's expiration date, the contract ceases to exist. At that point,
   > An option's price is called the premium and is priced at a per share basis. The option holder’s potential loss is limited to the initial premium paid for the contract. Alternately, the writer collects the premium and has theoretically unlimited loss potential for a call option and substantial loss potential for a put o
 - [[Source — Options Basics]] · `Expiration Friday` · lines 50–58
   > Most equity options that expire in a given month usually expire on the third Friday of the month. Therefore, this third Friday is the last trading day for all standard expiring equity options. If there is an exchange holiday that falls on a Friday, expiration is then moved to the Thursday immediately preceding this hol
+- [[Source — Optionistics Chapter 1 Definition of Option Terms]] · `Definition Of Option Terms`
+  > An option is a contract to buy or sell a fixed number of shares, usually 100, of the underlying stock. The premium is the price of an option and is quoted on a per-share basis. An option contract quoted at $1.75 will cost $175, plus commissions. Contracts listed by the exchange typically cover 100 shares of the underlying stock, but that is subject to change as a result of stock splits, mergers, spin-offs, large dividends, or other corporate actions.
 
 ## See also
 

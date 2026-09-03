@@ -3,7 +3,7 @@ type: concept
 title: "Options risk, leverage, and hedging"
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - concept
   - risk_rule
@@ -14,6 +14,8 @@ aliases:
   - leverage
 sources:
   - "[[Source — What are the Benefits & Risks-]]"
+  - "[[Source — Optionistics Chapter 2 Objectives of Option Trading]]"
+  - "[[Source — Optionistics Chapter 2 Leverage]]"
 related: []
 ---
 
@@ -43,6 +45,8 @@ Like other securities including stocks, bonds and mutual funds, options carry no
 But as an options writer, you take on a much higher level of risk. For example, if you write an uncovered call, you face unlimited potential loss, since there is no cap on how high a stock price can rise.
 Since initial options investments usually require less capital than equivalent stock positions, your potential cash losses as an options investor are usually smaller than if you'd bought the underlying stock or sold the stock short. The exception to this general rule occurs when you use options to provide leverage. Percentage returns are often high, but percentage losses can be high as well.
 
+Optionistics: options can limit risk, hedge, or speculate. A protective put hedges a stock holding; a covered call can add income but does not protect against a decline in the stock. Buying the option instead of the stock limits loss to the premium and uses less capital than the equivalent shares. Do not treat Optionistics probability remarks as published P/L fields.
+
 ## Evidence
 
 - [[Source — What are the Benefits & Risks-]] · `What are the Benefits & Risks?` · lines 1–8
@@ -51,6 +55,10 @@ Since initial options investments usually require less capital than equivalent s
   > For many investors, options are useful tools of risk management. They act as insurance policies against a drop in stock prices.For example, if an investor is concerned that the price of their shares are about to drop, they can purchase puts that give the right to sell the stock at the strike price, no matter how low th
 - [[Source — What are the Benefits & Risks-]] · `Risking Your Principal` · lines 17–23
   > Like other securities including stocks, bonds and mutual funds, options carry no guarantees. Be aware that it's possible to lose the entire principal invested, and sometimes more. As an options holder, you risk the entire amount of the premium you pay. But as an options writer, you take on a much higher level of risk.
+- [[Source — Optionistics Chapter 2 Objectives of Option Trading]] · `Objectives Of Option Trading`
+  > Options can be used to limit risk, hedge against loss, or speculate. Stock holders can purchase a protective put to hedge against losses from a declining stock. Covered call writers can realize supplemental returns on stock holdings by selling rights their stock positions. This strategy can provide additional income versus simply holding the stock, but does not protect against losses if the stock price falls.
+- [[Source — Optionistics Chapter 2 Leverage]] · `Leverage`
+  > The call option holder will profit from a rise in the underlying stock price without the risk of large losses if the stock price declines. The risk is limited to the cost of the option. The cost of the option can be a small fraction of the cost of buying the equivalent amount of stock, and the option can be used to leverage a small amount of funds to take a position in a large amount of stock.
 
 
 See the [[index|Wiki Index]].

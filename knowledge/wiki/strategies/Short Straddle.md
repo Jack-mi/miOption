@@ -3,7 +3,7 @@ type: entity
 title: Short Straddle
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -13,12 +13,13 @@ aliases:
   - short straddle
 sources:
   - "[[Source — Short Straddle]]"
+  - "[[Source — Optionistics Chapter 5 Straddles]]"
 related: []
 ---
 
 # Short Straddle
 
-Collect premium when expecting a narrow trading range and stable or falling implied volatility.
+Collect premium when expecting a narrow trading range and stable or falling implied volatility. Optionistics: collect two premiums; maximum profit when the underlying equals the strike. P/L stays OIC.
 
 - Underlying: equity option
 - Knowledge id: `strategy.short_straddle`
@@ -62,6 +63,8 @@ Only for investors who can margin short options and accept large or theoreticall
   > A short straddle is a combination of writing uncovered calls (bearish) and writing uncovered puts (bullish), both with the same strike price and expiration. Together, they produce a position that predicts a narrow trading range for the underlying stock. Before there were options, it was difficult for investors to profi
 - [[Source — Short Straddle]] · `Summary` · lines 36–39
   > This strategy involves selling a call option and a put option with the same expiration and strike price. It generally profits if the stock price and volatility remain steady.
+- [[Source — Optionistics Chapter 5 Straddles]] · `Straddles`
+  > The objective of a short straddle is to reap the premium of two option contracts, realizing the maximum profit when the price of the underlying stock equals the strike price. The short straddle trader profits when the stock price remains relatively stable.
 
 ### Legs
 

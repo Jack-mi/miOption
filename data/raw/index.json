@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "latest_run_id": "dwOriSJHmglF1wbJA",
-  "generated_at": "2026-09-02T06:57:41.668114+00:00",
+  "latest_run_id": "AWXfMSfWk9gkOdbaT",
+  "generated_at": "2026-09-03T03:34:35.881471+00:00",
   "documents": [
     {
       "id": "00823197d8941302",
@@ -19,6 +19,23 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-02T06:57:41.665178+00:00"
+    },
+    {
+      "id": "037eb03bcae90819",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/8_conversions.html",
+      "title": "Chapter5/8 Conversions",
+      "description": "chapter5/6 collars",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/037eb03bcae90819.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/037eb03bcae90819.md",
+      "run_id": "AWXfMSfWk9gkOdbaT",
+      "quality": {
+        "content_chars": 5014,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:34:35.879506+00:00"
     },
     {
       "id": "0674d2cfe2fb3528",
@@ -55,6 +72,40 @@
       "ingested_at": "2026-09-01T09:44:52.179361+00:00"
     },
     {
+      "id": "12e7d5dbf076b84d",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter2/6_more_definitions.html",
+      "title": "Chapter2/6 More Definitions",
+      "description": "chapter2/5 capture market volatility",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/12e7d5dbf076b84d.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/12e7d5dbf076b84d.md",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "quality": {
+        "content_chars": 6073,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:32:12.245246+00:00"
+    },
+    {
+      "id": "137ab907e8535475",
+      "source_id": "opc",
+      "source_name": "Options Profit Calculator",
+      "url": "https://www.optionsprofitcalculator.com/faq.html",
+      "title": "Options Profit Calculator | Frequently asked questions",
+      "description": "Free stock-option profit calculation tool. See visualisations of a strategy's return on investment by possible future stock prices.  Calculate the value of a call or put option or multi-option strategies.",
+      "language": "en",
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/137ab907e8535475.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/137ab907e8535475.md",
+      "run_id": "xdu5fXpb4WAy08NJ0",
+      "quality": {
+        "content_chars": 3354,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:30:11.865498+00:00"
+    },
+    {
       "id": "19339290b8c1f453",
       "source_id": "optionalpha",
       "source_name": "Option Alpha",
@@ -72,6 +123,57 @@
       "ingested_at": "2026-09-01T11:33:55.685944+00:00"
     },
     {
+      "id": "1c3b53a05a9edce3",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/4_straddles.html",
+      "title": "Chapter5/4 Straddles",
+      "description": "chapter5/2 covered calls",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/1c3b53a05a9edce3.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/1c3b53a05a9edce3.md",
+      "run_id": "AWXfMSfWk9gkOdbaT",
+      "quality": {
+        "content_chars": 4737,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:34:35.879456+00:00"
+    },
+    {
+      "id": "22d33730858828a3",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter4/1_pricing_an_option.html",
+      "title": "Chapter4/1 Pricing An Option",
+      "description": "chapter3/6 interest rates",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/22d33730858828a3.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/22d33730858828a3.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 5507,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433772+00:00"
+    },
+    {
+      "id": "25ecc083dd8e096b",
+      "source_id": "sharepredictions",
+      "source_name": "Share Predictions",
+      "url": "https://sharepredictions.com/",
+      "title": "Share Predictions - AI-Driven Stock, Options, and Crypto Market Forecasts | Share Predictions",
+      "description": "AI-powered stock predictions for 5,000+ US stocks. Daily market forecasts, Magnificent Seven analysis, and REST API access. Free preview available.",
+      "language": "en",
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/25ecc083dd8e096b.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/25ecc083dd8e096b.md",
+      "run_id": "cID3Ylt992qsANWc9",
+      "quality": {
+        "content_chars": 5623,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:32:52.829431+00:00"
+    },
+    {
       "id": "27879bf81e791259",
       "source_id": "cme",
       "source_name": "CME Institute",
@@ -87,6 +189,40 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T09:44:52.179394+00:00"
+    },
+    {
+      "id": "290dbac0afea74f3",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter2/3_leverage.html",
+      "title": "Chapter2/3 Leverage",
+      "description": "chapter2/2 minimize risk",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/290dbac0afea74f3.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/290dbac0afea74f3.md",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "quality": {
+        "content_chars": 4379,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:32:12.245166+00:00"
+    },
+    {
+      "id": "2cbabbef4f53f652",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter4/4_expected_returns.html",
+      "title": "Chapter4/4 Expected Returns",
+      "description": "chapter4/3 data quality and models",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/2cbabbef4f53f652.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/2cbabbef4f53f652.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 3099,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433986+00:00"
     },
     {
       "id": "306dfc82d7afd0de",
@@ -156,6 +292,23 @@
       "ingested_at": "2026-09-01T22:17:53.843195+00:00"
     },
     {
+      "id": "3dc51927726f6763",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter3/5_dividends.html",
+      "title": "Chapter3/5 Dividends",
+      "description": "chapter3/4 volatility",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/3dc51927726f6763.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/3dc51927726f6763.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 4594,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433689+00:00"
+    },
+    {
       "id": "48341041772ecac4",
       "source_id": "oic",
       "source_name": "The Options Industry Council",
@@ -171,6 +324,23 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T22:17:53.843167+00:00"
+    },
+    {
+      "id": "4885c0737b3244c4",
+      "source_id": "opc",
+      "source_name": "Options Profit Calculator",
+      "url": "https://www.optionsprofitcalculator.com/calculator/long-call.html",
+      "title": "Long Call Calculator | Options Profit Calculator",
+      "description": "Call option profit calculator.  Visualise the projected P&L of a call option at possible stock prices over time until expiry.",
+      "language": "en",
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/4885c0737b3244c4.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/4885c0737b3244c4.md",
+      "run_id": "fubGXWqWdHRkOwJd1",
+      "quality": {
+        "content_chars": 13629,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:35:25.442654+00:00"
     },
     {
       "id": "48ce58826e49a500",
@@ -207,6 +377,23 @@
       "ingested_at": "2026-09-01T09:44:52.179306+00:00"
     },
     {
+      "id": "4ac7aaaf168f1dfc",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter2/1_objectives_of_option_trading.html",
+      "title": "Chapter2/1 Objectives Of Option Trading",
+      "description": "chapter1/3 definition of option terms",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/4ac7aaaf168f1dfc.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/4ac7aaaf168f1dfc.md",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "quality": {
+        "content_chars": 1644,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:32:12.245117+00:00"
+    },
+    {
       "id": "4b3ae3e36b510b23",
       "source_id": "oic",
       "source_name": "The Options Industry Council",
@@ -239,6 +426,91 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T22:19:30.551677+00:00"
+    },
+    {
+      "id": "4f03692ad0cc7b6e",
+      "source_id": "opc",
+      "source_name": "Options Profit Calculator",
+      "url": "https://www2.optionsprofitcalculator.com/calculator/diagonal-spread.html",
+      "title": "Diagonal Spread Calculator | Options Profit Calculator",
+      "description": "Diagonal Spread Calculator shows projected profit and loss over time. A diagonal spread involves entering a long and a short position on two options, usually\n            at different strikes price and in different months.",
+      "language": "en",
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/4f03692ad0cc7b6e.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/4f03692ad0cc7b6e.md",
+      "run_id": "QTfPtb6GCrJGg33Ap",
+      "quality": {
+        "content_chars": 11597,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:35:48.205865+00:00"
+    },
+    {
+      "id": "51457252a316e715",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter3/2_underlying_price_vs_strike.html",
+      "title": "Chapter3/2 Underlying Price Vs Strike",
+      "description": "chapter3/1 option pricing",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/51457252a316e715.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/51457252a316e715.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 4392,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433518+00:00"
+    },
+    {
+      "id": "572b856bd47ff314",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter3/4_volatility.html",
+      "title": "Chapter3/4 Volatility",
+      "description": "chapter3/3 option term",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/572b856bd47ff314.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/572b856bd47ff314.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 2331,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433610+00:00"
+    },
+    {
+      "id": "57e1e767e261ad71",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter2/4_growth.html",
+      "title": "Chapter2/4 Growth",
+      "description": "chapter2/3 leverage",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/57e1e767e261ad71.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/57e1e767e261ad71.md",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "quality": {
+        "content_chars": 1528,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:32:12.245201+00:00"
+    },
+    {
+      "id": "5ac902194da6cb65",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/2_covered_calls.html",
+      "title": "Chapter5/2 Covered Calls",
+      "description": "Optionistics",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/5ac902194da6cb65.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/5ac902194da6cb65.md",
+      "run_id": "AWXfMSfWk9gkOdbaT",
+      "quality": {
+        "content_chars": 2209,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:34:35.879200+00:00"
     },
     {
       "id": "5cfb6746f1551213",
@@ -325,6 +597,40 @@
       "ingested_at": "2026-09-01T22:19:30.551642+00:00"
     },
     {
+      "id": "7185f646fdb6cf00",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter1/2_what_is_an_option.html",
+      "title": "Chapter1/2 What Is An Option",
+      "description": "Optionistics",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/7185f646fdb6cf00.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/7185f646fdb6cf00.md",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "quality": {
+        "content_chars": 2966,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:32:12.244818+00:00"
+    },
+    {
+      "id": "748c8807ad8cfe8c",
+      "source_id": "optionstrat",
+      "source_name": "OptionStrat",
+      "url": "https://optionstrat.com/tutorials/strategy-optimizer",
+      "title": "Options Strategy Optimizer Tutorial | OptionStrat",
+      "description": null,
+      "language": "en",
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/748c8807ad8cfe8c.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/748c8807ad8cfe8c.md",
+      "run_id": "ZNbfM1By9eDBXrQrO",
+      "quality": {
+        "content_chars": 2223,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:36:11.036122+00:00"
+    },
+    {
       "id": "77eec3ea8d9b0a94",
       "source_id": "oic",
       "source_name": "The Options Industry Council",
@@ -376,6 +682,40 @@
       "ingested_at": "2026-09-01T22:17:53.843188+00:00"
     },
     {
+      "id": "7f676a83c12277d9",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter1/3_definition_of_option_terms.html",
+      "title": "Chapter1/3 Definition Of Option Terms",
+      "description": "chapter1/2 what is an option",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/7f676a83c12277d9.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/7f676a83c12277d9.md",
+      "run_id": "bYp1NpJN2RsVBHSRf",
+      "quality": {
+        "content_chars": 1488,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:32:12.245075+00:00"
+    },
+    {
+      "id": "86c027a02074a391",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/9_synthetic_positions.html",
+      "title": "Chapter5/9 Synthetic Positions",
+      "description": "chapter5/8 conversions",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/86c027a02074a391.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/86c027a02074a391.md",
+      "run_id": "AWXfMSfWk9gkOdbaT",
+      "quality": {
+        "content_chars": 4940,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:34:35.879547+00:00"
+    },
+    {
       "id": "91e58ed887affc8c",
       "source_id": "oic",
       "source_name": "The Options Industry Council",
@@ -391,6 +731,23 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T22:19:30.551670+00:00"
+    },
+    {
+      "id": "937dd07d24921932",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter4/3_data_quality_and_models.html",
+      "title": "Chapter4/3 Data Quality And Models",
+      "description": "chapter4/2 the significance of volatility",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/937dd07d24921932.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/937dd07d24921932.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 2629,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433917+00:00"
     },
     {
       "id": "94f27ca3e21a8670",
@@ -425,6 +782,23 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T09:44:52.179337+00:00"
+    },
+    {
+      "id": "962ed0b126feae6c",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/option_spreads",
+      "title": "What Is An Option Spread?",
+      "description": "Daily reports of selected vertical and horizontal spreads. Bull call, bear call, bull put, and bear put strategies explained.",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/962ed0b126feae6c.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/962ed0b126feae6c.md",
+      "run_id": "itzKzBM0lWaksMgcS",
+      "quality": {
+        "content_chars": 6866,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:25:07.202317+00:00"
     },
     {
       "id": "96498860d7dd62e8",
@@ -476,6 +850,23 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T22:17:53.843218+00:00"
+    },
+    {
+      "id": "9bb36c7bcd7ff0aa",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/7_butterflies_condors_and_wingspreads.html",
+      "title": "Chapter5/7 Butterflies Condors And Wingspreads",
+      "description": "What is an Option Spread?",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/9bb36c7bcd7ff0aa.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/9bb36c7bcd7ff0aa.md",
+      "run_id": "itzKzBM0lWaksMgcS",
+      "quality": {
+        "content_chars": 5048,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:25:07.202338+00:00"
     },
     {
       "id": "a0e82e52694688d2",
@@ -580,6 +971,74 @@
       "ingested_at": "2026-09-01T11:33:55.685976+00:00"
     },
     {
+      "id": "cc4c50ef0cfc4c52",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/3_spreads.html",
+      "title": "Chapter5/3 Spreads",
+      "description": "Optionistics",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/cc4c50ef0cfc4c52.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/cc4c50ef0cfc4c52.md",
+      "run_id": "itzKzBM0lWaksMgcS",
+      "quality": {
+        "content_chars": 6154,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:25:07.202037+00:00"
+    },
+    {
+      "id": "d73d17252ae3d840",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter4/5_identifying_unusual_volatility.html",
+      "title": "Chapter4/5 Identifying Unusual Volatility",
+      "description": "chapter4/4 expected returns",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/d73d17252ae3d840.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/d73d17252ae3d840.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 6108,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.434068+00:00"
+    },
+    {
+      "id": "d8fffd193002261d",
+      "source_id": "optionstrat",
+      "source_name": "OptionStrat",
+      "url": "https://optionstrat.com/tutorials/options-builder",
+      "title": "Options Builder Tutorial | OptionStrat",
+      "description": null,
+      "language": "en",
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/d8fffd193002261d.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/d8fffd193002261d.md",
+      "run_id": "RojKQg6c6fChnXVLV",
+      "quality": {
+        "content_chars": 11341,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:38:11.253965+00:00"
+    },
+    {
+      "id": "da2eb42ba32e8ccb",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter4/2_the_significance_of_volatility.html",
+      "title": "Chapter4/2 The Significance Of Volatility",
+      "description": "chapter4/1 pricing an option",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/da2eb42ba32e8ccb.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/da2eb42ba32e8ccb.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 4219,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433848+00:00"
+    },
+    {
       "id": "e4122df78e2e862a",
       "source_id": "oic",
       "source_name": "The Options Industry Council",
@@ -611,6 +1070,23 @@
         "content_chars": 3640,
         "requires_manual_review": false
       }
+    },
+    {
+      "id": "eb358ae9bd814a5b",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter5/1_common_complex_strategies.html",
+      "title": "Chapter5/1 Common Complex Strategies",
+      "description": "chapter5/7 butterflies condors and wingspreads",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/eb358ae9bd814a5b.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/eb358ae9bd814a5b.md",
+      "run_id": "itzKzBM0lWaksMgcS",
+      "quality": {
+        "content_chars": 4440,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-02T14:25:07.202355+00:00"
     },
     {
       "id": "eb8f6aeedfbc450f",
@@ -695,6 +1171,23 @@
         "requires_manual_review": false
       },
       "ingested_at": "2026-09-01T22:19:30.551633+00:00"
+    },
+    {
+      "id": "f6c384dbf9257bd9",
+      "source_id": "optionistics",
+      "source_name": "Optionistics",
+      "url": "https://www.optionistics.com/s/chapter3/1_option_pricing.html",
+      "title": "Chapter3/1 Option Pricing",
+      "description": "Optionistics",
+      "language": null,
+      "page_path": "/Users/miller/Projects/miOption/data/raw/pages/f6c384dbf9257bd9.json",
+      "markdown_path": "/Users/miller/Projects/miOption/data/raw/pages/f6c384dbf9257bd9.md",
+      "run_id": "Sgdh96rxVEeKOGf22",
+      "quality": {
+        "content_chars": 1592,
+        "requires_manual_review": false
+      },
+      "ingested_at": "2026-09-03T03:33:14.433249+00:00"
     },
     {
       "id": "fb8ce48c80fbd468",

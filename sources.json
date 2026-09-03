@@ -117,6 +117,63 @@
       "name": "Investopedia",
       "allowed": false,
       "reason": "Terms and robots.txt prohibit automated scraping and AI dataset construction; retain links only, not crawled content."
+    },
+    {
+      "id": "optionistics",
+      "name": "Optionistics",
+      "allowed": true,
+      "sample_url": "https://www.optionistics.com/s/option_spreads",
+      "include_prefixes": [
+        "/s/chapter1",
+        "/s/chapter2",
+        "/s/chapter3",
+        "/s/chapter4",
+        "/s/chapter5",
+        "/s/option_spreads",
+        "/g/"
+      ],
+      "crawler_type": "cheerio",
+      "notes": "Learning Center lesson pages and glossary only; skip TOCs, screeners, and calculators."
+    },
+    {
+      "id": "opc",
+      "name": "Options Profit Calculator",
+      "allowed": true,
+      "sample_url": "https://www.optionsprofitcalculator.com/faq.html",
+      "allowed_hosts": [
+        "www.optionsprofitcalculator.com",
+        "www2.optionsprofitcalculator.com"
+      ],
+      "include_prefixes": [
+        "/faq.html",
+        "/calculator/",
+        "/blog"
+      ],
+      "crawler_type": "playwright:firefox",
+      "notes": "FAQ is stable. Many /calculator/* pages render as nav shells; prefer www2 or re-smoke before approving."
+    },
+    {
+      "id": "optionstrat",
+      "name": "OptionStrat",
+      "allowed": true,
+      "sample_url": "https://optionstrat.com/tutorials/strategy-optimizer",
+      "include_prefixes": [
+        "/tutorials/",
+        "/build/"
+      ],
+      "crawler_type": "playwright:firefox",
+      "notes": "Tutorials are knowledge-eligible. /build/* stubs often fail the 1200-char gate."
+    },
+    {
+      "id": "sharepredictions",
+      "name": "Share Predictions",
+      "allowed": true,
+      "sample_url": "https://sharepredictions.com/",
+      "include_prefixes": [
+        "/"
+      ],
+      "crawler_type": "playwright:adaptive",
+      "notes": "Public FAQ/product copy only; not used as strategy-card evidence."
     }
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "run_id": "fubGXWqWdHRkOwJd1",
+  "status": "SUCCEEDED",
+  "exit_code": 0,
+  "started_at": "2026-09-02T14:16:46.530Z",
+  "finished_at": "2026-09-02T14:17:09.362Z",
+  "cost_usd": 0.01037053447501527,
+  "page_budget": 1,
+  "documents": [
+    {
+      "id": "4885c0737b3244c4",
+      "url": "https://www.optionsprofitcalculator.com/calculator/long-call.html"
+    }
+  ],
+  "generated_at": "2026-09-02T14:35:25.445364+00:00"
+}

@@ -15,6 +15,7 @@ aliases:
 sources:
   - "[[Source — Wikipedia Diagonal spread]]"
   - "[[Source — Long Call Calendar Spread (Call Horizontal)]]"
+  - "[[Source — Optionistics Chapter 5 Spreads]]"
 related:
   - "[[Long Call Calendar Spread]]"
   - "[[Long Put Calendar Spread]]"
@@ -46,6 +47,8 @@ A diagonal spread shares features of both a calendar spread and a vertical sprea
 
 OIC: a calendar most commonly uses the same strike (horizontal); different strikes make it a diagonal, with a slightly different profit/loss profile.
 
+Optionistics: a spread is two same-type legs (both calls or both puts), one short and one long. Vertical = different strikes, same expiry; horizontal/calendar = same strike, different expiries; diagonal = any combination of the two. No single numeric P/L is published for the diagonal case.
+
 ## Scenario
 
 Strike choice tilts bullish or bearish versus a same-strike calendar. A one-to-one diagonal with similar deltas behaves much like a calendar: close to delta-neutral, P/L driven mainly by volatility and time, not direction.
@@ -74,6 +77,10 @@ Strike choice tilts bullish or bearish versus a same-strike calendar. A one-to-o
   > The strategy most commonly involves calls with the same strike (horizontal spread), but can also be done with different strikes (diagonal spread).
 - [[Source — Long Call Calendar Spread (Call Horizontal)]] · `Variations`
   > A diagonal spread, involving two calls with different strikes as well as expirations, would have a slightly different profit/loss profile. The basic concepts, however, would continue to apply.
+- [[Source — Optionistics Chapter 5 Spreads]] · `Spreads`
+  > A spread consists of two legs, both are either calls or both are puts, one is short and one is long.
+- [[Source — Optionistics Chapter 5 Spreads]] · `Spreads`
+  > This can be done with options with different strike prices that expire in the same month (vertical spread), or options that have different expirations but the same strike (horizontal spread), or any combination of the two (diagonal spread).
 
 ### Legs
 

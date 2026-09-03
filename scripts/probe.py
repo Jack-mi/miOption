@@ -53,6 +53,17 @@ def allowed_sources(sources: list[dict]) -> list[dict]:
     return [source for source in sources if source.get("allowed")]
 
 
+def source_hosts(source: dict) -> set[str]:
+    sample_url = source.get("sample_url")
+    if not sample_url:
+        return set()
+    hosts = {urlparse(sample_url).netloc}
+    for host in source.get("allowed_hosts") or []:
+        if host:
+            hosts.add(host)
+    return hosts
+
+
 def source_for_url(url: str, sources: list[dict]) -> dict:
     parsed = urlparse(url)
     if parsed.scheme != "https" or not parsed.netloc:
@@ -62,8 +73,7 @@ def source_for_url(url: str, sources: list[dict]) -> dict:
         prefixes = source.get("include_prefixes")
         if not sample_url or not prefixes:
             raise ValueError(f"Allowed source has no complete allowlist: {source.get('id')}")
-        sample = urlparse(sample_url)
-        if parsed.netloc == sample.netloc and any(path_matches_prefix(parsed.path, prefix) for prefix in prefixes):
+        if parsed.netloc in source_hosts(source) and any(path_matches_prefix(parsed.path, prefix) for prefix in prefixes):
             return source
     raise ValueError(f"URL is outside the approved source/path allowlist: {url}")
 
@@ -140,11 +150,13 @@ def allowed_url_globs(sources: list[dict]) -> list[str]:
     globs = []
     for source in allowed_sources(sources):
         sample = urlparse(source["sample_url"])
-        origin = f"{sample.scheme}://{sample.netloc}"
-        for prefix in source["include_prefixes"]:
-            path = normalized_prefix(prefix)
-            globs.append(f"{origin}{path}")
-            globs.append(f"{origin}{path}/**")
+        hosts = sorted(source_hosts(source)) or [sample.netloc]
+        for host in hosts:
+            origin = f"{sample.scheme}://{host}"
+            for prefix in source["include_prefixes"]:
+                path = normalized_prefix(prefix)
+                globs.append(f"{origin}{path}")
+                globs.append(f"{origin}{path}/**")
     return globs
 
 
@@ -192,10 +204,16 @@ def build_input(config: dict, urls: list[str] | None = None, max_pages: int | No
     estimated_cost = page_budget * crawl_policy["estimated_cost_per_page_usd"]
     if estimated_cost > crawl_policy["max_cost_usd"]:
         raise ValueError(f"Estimated cost ${estimated_cost:.2f} exceeds the configured budget")
+    crawler_types = {
+        source_for_url(url, config["sources"]).get("crawler_type") or crawl_policy["crawler_type"]
+        for url in urls
+    }
+    if len(crawler_types) != 1:
+        raise ValueError(f"Selected URLs require mixed crawler types: {sorted(crawler_types)}")
     return {
         "startUrls": [{"url": url} for url in urls],
         "includeUrlGlobs": allowed_url_globs(config["sources"]),
-        "crawlerType": crawl_policy["crawler_type"],
+        "crawlerType": next(iter(crawler_types)),
         "maxCrawlDepth": 0,
         "maxCrawlPages": page_budget,
         "maxResults": page_budget,

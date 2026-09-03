@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "run_id": "QTfPtb6GCrJGg33Ap",
+  "status": "SUCCEEDED",
+  "exit_code": 0,
+  "started_at": "2026-09-02T14:15:54.967Z",
+  "finished_at": "2026-09-02T14:16:16.809Z",
+  "cost_usd": 0.009912247368863888,
+  "page_budget": 1,
+  "documents": [
+    {
+      "id": "4f03692ad0cc7b6e",
+      "url": "https://www2.optionsprofitcalculator.com/calculator/diagonal-spread.html"
+    }
+  ],
+  "generated_at": "2026-09-02T14:35:48.207806+00:00"
+}

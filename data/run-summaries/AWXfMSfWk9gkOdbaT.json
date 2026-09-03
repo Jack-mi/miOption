@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "run_id": "AWXfMSfWk9gkOdbaT",
+  "status": "SUCCEEDED",
+  "exit_code": 0,
+  "started_at": "2026-09-03T03:33:26.357Z",
+  "finished_at": "2026-09-03T03:33:35.299Z",
+  "cost_usd": 0.00015460597801705202,
+  "page_budget": 4,
+  "documents": [
+    {
+      "id": "5ac902194da6cb65",
+      "url": "https://www.optionistics.com/s/chapter5/2_covered_calls.html"
+    },
+    {
+      "id": "1c3b53a05a9edce3",
+      "url": "https://www.optionistics.com/s/chapter5/4_straddles.html"
+    },
+    {
+      "id": "037eb03bcae90819",
+      "url": "https://www.optionistics.com/s/chapter5/8_conversions.html"
+    },
+    {
+      "id": "86c027a02074a391",
+      "url": "https://www.optionistics.com/s/chapter5/9_synthetic_positions.html"
+    }
+  ],
+  "generated_at": "2026-09-03T03:34:35.882247+00:00"
+}
