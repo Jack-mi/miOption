@@ -1,0 +1,7 @@
+# Example Codex MCP wiring. Copy to a trusted project `.codex/config.toml`
+# if you use Codex as a host. Same FastMCP entry as Cursor.
+#
+# [mcp_servers.mioption]
+# command = "/path/to/runtime/.venv/bin/python"
+# args = ["-m", "mioption_runtime.agent.stdio_mcp"]
+# startup_timeout_sec = 15
