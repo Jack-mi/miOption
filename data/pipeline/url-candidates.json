@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-09-03T11:30:00+08:00",
-  "policy": "Only approved HTTPS URLs matching sources.json host and path allowlists may be run. proposed candidates are staged for human approval and cannot be crawled until crawl_status becomes approved. The corpus covers options, including options on futures when the page is about options; standalone futures material is out of scope. Strategy coverage is one set merged from the Futu App menu and help topic474, filled from OIC text pages.",
+  "generated_at": "2026-09-03T16:30:00+08:00",
+  "policy": "Only approved HTTPS URLs matching sources.json host and path allowlists may be run. proposed candidates are staged for human approval and cannot be crawled until crawl_status becomes approved. The corpus covers options, including options on futures when the page is about options; standalone futures material is out of scope. Strategy coverage is one set merged from the Futu App menu and help topic474, filled from OIC text pages. Apify collects education text only: CME/Cboe Institute pages are not market data; OptionStrat /build stubs and calculator shells are skipped.",
   "candidates": [
     {
       "url": "https://www.optionseducation.org/optionsoverview/what-is-an-option",
@@ -972,10 +972,10 @@
       "source_id": "optionstrat",
       "topic": "strategy",
       "priority": 8,
-      "crawl_status": "proposed",
+      "crawl_status": "skipped",
       "allowed": true,
       "batch": "four-site-match",
-      "knowledge_eligible": true,
+      "knowledge_eligible": false,
       "knowledge_type": "strategy",
       "content_kind": "strategy",
       "video": false,
@@ -984,17 +984,17 @@
         "legs"
       ],
       "target_card_id": "strategy.strap",
-      "notes": "Build stub ~400–500 chars; fails knowledge_policy 1200. Keep proposed until threshold or richer page."
+      "notes": "Skipped 2026-09-03: /build stub fails 1200-char knowledge gate. Product-benchmark UI is recorded in wiki/meta/Product patterns.md; do not recrawl as a strategy source."
     },
     {
       "url": "https://optionstrat.com/build/diagonal-call-spread",
       "source_id": "optionstrat",
       "topic": "strategy",
       "priority": 8,
-      "crawl_status": "proposed",
+      "crawl_status": "skipped",
       "allowed": true,
       "batch": "four-site-match",
-      "knowledge_eligible": true,
+      "knowledge_eligible": false,
       "knowledge_type": "strategy",
       "content_kind": "strategy",
       "video": false,
@@ -1003,17 +1003,17 @@
         "legs"
       ],
       "target_card_id": "strategy.diagonal_spread",
-      "notes": "Build stub ~400 chars; fails 1200-char gate. Do not approve until body is longer."
+      "notes": "Skipped 2026-09-03: /build stub fails 1200-char knowledge gate. Diagonal structure stays on Wikipedia + OIC; do not recrawl OptionStrat builder shells."
     },
     {
       "url": "https://www.optionsprofitcalculator.com/calculator/diagonal-spread.html",
       "source_id": "opc",
       "topic": "strategy",
       "priority": 8,
-      "crawl_status": "proposed",
+      "crawl_status": "skipped",
       "allowed": true,
       "batch": "four-site-match",
-      "knowledge_eligible": true,
+      "knowledge_eligible": false,
       "knowledge_type": "strategy",
       "content_kind": "strategy",
       "video": false,
@@ -1022,24 +1022,24 @@
         "legs"
       ],
       "target_card_id": "strategy.diagonal_spread",
-      "notes": "www host usually returns ~169-char nav shell. Use www2 URL instead."
+      "notes": "Skipped 2026-09-03: www host is a nav shell. www2 diagonal page already ingested; do not approve empty calculator shells."
     },
     {
       "url": "https://www.optionistics.com/s/tutorial",
       "source_id": "optionistics",
       "topic": "curriculum",
       "priority": 8,
-      "crawl_status": "proposed",
+      "crawl_status": "skipped",
       "allowed": true,
       "batch": "four-site-match",
-      "knowledge_eligible": true,
+      "knowledge_eligible": false,
       "knowledge_type": "concept",
       "content_kind": "text_lesson",
       "video": false,
       "expected_fields": [
         "definition_meaning"
       ],
-      "notes": "Learning Center hub; not crawled in winner batch. Needs approval before probe."
+      "notes": "Skipped 2026-09-03: Learning Center hub/TOC. Lesson pages already ingested; do not crawl the tutorial index."
     },
     {
       "url": "https://www.optionistics.com/s/chapter1/1_introduction_to_stock_options.html",

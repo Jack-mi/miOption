@@ -3,7 +3,7 @@ type: entity
 title: Bear Put Spread
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -44,12 +44,12 @@ For bearish investors who want defined risk and are willing to cap downside gain
 
 ## Method
 
-- Max gain: The maximum gain is limited. The best that can happen is for the stock price to be below the lower strike at expiration.
-- Max loss: The maximum loss is limited. The worst that can happen at expiration is for the stock to be above the higher (long put) strike price.
-- Breakeven: This strategy breaks even if, at expiration, the stock price is below the upper strike by the amount of the initial outlay (the debit). In that case, the short put would expire worthless, and the long put's intrinsic value would equal the debit.
+- Maximum profit: The maximum gain is limited. The best that can happen is for the stock price to be below the lower strike at expiration.
+- Maximum loss: The maximum loss is limited. The worst that can happen at expiration is for the stock to be above the higher (long put) strike price.
+- Break-even: This strategy breaks even if, at expiration, the stock price is below the upper strike by the amount of the initial outlay (the debit). In that case, the short put would expire worthless, and the long put's intrinsic value would equal the debit.
 - Assignment / expiration: Yes. Early assignment, while possible at any time, generally occurs only when a put option goes deep into-the-money. Yes. If held into expiration, this strategy entails added risk.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Slight, all other things being equal. Since the strategy involves being short one put and long another with the same expiration, the effects of volatility shifts on the two contracts may offset each other to a large degree.
 - Time decay: The passage of time hurts the position, though not quite as much as it does an plain long put position. Since the strategy involves being long one put and short another with the same expiration, the effects of time decay on the two contracts may offset each other to a large degree.

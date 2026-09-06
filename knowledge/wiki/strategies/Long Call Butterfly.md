@@ -3,7 +3,7 @@ type: entity
 title: Long Call Butterfly
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -45,12 +45,12 @@ For investors seeking defined-risk short-volatility style payoff who accept high
 
 ## Method
 
-- Max gain: The maximum profit would occur should the underlying stock be at the middle strike at expiration. In that case, the long call with the lower strike would be in-the-money and all the other options would expire worthless.
-- Max loss: The maximum loss would occur should the underlying stock be outside the wings at expiration. If the stock were below the lower strike all the options would expire worthless; if above the upper strike all the options would be exercised and offset each other for a zero profit.
-- Breakeven: The strategy breaks even if at expiration the underlying stock is above the lower strike or below the upper strike by the amount of premium paid to initiate the position.
+- Maximum profit: The maximum profit would occur should the underlying stock be at the middle strike at expiration. In that case, the long call with the lower strike would be in-the-money and all the other options would expire worthless.
+- Maximum loss: The maximum loss would occur should the underlying stock be outside the wings at expiration. If the stock were below the lower strike all the options would expire worthless; if above the upper strike all the options would be exercised and offset each other for a zero profit.
+- Break-even: The strategy breaks even if at expiration the underlying stock is above the lower strike or below the upper strike by the amount of premium paid to initiate the position.
 - Assignment / expiration: Yes. The short calls that form the body of the butterfly are subject to exercise at any time, while the investor decides if and when to exercise the wings. Yes. This strategy has an extremely high expiration risk.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, will usually have a slightly negative impact on this strategy.
 - Time decay: The passage of time, all other things equal, will usually have a positive impact on this strategy if the body of the butterfly is at-the-money, and a negative impact if the body is away from the money.

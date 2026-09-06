@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 2 Growth
 
-Describes covered-call writing as stock plus a short call, collecting premium and dividends while capping upside. Names a simultaneous stock-and-call fill a complex option / buy-write. Structure only; P/L stays OIC.
+Describes covered-call writing as stock plus a short call, collecting premium and dividends while capping upside. Names a simultaneous stock-and-call fill a complex option / buy-write. Structure only; profit-and-loss numbers stay with the Options Industry Council.
 
 - Publisher: Optionistics
 - Body eligible: yes

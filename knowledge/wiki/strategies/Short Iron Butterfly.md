@@ -3,7 +3,7 @@ type: entity
 title: Short Iron Butterfly
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -19,7 +19,7 @@ related: []
 
 # Short Iron Butterfly
 
-Collect credit for a short ATM straddle hedged by a long OTM strangle; profits if price stays near the body.
+Collect credit for a short at-the-money straddle (strikes near the current stock price) hedged by a long out-of-the-money strangle (strikes farther from the current stock price); profits if price stays near the body.
 
 - Underlying: equity option
 - Knowledge id: `strategy.short_iron_butterfly`
@@ -35,7 +35,7 @@ Collect credit for a short ATM straddle hedged by a long OTM strangle; profits i
 
 ## Meaning
 
-Collect credit for a short ATM straddle hedged by a long OTM strangle; profits if price stays near the body.
+Collect credit for a short at-the-money straddle (strikes near the current stock price) hedged by a long out-of-the-money strangle (strikes farther from the current stock price); profits if price stays near the body.
 
 ## Scenario
 
@@ -45,12 +45,12 @@ For short-premium traders who need defined wings and can handle assignment on th
 
 ## Method
 
-- Max gain: The maximum gain would occur should the underlying stock be at the body of the butterfly at expiration. In that case all the options would expire worthless, and the premium received to initiate the position could be pocketed.
-- Max loss: The maximum loss would occur should the underlying stock be outside the wings at expiration. In that case either both calls or both puts would be in-the-money.
-- Breakeven: The strategy breaks even if at expiration the underlying stock is either above or below the body of the butterfly by the amount of premium received to initiate the position.
+- Maximum profit: The maximum gain would occur should the underlying stock be at the body of the butterfly at expiration. In that case all the options would expire worthless, and the premium received to initiate the position could be pocketed.
+- Maximum loss: The maximum loss would occur should the underlying stock be outside the wings at expiration. In that case either both calls or both puts would be in-the-money.
+- Break-even: The strategy breaks even if at expiration the underlying stock is either above or below the body of the butterfly by the amount of premium received to initiate the position.
 - Assignment / expiration: The short options that form the body of the butterfly are subject to exercise at any time, while the investor decides if and when to exercise the wings. If an early exercise occurs at the body, the investor can choose whether to close out the resulting position in the market or to exercise one of their options (put or  This strategy has expiration risk. If at expiration the stock is trading near the body of the butterfly, the investor faces uncertainty as to whether or not they will be assigned.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, would have a negative impact on this strategy.
 - Time decay: The passage of time, all other things equal, will have a positive effect on this strategy.

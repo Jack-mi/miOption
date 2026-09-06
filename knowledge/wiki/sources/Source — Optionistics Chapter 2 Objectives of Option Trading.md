@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 2 Objectives of Option Trading
 
-Lists uses: directional speculation, protective puts, covered-call income (no protection if the stock falls), and leverage by buying options instead of stock. Complex multi-leg strategies are deferred to chapter 5. No numeric P/L.
+Lists uses: directional speculation, protective puts, covered-call income (no protection if the stock falls), and leverage by buying options instead of stock. Complex multi-leg strategies are deferred to chapter 5. No published profit-and-loss numbers.
 
 - Publisher: Optionistics
 - Body eligible: yes

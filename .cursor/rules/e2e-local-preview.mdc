@@ -1,0 +1,14 @@
+---
+description: End-to-end local preview must bind a free port and verify the server before browser checks
+alwaysApply: true
+---
+
+# E2E local preview
+
+When verifying a local web page (H5, static docs, app UI):
+
+1. **Own the server.** Start a preview process yourself. Do not assume an already-open port is serving the files you just edited.
+2. **Port taken → switch.** If bind fails with `Address already in use` / errno 48, pick another free port (probe `127.0.0.1`) and start again. Never treat a failed bind as “good enough” because something else answered on that port.
+3. **Confirm listen before browse.** After start, check the process is up (or `curl -I` / open the URL succeeds against **your** port). Only then run browser verification.
+4. **Point the browser at that URL.** Use the host and port you actually bound. Say the URL in the final report.
+5. **Stop what you started** when verification is done, unless the user wants it left running.

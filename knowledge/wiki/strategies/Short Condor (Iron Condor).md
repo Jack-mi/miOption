@@ -3,7 +3,7 @@ type: entity
 title: Short Condor (Iron Condor)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -40,19 +40,19 @@ Collect credit when expecting the underlying to stay between the short put and s
 
 ## Scenario
 
-Neutral / range-bound inside the inner wings; rising IV generally hurts.
+Neutral / range-bound inside the inner wings; rising implied volatility generally hurts.
 
 For short-premium traders seeking a wider profit zone than an iron butterfly with defined wing risk.
 
 ## Method
 
-- Max gain: The maximum gain would occur should the underlying stock be between the lower call strike and upper put strike at expiration. In that case all the options would expire worthless, and the premium received to initiate the position could be pocketed.
-- Max loss: The maximum loss would occur should the underlying stock be above the upper call strike or below the lower put strike at expiration. In that case either both calls or both puts would be in-the-money.
-- Breakeven: This strategy breaks even if at expiration the underlying stock is either above the lower call strike or below the upper put strike by the amount of the premium received to initiate the position. Upside breakeven = lower call strike + premiums received
+- Maximum profit: The maximum gain would occur should the underlying stock be between the lower call strike and upper put strike at expiration. In that case all the options would expire worthless, and the premium received to initiate the position could be pocketed.
+- Maximum loss: The maximum loss would occur should the underlying stock be above the upper call strike or below the lower put strike at expiration. In that case either both calls or both puts would be in-the-money.
+- Break-even: This strategy breaks even if at expiration the underlying stock is either above the lower call strike or below the upper put strike by the amount of the premium received to initiate the position. Upside breakeven = lower call strike + premiums received
 Downside breakeven = upper put strike - premiums received
 - Assignment / expiration: The short options that form the shoulders of the condor's wings are subject to exercise at any time, while the investor decides if and when to exercise the wingtips. If an early exercise occurs at either shoulder, the investor can choose whether to close out the resulting position in the market or to exercise the appro If at expiration the stock is trading near either shoulder the investor would face uncertainty as to whether or not they would be assigned. Should the exercise activity be other than expected, the investor could be unexpectedly long or short the stock on the Monday following expiration and hence subject to an adverse m
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, would have a negative impact on this strategy.
 - Time decay: The passage of time, all other things equal, will have a positive effect on this strategy.

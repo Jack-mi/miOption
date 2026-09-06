@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mioption": {
+      "command": "<repo>/runtime/.venv/bin/python",
+      "args": ["-m", "mioption_runtime.agent.stdio_mcp"],
+      "env": {
+        "PYTHONPATH": "<repo>/runtime",
+        "MIOPTION_FUTU_MOCK": "1",
+        "MIOPTION_VAULT": "<repo>/knowledge"
+      }
+    }
+  }
+}

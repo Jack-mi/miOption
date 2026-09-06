@@ -3,7 +3,7 @@ type: entity
 title: Long Put Calendar Spread
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -45,12 +45,12 @@ The investor is looking for either a steady to slightly rising stock price durin
 
 ## Method
 
-- Max gain: At the expiration of the near-term option, the maximum gain would occur should the underlying stock be at the strike price of the expiring option. After that, the position is a long put.
-- Max loss: The maximum loss would occur should the two options reach parity. The loss would be the premium paid to establish the position.
-- Breakeven: A function of stock price, implied volatility, and time decay while both options are live. If the near-term put expires worthless, later breakeven is the strike minus the net debit.
+- Maximum profit: At the expiration of the near-term option, the maximum gain would occur should the underlying stock be at the strike price of the expiring option. After that, the position is a long put.
+- Maximum loss: The maximum loss would occur should the two options reach parity. The loss would be the premium paid to establish the position.
+- Break-even: A function of stock price, implied volatility, and time decay while both options are live. If the near-term put expires worthless, later breakeven is the strike minus the net debit.
 - Assignment / expiration: Early assignment generally occurs for a put when it goes deep-in-the-money. Assignment on the near-term put leaves a long stock position hedged by the longer-term put.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, would have an extremely positive impact on this strategy.
 - Time decay: Positive while the near-term put is decaying faster; after it expires the remaining long put is hurt by time decay.

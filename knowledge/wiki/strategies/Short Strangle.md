@@ -3,7 +3,7 @@ type: entity
 title: Short Strangle
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -27,8 +27,8 @@ Collect premium with a wider profit zone than a short straddle, still exposed to
 
 ## Legs
 
-- short OTM call (call option)
-- short OTM put, same expiration (put option)
+- short out-of-the-money call (strike farther from the current stock price)
+- short out-of-the-money put, same expiration
 
 ## Meaning
 
@@ -36,18 +36,18 @@ Collect premium with a wider profit zone than a short straddle, still exposed to
 
 ## Scenario
 
-Neutral / range-bound with room between the short strikes; rising IV hurts.
+Neutral / range-bound with room between the short strikes; rising implied volatility hurts.
 
 For short-premium traders who accept substantial risk outside the strikes and margin requirements.
 
 ## Method
 
-- Max gain: The maximum gain is very limited. The maximum gain occurs if the underlying stock remains between the strike prices.
-- Max loss: The maximum loss is unlimited. The maximum loss occurs if the stock goes to infinity, and a very substantial loss could occur if the stock became worthless.
-- Breakeven: This strategy breaks even if, at expiration, the stock price is either above the call strike price or below the put strike price by the amount of premium received initially. At either of those levels, one option's intrinsic value will equal the premium received for selling both options while the other option will be ex
+- Maximum profit: The maximum gain is very limited. The maximum gain occurs if the underlying stock remains between the strike prices.
+- Maximum loss: The maximum loss is unlimited. The maximum loss occurs if the stock goes to infinity, and a very substantial loss could occur if the stock became worthless.
+- Break-even: This strategy breaks even if, at expiration, the stock price is either above the call strike price or below the put strike price by the amount of premium received initially. At either of those levels, one option's intrinsic value will equal the premium received for selling both options while the other option will be ex
 - Assignment / expiration: Early assignment, while possible at any time, generally occurs for a call only when the stock goes ex-dividend or for a put when it goes deep in-the-money. And be aware, a situation where a stock is involved in a restructuring or capitalization event, such as a merger, takeover, spin-off or special dividend, could comp An investor cannot know for sure whether or not they will be assigned on either the call or put until the Monday after expiration. If an assignment occurs unexpectedly, they will find themselves long or short the stock on the Monday following expiration and subject to an adverse move in the stock over the weekend.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, would have a very negative impact on this strategy. Even if the stock price holds steady, a quick rise in implied volatility would push up the value of both options and force the investor to put up additional margin in order to maintain the position.
 - Time decay: The passage of time, all other things equal, will have a very positive impact on this strategy. Every day that passes without a move in the stock price brings both options one day closer to expiring worthless.

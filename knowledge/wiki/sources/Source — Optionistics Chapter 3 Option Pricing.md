@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 3 Option Pricing
 
-Names the three largest premium drivers (underlying vs strike, time, volatility) and five model inputs including the risk-free rate and dividend yield. Secondary to OIC pricing; no invented P/L.
+Names the three largest premium drivers (underlying vs strike, time, volatility) and five model inputs including the risk-free rate and dividend yield. Secondary to OIC pricing; no invented profit-and-loss numbers.
 
 - Publisher: Optionistics
 - Body eligible: yes

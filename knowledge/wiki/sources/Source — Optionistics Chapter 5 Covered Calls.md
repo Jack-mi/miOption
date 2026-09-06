@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 5 Covered Calls
 
-Covered call = long stock + short call; buy-write is the simultaneous fill. Same risk profile as a short put. Typical near-term sales mentioned. Structure/naming only; P/L stays OIC.
+Covered call = long stock + short call; buy-write is the simultaneous fill. Same risk profile as a short put. Typical near-term sales mentioned. Structure/naming only; profit-and-loss numbers stay with the Options Industry Council.
 
 - Publisher: Optionistics
 - Body eligible: yes

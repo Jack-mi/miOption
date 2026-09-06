@@ -135,6 +135,10 @@ miOption options knowledge: source-backed concepts and named strategies.
 ## Coverage
 
 - [[Futu strategy coverage]]
+- [[Source roles]] — education evidence vs market data; CME/Cboe Institute is not a price feed
+- [[Product patterns]] — builder/bot design spec; Trigger/Condition/Action and exit rules (not strategy-card evidence)
+- [[Futu OpenAPI integration]] — OpenD + futu-api bridge; SIMULATE default; not education evidence
+- [[Product capability map]] — canvas: knowledge Q&A / market data / builder and bot
 
 ## Questions
 

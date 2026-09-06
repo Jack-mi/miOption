@@ -3,7 +3,7 @@ type: entity
 title: Protective Put (Married Put)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -43,12 +43,12 @@ For stock holders willing to pay premium for a known exit floor; not a profit-ma
 
 ## Method
 
-- Max gain: In theory, the potential gains on this strategy are unlimited. The best that can happen is for the stock price to rise to infinity.
-- Max loss: The maximum loss is limited. The worst that can happen is for the stock to drop below the strike price.
-- Breakeven: There is no single formula to determine the strategy's breakeven point. Whether this strategy results in a profit or loss is largely determined by the purchase price of the stock, which may have occurred well in the past at a much lower price.
+- Maximum profit: In theory, the potential gains on this strategy are unlimited. The best that can happen is for the stock price to rise to infinity.
+- Maximum loss: The maximum loss is limited. The worst that can happen is for the stock to drop below the strike price.
+- Break-even: There is no single formula to determine the strategy's breakeven point. Whether this strategy results in a profit or loss is largely determined by the purchase price of the stock, which may have occurred well in the past at a much lower price.
 - Assignment / expiration: None. None, providing that the investor knows the pre-established minimum value for automatic exercise. If the protective put holder carries the open position into expiration, it indicates a desire to exercise the option if it's sufficiently in-the-money.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility would have a neutral to slightly positive impact on this strategy, all other things being equal. On one hand, the investor might perceive a greater value to having the put protection, since the market seems to think a big move has become likely.
 - Time decay: The passage of time will have a negative impact on this strategy, all other things being equal. The protection of the hedge ends at expiration.

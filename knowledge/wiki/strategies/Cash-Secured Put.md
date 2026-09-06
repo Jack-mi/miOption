@@ -3,7 +3,7 @@ type: entity
 title: Cash-Secured Put
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -44,12 +44,12 @@ Only for investors who want to own the stock at the strike (less premium) and ha
 
 ## Method
 
-- Max gain: The maximum gain from the put option itself is limited. However, the optimal outcome is not readily apparent in the expiration profit/loss payoff diagram, because it does not address developments after expiration.
-- Max loss: The maximum loss is limited but substantial. The worst that can happen is for the stock to become worthless.
-- Breakeven: Since the object of this strategy is to acquire stock, the investor would break even if it is possible to sell the stock at the same effective price they paid for it. Breakeven = strike price – premium
+- Maximum profit: The maximum gain from the put option itself is limited. However, the optimal outcome is not readily apparent in the expiration profit/loss payoff diagram, because it does not address developments after expiration.
+- Maximum loss: The maximum loss is limited but substantial. The worst that can happen is for the stock to become worthless.
+- Break-even: Since the object of this strategy is to acquire stock, the investor would break even if it is possible to sell the stock at the same effective price they paid for it. Breakeven = strike price – premium
 - Assignment / expiration: Slight. Since the goal of this strategy is to acquire stock, assignment is not a problem. None. Since the goal of this strategy is to acquire stock, the investor should welcome an assignment at the option's expiration.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Whereas an increase in implied volatility would be considered an unqualified negative for a naked put writer, the effect could be described as neutral to slightly negative for the cash-secured put writer, all other things being equal. If it now appears likelier that the put will be assigned, greater volatility is a neu
 - Time decay: The passage of time will have a positive impact on this strategy, all other things being equal. As expiration approaches, the option tends to move toward its intrinsic value, which for out-of-money puts is zero.

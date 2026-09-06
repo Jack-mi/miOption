@@ -167,8 +167,10 @@ h2 {
 
 /* N1 */
 .nav-min {
-  position: relative;
-  z-index: 2;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--color-paper);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -262,6 +264,20 @@ h2 {
   min-width: 0;
 }
 
+.flow details {
+  min-width: 0;
+}
+
+.flow summary {
+  list-style: none;
+  cursor: pointer;
+  min-height: 48px;
+}
+
+.flow summary::-webkit-details-marker {
+  display: none;
+}
+
 .flow strong {
   display: block;
   font-weight: 800;
@@ -271,10 +287,26 @@ h2 {
   margin: var(--space-2xs) 0;
 }
 
+.flow-body {
+  margin-top: var(--space-sm);
+  max-width: 36ch;
+}
+
+.flow-body p,
 .flow p {
-  margin: 0;
+  margin: 0 0 var(--space-xs);
   max-width: 36ch;
   color: color-mix(in oklab, var(--color-accent-ink) 82%, transparent);
+}
+
+.flow-body p:last-child {
+  margin-bottom: 0;
+}
+
+.flow details[open] summary strong {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.18em;
 }
 
 .flow .n {
@@ -324,6 +356,10 @@ h2 {
   .flow li:last-child .arrow {
     display: none;
   }
+
+  .flow--tri {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 /* Counts */
@@ -335,10 +371,6 @@ h2 {
 }
 
 .count {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--space-sm);
-  align-items: end;
   padding: var(--space-md) 0;
   border-top: var(--rule-hair) solid var(--color-rule);
   min-width: 0;
@@ -348,11 +380,44 @@ h2 {
   border-top: 0;
 }
 
+.count > summary {
+  display: grid;
+  gap: var(--space-sm);
+  align-items: end;
+  cursor: pointer;
+  list-style: none;
+  min-height: 48px;
+}
+
+.count > summary::-webkit-details-marker {
+  display: none;
+}
+
 .count b {
+  display: block;
   font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 800;
   letter-spacing: -0.05em;
   line-height: 0.85;
+}
+
+.count-body {
+  margin-top: var(--space-sm);
+  max-width: 40ch;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.count-body p {
+  margin: 0 0 var(--space-xs);
+}
+
+.count-body p:last-child {
+  margin-bottom: 0;
+}
+
+.count[open] > summary .label {
+  color: var(--color-accent);
 }
 
 .step {
@@ -609,11 +674,56 @@ body:has(#cat-ironcondor:checked) .row:not([data-cat="ironcondor"]) {
 }
 
 .cell {
-  padding: var(--space-md) 0;
   border-bottom: var(--rule-hair) solid var(--color-rule);
   font-weight: 600;
   letter-spacing: -0.02em;
   min-width: 0;
+}
+
+.cell > summary {
+  padding: var(--space-md) 0;
+  cursor: pointer;
+  list-style: none;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+}
+
+.cell > summary::-webkit-details-marker {
+  display: none;
+}
+
+.cell > summary::after {
+  content: "+";
+  margin-inline-start: auto;
+  padding-inline-start: var(--space-sm);
+  font-weight: 800;
+  color: var(--color-muted);
+}
+
+.cell[open] > summary::after {
+  content: "–";
+  color: var(--color-accent);
+}
+
+.cell-body {
+  padding: 0 0 var(--space-md);
+  max-width: 52ch;
+  font-weight: 400;
+}
+
+.cell-body p {
+  margin: 0 0 var(--space-sm);
+}
+
+.cell-body p:last-child {
+  margin-bottom: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.cell[open] > summary {
+  color: var(--color-accent);
 }
 
 @media (min-width: 40rem) {
@@ -622,12 +732,16 @@ body:has(#cat-ironcondor:checked) .row:not([data-cat="ironcondor"]) {
   }
 
   .cell {
-    padding: var(--space-md);
+    padding-inline: var(--space-md);
     border-inline-end: var(--rule-hair) solid var(--color-rule);
   }
 
   .cell:nth-child(2n) {
     border-inline-end: 0;
+  }
+
+  .cell > summary {
+    padding-inline: 0;
   }
 }
 
@@ -638,15 +752,28 @@ body:has(#cat-ironcondor:checked) .row:not([data-cat="ironcondor"]) {
     padding-inline: var(--page-gutter);
   }
 
-  .cell:hover {
+  .cell > summary:hover {
     background: var(--color-paper-2);
+  }
+
+  .count > summary:hover .label {
+    color: var(--color-accent);
+  }
+
+  .flow summary:hover strong {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.18em;
   }
 }
 
 @media (pointer: coarse) {
   .nav-min a,
   .filters label,
-  .row summary {
+  .row summary,
+  .cell > summary,
+  .count > summary,
+  .flow summary {
     min-height: 48px;
   }
 }

@@ -3,7 +3,7 @@ type: meta
 title: Futu strategy coverage
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - meta
   - coverage
@@ -16,7 +16,7 @@ One merged set from two Futu surfaces:
 - App strategy menu (product categories: single-leg, covered, collar, diagonal, iron butterfly, and the rest of the named menu)
 - Help article [常用期权组合简介](https://support.futunn.com/topic474) (combo structures #1–12)
 
-Evidence for P/L and Greeks is OIC text, except Strap/Strip (Wikipedia + Futu structure; no numeric P/L) and Diagonal (Wikipedia: analyze each variation individually).
+Evidence for profit-and-loss numbers and price-sensitivity measures is Options Industry Council text, except Strap/Strip (Wikipedia + Futu structure; no published profit-and-loss numbers) and Diagonal (Wikipedia: analyze each variation individually).
 
 Positioning source: [[Source — Futu 常用期权组合简介]]
 
@@ -82,7 +82,7 @@ Category status: `ready`. topic474 #12 (sell near, buy far, same strike).
 
 ## 对角策略 / Diagonal Spread
 
-Category status: `ready` for structure. Wikipedia dedicated page; OIC calendar only as the “different-strike variation” note. No single published P/L formula.
+Category status: `ready` for structure. Wikipedia dedicated page; OIC calendar only as the “different-strike variation” note. No single published profit-and-loss formula.
 
 - [[Diagonal Call Spread]] — `ready` — 不同执行价 + 不同到期；盈亏要按具体组合单独看
 

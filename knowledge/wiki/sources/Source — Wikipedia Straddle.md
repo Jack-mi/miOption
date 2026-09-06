@@ -3,7 +3,7 @@ type: source
 title: Source — Wikipedia Straddle
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - source
   - wikipedia
@@ -22,7 +22,7 @@ Wikipedia article on straddles, including the strap (two calls and one put) and 
 
 - Publisher: Wikipedia
 - License: CC BY-SA 4.0
-- Body eligible: yes (structure and directional bias; no strap/strip numeric P/L)
+- Body eligible: yes (structure and directional bias; no strap/strip numeric profit and loss)
 - Knowledge type: strategy
 - Immutable capture: `.raw/captured/bc7b3b508117f055b8aba011b077e4996217853f08f6f5a386a606ba33adb91d.md`
 

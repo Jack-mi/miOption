@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>miOption vault map — 知识库架构与策略卡</title>
-  <meta name="description" content="富途定覆盖，OIC 与 Wikipedia 定含义。43 页证据，49 条源笔记，13 张概念，27 张策略卡。" />
+  <meta name="description" content="富途定覆盖，OIC 与 Wikipedia 定含义。72 页证据，70 条源笔记，13 张概念，27 张策略卡。教育抓取，不是行情接口。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="map.css" />
+  <link rel="stylesheet" href="chat.css" />
 </head>
 <body>
   <div class="shell">
@@ -18,18 +19,21 @@
       <a class="wordmark" href="#top">mioption</a>
       <ul>
         <li><a href="#map">架构</a></li>
+        <li><a href="#roles">角色</a></li>
         <li><a href="#strategies">策略</a></li>
+        <li><a href="#concepts">概念</a></li>
+        <li><a href="#chat-panel">对话</a></li>
       </ul>
     </nav>
 
     <header class="band band--hero" id="top">
       <div class="grid-12">
         <div class="span-copy">
-          <p class="label">Knowledge vault · 2026-09-02</p>
+          <p class="label">Knowledge vault · 2026-09-03</p>
           <h1>the vault<span class="period" aria-hidden="true"></span></h1>
           <span class="bar" aria-hidden="true"></span>
-          <p class="lede">Futu 定覆盖。OIC 与 Wikipedia 定含义。成品在 <code>knowledge/wiki</code>，不是 JSON。</p>
-          <p class="meta">27 张策略卡全部 evergreen。对角没有单一盈亏公式；Strap / Strip 只发表腿与方向，不填最多赚、最多亏、打平价。</p>
+          <p class="lede">Futu 定覆盖。OIC 与 Wikipedia 定含义。成品在 <code>knowledge/wiki</code>，不是 JSON。抓的是教育正文，不是期权链。</p>
+          <p class="meta">27 张策略卡全部 evergreen。对角没有单一盈亏公式；Strap / Strip 只发表腿与方向，不填最多赚、最多亏、打平价。知识问答已落地；行情与 Builder 未做。</p>
         </div>
       </div>
     </header>
@@ -41,34 +45,110 @@
     <span class="bar" aria-hidden="true"></span>
     <ol class="flow">
       <li>
-        <span class="n">01 覆盖</span>
-        <strong>Futu ∪ topic474</strong>
-        <p>App 菜单和「常用期权组合简介」合成一套清单。</p>
+        <details>
+          <summary>
+            <span class="n">01 覆盖</span>
+            <strong>Futu ∪ topic474</strong>
+          </summary>
+          <div class="flow-body">
+            <p>App 菜单和「常用期权组合简介」合成<strong>一套</strong>清单，不是两套并行覆盖。</p>
+            <p>清单决定有哪些策略实体；盈亏数字仍以 OIC 文字为准。详见 <code>wiki/meta/Futu strategy coverage.md</code>。</p>
+          </div>
+        </details>
         <span class="arrow" aria-hidden="true"></span>
       </li>
       <li>
-        <span class="n">02 证据</span>
-        <strong>raw pages</strong>
-        <p><code>data/raw/pages</code>：43 页抓取。另有 6 篇只存在 vault 本地捕获。</p>
+        <details>
+          <summary>
+            <span class="n">02 证据</span>
+            <strong>raw pages</strong>
+          </summary>
+          <div class="flow-body">
+            <p><code>data/raw/pages</code>：72 页抓取（含 Optionistics Learning Center 课文）。另有 6 篇只存在 vault 本地捕获、尚未全部写入 raw。</p>
+            <p>正文证据页 64；目录/课程/视频页 8 只作导航，不进知识抽取。</p>
+          </div>
+        </details>
         <span class="arrow" aria-hidden="true"></span>
       </li>
       <li>
-        <span class="n">03 捕获</span>
-        <strong>.raw / captured</strong>
-        <p>不可变正文，按 sha256 落在 <code>knowledge/.raw/captured</code>。</p>
+        <details>
+          <summary>
+            <span class="n">03 捕获</span>
+            <strong>.raw / captured</strong>
+          </summary>
+          <div class="flow-body">
+            <p>不可变正文，按 sha256 落在 <code>knowledge/.raw/captured</code>。</p>
+            <p>后续笔记只能引用这些捕获，不能改写原始页来「修」数字。</p>
+          </div>
+        </details>
         <span class="arrow" aria-hidden="true"></span>
       </li>
       <li>
-        <span class="n">04 源笔记</span>
-        <strong>wiki / sources</strong>
-        <p>49 条来源笔记。主张必须能指回段落，不能凭空写。</p>
+        <details>
+          <summary>
+            <span class="n">04 源笔记</span>
+            <strong>wiki / sources</strong>
+          </summary>
+          <div class="flow-body">
+            <p>70 条来源笔记。主张必须能指回段落，不能凭空写。</p>
+            <p>Optionistics 课文可融结构与命名；策略卡上的最多赚 / 亏 / 打平仍认 OIC。</p>
+          </div>
+        </details>
         <span class="arrow" aria-hidden="true"></span>
       </li>
       <li>
-        <span class="n">05 成品</span>
-        <strong>concepts · strategies</strong>
-        <p>13 张概念，27 张策略。入口是 vault 笔记，不是 <code>items.json</code>。</p>
+        <details>
+          <summary>
+            <span class="n">05 成品</span>
+            <strong>concepts · strategies</strong>
+          </summary>
+          <div class="flow-body">
+            <p>13 张概念，27 张策略。问答入口是 vault 笔记，不是 <code>items.json</code>。</p>
+            <p>Agent 应走 wiki / wiki-query；本页只是现状地图。</p>
+          </div>
+        </details>
+      </li>
+    </ol>
+
+    <p class="label" id="roles" style="margin-top: 2.5rem">来源角色 · 不是同一类网站</p>
+    <ol class="flow flow--tri">
+      <li>
+        <details>
+          <summary>
+            <span class="n">教育证据</span>
+            <strong>OIC · Wiki · Institute 课文</strong>
+          </summary>
+          <div class="flow-body">
+            <p>问答只认可可引用正文。CME / Cboe Institute 是教育页，不是行情接口。</p>
+            <p>细则在 <code>wiki/meta/Source roles.md</code>。视频库、课程目录不进可用知识。</p>
+          </div>
+        </details>
         <span class="arrow" aria-hidden="true"></span>
+      </li>
+      <li>
+        <details>
+          <summary>
+            <span class="n">产品形态</span>
+            <strong>Builder · Bot 规格</strong>
+          </summary>
+          <div class="flow-body">
+            <p><code>wiki/meta/Product patterns.md</code> 记 Builder 字段与触发 / 条件 / 动作。</p>
+            <p>不写进 27 张策略卡，也不是默认问答路径。数字自己算，不接对标站 API。</p>
+          </div>
+        </details>
+        <span class="arrow" aria-hidden="true"></span>
+      </li>
+      <li>
+        <details>
+          <summary>
+            <span class="n">禁止当行情</span>
+            <strong>DataShop · 筛表 · /build</strong>
+          </summary>
+          <div class="flow-body">
+            <p>Cboe DataShop、Screener 报价、OptionStrat <code>/build</code> 空壳不走 Apify。</p>
+            <p>行情、回测、Bot 执行以后另开模块，不和课文抓取混在一条流水线。</p>
+          </div>
+        </details>
       </li>
     </ol>
   </section>
@@ -80,39 +160,55 @@
       <div class="band-head">
         <p class="label">02 · 存量</p>
         <h2 id="counts-h">inventory<span class="period" aria-hidden="true"></span></h2>
-        <p class="meta">不是产品 KPI，只是各层当前有多少条的快照（来自 STATUS · 2026-09-02）。条形按 49 条源笔记为满宽。</p>
+        <p class="meta">不是产品 KPI，只是各层当前有多少条的快照（来自 STATUS · 2026-09-03）。点开数字看口径；条形按 72 页原始抓取为满宽。</p>
       </div>
       <div class="counts">
-        <div class="count">
-          <div>
+        <details class="count">
+          <summary>
             <p class="label">原始页面</p>
-            <b>43</b>
-            <span class="step" style="width: 88%"></span>
-          </div>
-        </div>
-        <div class="count">
-          <div>
-            <p class="label">源笔记</p>
-            <b>49</b>
+            <b>72</b>
             <span class="step" style="width: 100%"></span>
+          </summary>
+          <div class="count-body">
+            <p>Apify 抓取写入 <code>data/raw/pages</code> 的页数（含 new-topics、四站匹配、Optionistics LC）。</p>
+            <p>另有 6 篇 vault 本地捕获尚未全部进 raw。</p>
           </div>
-        </div>
-        <div class="count">
-          <div>
+        </details>
+        <details class="count">
+          <summary>
+            <p class="label">源笔记</p>
+            <b>70</b>
+            <span class="step" style="width: 97%"></span>
+          </summary>
+          <div class="count-body">
+            <p><code>knowledge/wiki/sources/</code> 下的 Source 笔记，含 Optionistics 19 课。</p>
+            <p>课程目录页可保留导航，但不算可用正文证据。</p>
+          </div>
+        </details>
+        <details class="count">
+          <summary>
             <p class="label">概念</p>
             <b>13</b>
-            <span class="step" style="width: 27%"></span>
+            <span class="step" style="width: 18%"></span>
+          </summary>
+          <div class="count-body">
+            <p>全部 evergreen。含保证金、买卖价差、期货期权行权等。</p>
+            <p>点下方 <a href="#concepts">thirteen notes</a> 看每一条解释。</p>
           </div>
-        </div>
-        <div class="count">
-          <div>
+        </details>
+        <details class="count">
+          <summary>
             <p class="label">策略卡</p>
             <b>27</b>
-            <span class="step" style="width: 55%"></span>
+            <span class="step" style="width: 38%"></span>
+          </summary>
+          <div class="count-body">
+            <p>富途 App ∪ topic474 一套覆盖，全部 evergreen。</p>
+            <p>点上方筛选与策略行看含义；对角 / Strap / Strip 有结构、无单一盈亏公式。</p>
           </div>
-        </div>
+        </details>
       </div>
-      <p class="meta" style="margin-top: 1.5rem">正文证据页 35，目录/课程页 8。来源构成：OIC 31 · Option Alpha 5 · CME 4 · Cboe 1 · Wikipedia 2。关系笔记 5 条。</p>
+      <p class="meta" style="margin-top: 1.5rem">正文证据页 64，目录/课程页 8。来源构成：OIC 31 · Optionistics 23 · Option Alpha 5 · CME 4 · OPC 3 · OptionStrat 2 · Wikipedia 2 · Cboe 1 · Share Predictions 1。关系笔记 5 条。产品能力：知识问答已落地；行情数据、Builder 与 Bot 未做。</p>
     </section>
 
     <section class="band" id="strategies" aria-labelledby="strat-h">
@@ -120,7 +216,7 @@
         <span class="numeral" aria-hidden="true">27</span>
         <p class="label">03 · 策略卡</p>
         <h2 id="strat-h">the cards<span class="period" aria-hidden="true"></span></h2>
-        <p class="meta">点开看含义。筛选按富途类别。盈亏数字只在来源发表过时才写。</p>
+        <p class="meta">点开看含义与笔记路径。筛选按富途类别。盈亏数字只在来源发表过时才写。</p>
       </div>
 
       <div class="legend" aria-label="盈亏标记说明">
@@ -299,7 +395,7 @@
           <summary><span class="row-name">Long Strangle</span><span class="mark" data-pl="num">数字</span></summary>
           <div class="row-body">
             <p class="row-cat">宽跨式策略 · Strangle · Long Combination</p>
-            <p>买 OTM call 和 OTM put。比跨式便宜，但要走得更远才打平。</p>
+            <p>买入价外看涨期权和价外看跌期权（执行价都离现价更远）。比跨式便宜，但标的要走得更远才打平。</p>
             <p>笔记 <code>knowledge/wiki/strategies/Long Strangle (Long Combination).md</code></p>
           </div>
         </details>
@@ -308,7 +404,7 @@
           <summary><span class="row-name">Short Strangle</span><span class="mark" data-pl="num">数字</span></summary>
           <div class="row-body">
             <p class="row-cat">宽跨式策略 · Strangle</p>
-            <p>卖 OTM call 和 OTM put。获利区比空跨式宽，仍怕单边大行情。</p>
+            <p>卖出价外看涨期权和价外看跌期权。获利区比空跨式宽，仍怕单边大行情。</p>
             <p>笔记 <code>knowledge/wiki/strategies/Short Strangle.md</code></p>
           </div>
         </details>
@@ -398,7 +494,7 @@
           <summary><span class="row-name">Short Iron Butterfly</span><span class="mark" data-pl="num">数字</span></summary>
           <div class="row-body">
             <p class="row-cat">铁蝶式策略 · Iron Butterfly</p>
-            <p>卖 ATM 跨式，再买 OTM 宽跨式对冲。收权利金；价格靠近中轴时赚。</p>
+            <p>卖出平值跨式，再买入价外宽跨式对冲。收权利金；价格靠近中轴时赚。</p>
             <p>笔记 <code>knowledge/wiki/strategies/Short Iron Butterfly.md</code></p>
           </div>
         </details>
@@ -419,28 +515,123 @@
       <div class="band-head">
         <p class="label">04 · 概念</p>
         <h2 id="concept-h">thirteen notes<span class="period" aria-hidden="true"></span></h2>
-        <p class="meta">策略卡挂在这些概念上。全部 evergreen，路径 <code>knowledge/wiki/concepts/</code>。</p>
+        <p class="meta">点开名词看解释。全部 evergreen，路径 <code>knowledge/wiki/concepts/</code>。</p>
       </div>
-      <div class="matrix">
-        <div class="cell">Option contract</div>
-        <div class="cell">Equity options basics</div>
-        <div class="cell">Option premium and pricing drivers</div>
-        <div class="cell">Delta</div>
-        <div class="cell">Gamma</div>
-        <div class="cell">Theta and time decay</div>
-        <div class="cell">Vega and implied volatility sensitivity</div>
-        <div class="cell">Exercise, assignment, and expiration</div>
-        <div class="cell">Options risk, leverage, and hedging</div>
-        <div class="cell">Option strategy design and payoff principles</div>
-        <div class="cell">Options margin and account approval</div>
-        <div class="cell">Bid-ask spread and liquidity cost</div>
-        <div class="cell">Options on futures exercise and assignment</div>
+      <div class="matrix" role="list">
+        <details class="cell">
+          <summary>Option contract</summary>
+          <div class="cell-body">
+            <p>期权赋予持有人合约权利，卖方在被指派时承担对应义务。看涨与看跌表达相反的买卖权利；股票期权合约会写明标的、执行价与到期。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Option contract.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Equity options basics</summary>
+          <div class="cell-body">
+            <p>标准化股票期权写明标的、执行价与到期。看涨 / 看跌对应不同持有人权利与卖方义务；权利金就是期权价格。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Equity options basics.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Option premium and pricing drivers</summary>
+          <div class="cell-body">
+            <p>权利金由内在价值与时间价值组成。标的价、执行价、剩余时间、隐含波动率、股息与利率都会影响权利金。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Option premium and pricing drivers.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Delta</summary>
+          <div class="cell-body">
+            <p>Delta 估计其他条件不变时，标的变动 1 美元时期权权利金大约变动多少。它会随虚实程度、到期远近和隐含波动率变化。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Delta.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Gamma</summary>
+          <div class="cell-body">
+            <p>Gamma 估计标的变动时 Delta 会跟着变多少。平值附近、临近到期时 Gamma 通常更大，Delta 变得更快。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Gamma.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Theta and time decay</summary>
+          <div class="cell-body">
+            <p>Theta 估计其他条件不变时权利金每日大约衰减多少。时间衰减非线性，临近到期往往加快。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Theta and time decay.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Vega and implied volatility sensitivity</summary>
+          <div class="cell-body">
+            <p>Vega 衡量隐含波动率变动 1 个百分点时权利金的敏感度。较长期权的 Vega 通常大于临近到期的期权。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Vega and implied volatility sensitivity.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Exercise, assignment, and expiration</summary>
+          <div class="cell-body">
+            <p>行权把合约转成交割义务；短仓可能被指派，且可能发生在到期前。当日想避免指派，需在收市前平掉已卖出的期权。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Exercise, assignment, and expiration.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Options risk, leverage, and hedging</summary>
+          <div class="cell-body">
+            <p>期权可用来对冲已有仓位，但都有风险。买方最多亏掉已付权利金；某些裸卖仓位的亏损可以大得多，甚至理论上无限。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Options risk, leverage, and hedging.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Option strategy design and payoff principles</summary>
+          <div class="cell-body">
+            <p>策略可用于对冲、收权利金，或表达方向 / 中性看法。有限风险仓与裸仓在最大亏损、保证金需求和盈亏形态上差别很大。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Option strategy design and payoff principles.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Options margin and account approval</summary>
+          <div class="cell-body">
+            <p>买入期权通常要全额付款，不能像股票那样融资买。裸卖一般需要保证金账户、券商审批和额外担保。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Options margin and account approval.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Bid-ask spread and liquidity cost</summary>
+          <div class="cell-body">
+            <p>买卖价差是即时买价（ask）与卖价（bid）之差，用来衡量流动性和交易成本。吃价差的一方付成本，挂限价的一方可能赚价差。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Bid-ask spread and liquidity cost.md</code></p>
+          </div>
+        </details>
+        <details class="cell">
+          <summary>Options on futures exercise and assignment</summary>
+          <div class="cell-body">
+            <p>期货期权行权得到的是期货仓位，不是实物商品交割。买方决定是否行权；卖方可能被随机指派。</p>
+            <p>笔记 <code>knowledge/wiki/concepts/Options on futures exercise and assignment.md</code></p>
+          </div>
+        </details>
       </div>
     </section>
 
     <footer class="foot-line">
-      <p>证据不进笔记，笔记不发明数字 · knowledge/wiki · 2026-09-02</p>
+      <p>证据不进笔记，笔记不发明数字 · knowledge/wiki · 2026-09-03</p>
     </footer>
   </div>
+
+  <button type="button" class="chat-launch" aria-expanded="false" aria-controls="chat-panel">对话</button>
+  <aside id="chat-panel" class="chat-panel" hidden>
+    <div class="chat-head">
+      <div>
+        <h2>vault chat</h2>
+        <p class="chat-status">连接本机 OpenCode…</p>
+      </div>
+      <button type="button" class="chat-close" aria-label="关闭">关闭</button>
+    </div>
+    <div class="chat-log" role="log" aria-live="polite"></div>
+    <form class="chat-form">
+      <textarea name="prompt" rows="2" placeholder="问策略含义，或让它探盘 / 模拟下单" required></textarea>
+      <button type="submit">发送</button>
+    </form>
+  </aside>
+  <script src="chat.js?v=ds-v4"></script>
 </body>
 </html>

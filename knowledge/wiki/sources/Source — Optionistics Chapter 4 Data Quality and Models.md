@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 4 Data Quality and Models
 
-Warns that model output depends on input quality. Source note only; does not change published Greeks or P/L fields.
+Warns that model output depends on input quality. Source note only; does not change published sensitivity measures or profit-and-loss fields.
 
 - Publisher: Optionistics
 - Body eligible: yes

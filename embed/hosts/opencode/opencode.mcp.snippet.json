@@ -1,0 +1,20 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mioption": {
+      "type": "local",
+      "command": [
+        "runtime/.venv/bin/python",
+        "-m",
+        "mioption_runtime.agent.stdio_mcp"
+      ],
+      "environment": {
+        "PYTHONPATH": "runtime",
+        "MIOPTION_FUTU_MOCK": "1",
+        "MIOPTION_VAULT": "knowledge"
+      },
+      "enabled": true,
+      "timeout": 30000
+    }
+  }
+}

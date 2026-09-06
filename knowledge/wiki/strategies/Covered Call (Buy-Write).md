@@ -25,7 +25,7 @@ related:
 
 # Covered Call (Buy-Write)
 
-Earn premium income while holding stock, accepting a cap on upside in exchange for a limited downside cushion. Optionistics also names the simultaneous stock-and-call fill a buy-write, and says the covered call has the same risk profile as a short put. P/L numbers stay with OIC.
+Earn premium income while holding stock, accepting a cap on upside in exchange for a limited downside cushion. Optionistics also names the simultaneous stock-and-call fill a buy-write, and says the covered call has the same risk profile as a short put. Profit-and-loss numbers stay with the Options Industry Council.
 
 - Underlying: equity stock
 - Knowledge id: `strategy.covered_call`
@@ -49,12 +49,12 @@ Appropriate only where the investor accepts the preset sale price and can mainta
 
 ## Method
 
-- Max gain: Limited. In the source example: strike price minus stock purchase price plus premium received.
-- Max loss: Limited but substantial. In the source example: stock purchase price minus premium received; the stock can become worthless.
-- Breakeven: Starting stock price minus premium received.
+- Maximum profit: Limited. In the source example: strike price minus stock purchase price plus premium received.
+- Maximum loss: Limited but substantial. In the source example: stock purchase price minus premium received; the stock can become worthless.
+- Break-even: Starting stock price minus premium received.
 - Assignment / expiration: Assignment is central to the strategy; the investor must be willing and able to sell stock at the strike. Early assignment and post-expiration assignment uncertainty require monitoring.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Neutral to slightly negative when implied volatility rises, all else equal, because buying back the short call can cost more.
 - Time decay: Generally positive for the short call position because time erosion reduces the short call's time value, all else equal.

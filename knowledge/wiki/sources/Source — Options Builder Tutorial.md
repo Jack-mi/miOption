@@ -3,7 +3,7 @@ type: source
 title: Source — Options Builder Tutorial
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - source
   - optionstrat
@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Options Builder Tutorial
 
-OptionStrat tool tutorial: how the strategy builder shows estimated P/L across prices and dates, net debit/credit, max profit/loss at expiration, breakeven, and combined Greeks. Definitions are product UI, not textbook strategy-card P/L. Do not copy calculator numbers onto named strategy entities.
+OptionStrat tool tutorial: how the strategy builder shows estimated profit and loss across prices and dates, net debit/credit, max profit/loss at expiration, breakeven, and combined price-sensitivity measures. Definitions are product user interface, not textbook strategy-card profit and loss. Do not copy calculator numbers onto named strategy entities.
 
 - Publisher: OptionStrat
 - Body eligible: yes (tool/concept explanation)
@@ -29,6 +29,6 @@ OptionStrat tool tutorial: how the strategy builder shows estimated P/L across p
 
 ## Used by
 
-- Not cited by a published knowledge or strategy card.
+- [[Product patterns]] (builder and payoff user-interface fields only; not strategy-card profit and loss)
 
 See the [[index|Wiki Index]].

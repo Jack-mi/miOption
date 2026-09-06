@@ -3,7 +3,7 @@ type: entity
 title: Bull Call Spread (Debit Call Spread)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -44,12 +44,12 @@ For bullish investors who want lower cost and capped upside versus a naked long 
 
 ## Method
 
-- Max gain: The maximum gain is capped at expiration, should the stock price do even better than hoped and exceed the higher strike price. If the stock price is at or above the higher (short call) strike at expiration, in theory, the investor would exercise the long call component and presumably would be assigned on the short call
-- Max loss: The maximum loss is very limited. The worst that can happen is for the stock to be below the lower strike price at expiration.
-- Breakeven: This strategy breaks even at expiration if the stock price is above the lower strike by the amount of the initial outlay (the debit). In that case, the short call would expire worthless and the long call's intrinsic value would equal the debit.
+- Maximum profit: The maximum gain is capped at expiration, should the stock price do even better than hoped and exceed the higher strike price. If the stock price is at or above the higher (short call) strike at expiration, in theory, the investor would exercise the long call component and presumably would be assigned on the short call
+- Maximum loss: The maximum loss is very limited. The worst that can happen is for the stock to be below the lower strike price at expiration.
+- Break-even: This strategy breaks even at expiration if the stock price is above the lower strike by the amount of the initial outlay (the debit). In that case, the short call would expire worthless and the long call's intrinsic value would equal the debit.
 - Assignment / expiration: Early assignment, while possible at any time, generally occurs only when the stock goes ex-dividend. Be warned, however, that using the long call to cover the short call assignment will require establishing a short stock position for one business day, due to the delay in assignment notification. Yes. If held into expiration this strategy entails added risk.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Slight, all other things being equal. Since the strategy involves being long one call and short another with the same expiration, the effects of volatility shifts on the two contracts may offset each other to a large degree.
 - Time decay: The passage of time hurts the position, though not as much as it does a plain long call position. Since the strategy involves being long one call and short another with the same expiration, the effects of time decay on the two contracts may offset each other to a large degree.

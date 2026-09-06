@@ -3,7 +3,8 @@
   "actor": "apify/website-content-crawler",
   "content_scope": {
     "include": "期权教育与策略内容；若页面主体是期权，也包括期货期权（options on futures）。",
-    "exclude": "不涉及期权的纯期货教育、交易或产品内容。"
+    "exclude": "不涉及期权的纯期货教育、交易或产品内容。",
+    "roles": "Apify 只采集可引用的教育正文。CME Institute 与 Cboe Options Institute 是教育源，不是 Market Data / DataShop。OptionStrat、Option Alpha、Optionistics Screener 是产品对标，不是行情源；其报价与 /build 空壳不得当知识抓取。"
   },
   "knowledge_policy": {
     "minimum_text_chars": 1200,
@@ -78,7 +79,8 @@
       "sample_url": "https://www.cboe.com/optionsinstitute/courses/options101",
       "include_prefixes": [
         "/optionsinstitute/"
-      ]
+      ],
+      "notes": "Education only: independent text or PDF pages. Course catalogs and interactive lessons are not knowledge-eligible. Cboe DataShop and LiveVol market data are not crawled here."
     },
     {
       "id": "optionalpha",
@@ -90,7 +92,8 @@
         "/courses/",
         "/options-strategies",
         "/handbook"
-      ]
+      ],
+      "notes": "Public education text only. Not a market-data or trading API. Course landings are catalog-only. Bot trigger/condition/action belongs in product-pattern notes, not strategy cards."
     },
     {
       "id": "cme",
@@ -99,7 +102,8 @@
       "sample_url": "https://www.cmegroup.com/education/courses/curriculum-all-about-options",
       "include_prefixes": [
         "/education/"
-      ]
+      ],
+      "notes": "CME Institute education pages only (options on futures when the page is about option contracts). The CME Market Data API is not crawled through this allowlist."
     },
     {
       "id": "wikipedia",
@@ -133,7 +137,7 @@
         "/g/"
       ],
       "crawler_type": "cheerio",
-      "notes": "Learning Center lesson pages and glossary only; skip TOCs, screeners, and calculators."
+      "notes": "Learning Center lesson pages and glossary only; skip TOCs (including /s/tutorial), screeners, and calculators. Delayed quotes and screener tables are not a market-data source for this vault."
     },
     {
       "id": "opc",
@@ -150,7 +154,7 @@
         "/blog"
       ],
       "crawler_type": "playwright:firefox",
-      "notes": "FAQ is stable. Many /calculator/* pages render as nav shells; prefer www2 or re-smoke before approving."
+      "notes": "FAQ is stable. www /calculator/* nav shells are skipped and must not be approved as knowledge. www2 calculator pages already ingested stay as secondary structure evidence only; profit-and-loss numbers stay with OIC."
     },
     {
       "id": "optionstrat",
@@ -158,11 +162,10 @@
       "allowed": true,
       "sample_url": "https://optionstrat.com/tutorials/strategy-optimizer",
       "include_prefixes": [
-        "/tutorials/",
-        "/build/"
+        "/tutorials/"
       ],
       "crawler_type": "playwright:firefox",
-      "notes": "Tutorials are knowledge-eligible. /build/* stubs often fail the 1200-char gate."
+      "notes": "Product-benchmark tutorials only. Not a market-data API. Do not crawl /build/* stubs. Do not copy calculator numbers onto named strategy cards."
     },
     {
       "id": "sharepredictions",

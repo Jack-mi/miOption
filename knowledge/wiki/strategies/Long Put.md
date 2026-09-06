@@ -3,7 +3,7 @@ type: entity
 title: Long Put
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -42,12 +42,12 @@ For bearish investors who prefer defined risk instead of shorting stock; must re
 
 ## Method
 
-- Max gain: The profit potential is limited but substantial. The best that can happen is for the stock to become worthless.
-- Max loss: The maximum loss is limited. The worst that can happen is for the stock price to be above the strike price at expiration with the put owner still holding the position.
-- Breakeven: At expiration, the strategy breaks even if the stock price equals the strike price minus the cost of the option. Any stock price below that level produces a net profit.
+- Maximum profit: The profit potential is limited but substantial. The best that can happen is for the stock to become worthless.
+- Maximum loss: The maximum loss is limited. The worst that can happen is for the stock price to be above the strike price at expiration with the put owner still holding the position.
+- Break-even: At expiration, the strategy breaks even if the stock price equals the strike price minus the cost of the option. Any stock price below that level produces a net profit.
 - Assignment / expiration: None. The investor is in control. Slight. If the option is in-the-money at expiration, it may be exercised on your behalf by your brokerage firm.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility would have a positive impact on this strategy, all other things being equal. Volatility tends to boost the value of any long option strategy, because it indicates a greater mathematical probability that the stock will move enough to give the option intrinsic value (or add to its curren
 - Time decay: As with most long option strategies, the passage of time has a negative impact, all other things being equal. As time remaining until expiration disappears, the statistical chances of achieving further gains shrink.

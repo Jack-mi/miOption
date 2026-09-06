@@ -3,7 +3,7 @@ type: entity
 title: Long Put Condor
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -45,12 +45,12 @@ For defined-risk traders using puts to express a wide middle sweet spot into exp
 
 ## Method
 
-- Max gain: The maximum gain would occur if the underlying security is between the two short put strikes at expiration. In that case, the higher strike long put is worth its maximum value.
-- Max loss: In all circumstances the maximum loss is limited to the net debit paid (assuming the distances between all four strikes prices are equal). The maximum loss would occur should the underlying be above the highest long put strike at expiration or at or below the lowest long put strike.
-- Breakeven: There are two breakeven points. This strategy breaks even if at expiration the underlying security is below the highest long put strike less the amount of premium paid to initiate the position or if the underlying is above the lowest long put strike plus the premium paid.
+- Maximum profit: The maximum gain would occur if the underlying security is between the two short put strikes at expiration. In that case, the higher strike long put is worth its maximum value.
+- Maximum loss: In all circumstances the maximum loss is limited to the net debit paid (assuming the distances between all four strikes prices are equal). The maximum loss would occur should the underlying be above the highest long put strike at expiration or at or below the lowest long put strike.
+- Break-even: There are two breakeven points. This strategy breaks even if at expiration the underlying security is below the highest long put strike less the amount of premium paid to initiate the position or if the underlying is above the lowest long put strike plus the premium paid.
 - Assignment / expiration: In the case of American style options, the short options that form the body of the long put condor are subject to assignment at any time. Should early assignment occur on the short put options, the investor can exercise the appropriate long option but may be required to borrow or finance stock for one business day. Investors face an uncertainty when the underlying trades below both short put strikes but above the lowest long put strike. In this case, the investor is likely to be assigned on both short puts resulting in a long position that is unhedged following expiration.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: All other things being equal, an increase in implied volatility if the underlying is between the two short strikes when established would have a negative impact on this strategy. As with most strategies however, the impact of implied volatility changes will depend on strike selection relative to the stock price when th
 - Time decay: All other things being equal, the passage of time will have a positive effect on this strategy.

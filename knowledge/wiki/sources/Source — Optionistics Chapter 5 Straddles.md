@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 5 Straddles
 
-A straddle is an equal number of puts and calls on the same stock at the same strike. Long: profit from a large swing. Short: collect two premiums, max profit if the stock finishes at the strike. Structure/naming only; P/L stays OIC.
+A straddle is an equal number of puts and calls on the same stock at the same strike. Long: profit from a large swing. Short: collect two premiums, max profit if the stock finishes at the strike. Structure/naming only; profit-and-loss numbers stay with the Options Industry Council.
 
 - Publisher: Optionistics
 - Body eligible: yes

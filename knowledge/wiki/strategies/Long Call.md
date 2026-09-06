@@ -3,7 +3,7 @@ type: entity
 title: Long Call
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -42,12 +42,12 @@ For bullish investors who accept that the call can expire worthless and that tim
 
 ## Method
 
-- Max gain: The profit potential is theoretically unlimited. The best that can happen is for the stock price to rise to infinity.
-- Max loss: The maximum loss is limited and occurs if the investor still holds the call at expiration and the stock is below the strike price. The option would expire worthless, and the loss would be the price paid for the call option.
-- Breakeven: At expiration, the strategy breaks even if the stock price is equal to the strike price plus the initial cost of the call option. Any stock price above that point produces a net profit.
+- Maximum profit: The profit potential is theoretically unlimited. The best that can happen is for the stock price to rise to infinity.
+- Maximum loss: The maximum loss is limited and occurs if the investor still holds the call at expiration and the stock is below the strike price. The option would expire worthless, and the loss would be the price paid for the call option.
+- Break-even: At expiration, the strategy breaks even if the stock price is equal to the strike price plus the initial cost of the call option. Any stock price above that point produces a net profit.
 - Assignment / expiration: None. The investor is in control. Slight. If the option expires in-the-money it may be exercised for you by your brokerage firm.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility would have a positive impact on this strategy, all other things being equal. Volatility tends to boost the value of any long option strategy, because it indicates a greater mathematical probability that the stock will move enough to give the option intrinsic value (or add to its curren
 - Time decay: As with most long option strategies, the passage of time has a negative impact here, all other things being equal. As time remaining to expiration disappears, the statistical chances of achieving further gains in intrinsic value shrink.

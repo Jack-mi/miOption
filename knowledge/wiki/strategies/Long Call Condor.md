@@ -3,7 +3,7 @@ type: entity
 title: Long Call Condor
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -45,12 +45,12 @@ For defined-risk traders wanting a wider profit zone than a butterfly, still wit
 
 ## Method
 
-- Max gain: The maximum gain would occur if the underlying security is between the two short call strikes at expiration. In that case, the lower strike long call is worth its maximum value.
-- Max loss: In all circumstances the maximum loss is limited to the net debit paid (assuming the distances between all four strikes prices are equal). The maximum loss would occur should the underlying be below the lowest long call strike at expiration or at or above the highest long call strike.
-- Breakeven: There are two breakeven points. This strategy breaks even if at expiration the underlying security is above the lower long call strike plus the amount of premium paid to initiate the position or if the underlying is below the highest long call strike less the premium paid.
+- Maximum profit: The maximum gain would occur if the underlying security is between the two short call strikes at expiration. In that case, the lower strike long call is worth its maximum value.
+- Maximum loss: In all circumstances the maximum loss is limited to the net debit paid (assuming the distances between all four strikes prices are equal). The maximum loss would occur should the underlying be below the lowest long call strike at expiration or at or above the highest long call strike.
+- Break-even: There are two breakeven points. This strategy breaks even if at expiration the underlying security is above the lower long call strike plus the amount of premium paid to initiate the position or if the underlying is below the highest long call strike less the premium paid.
 - Assignment / expiration: In the case of American style options, the short options that form the body of the long call condor are subject to assignment at any time. Should early assignment occur on the short call options, the investor can exercise the appropriate long option but may be required to borrow or finance stock for one business day. Investors face an uncertainty when the underlying trades above both short call strikes but below the highest long call strike. In this case, the investor is likely to be assigned on both short calls resulting in a short position that is unhedged following expiration.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: All other things being equal, an increase in implied volatility if the underlying is between the two short strikes when established would have a negative impact on this strategy. As with most strategies however, the impact of implied volatility changes will depend on strike selection relative to the stock price when th
 - Time decay: All other things being equal, the passage of time will have a positive impact on this strategy.

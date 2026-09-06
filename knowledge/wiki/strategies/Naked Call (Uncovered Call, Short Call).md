@@ -3,7 +3,7 @@ type: entity
 title: "Naked Call (Uncovered Call, Short Call)"
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -44,12 +44,12 @@ Only for investors who can post margin and accept theoretically unlimited loss i
 
 ## Method
 
-- Max gain: The maximum gain is very limited. The best that can happen is for expiration to arrive with the stock price below the strike price.
-- Max loss: The maximum loss is unlimited. The worst that can happen is for the stock to rise to infinity, in which case the investor would have to buy stock in the market at that undefinably high price and sell it at the strike price.
-- Breakeven: At expiration, the strategy breaks even if the stock price is above the strike price by the amount of the premium received; i.e., the option's intrinsic value equals the price at which the option was sold. Breakeven = strike + premium
+- Maximum profit: The maximum gain is very limited. The best that can happen is for expiration to arrive with the stock price below the strike price.
+- Maximum loss: The maximum loss is unlimited. The worst that can happen is for the stock to rise to infinity, in which case the investor would have to buy stock in the market at that undefinably high price and sell it at the strike price.
+- Break-even: At expiration, the strategy breaks even if the stock price is above the strike price by the amount of the premium received; i.e., the option's intrinsic value equals the price at which the option was sold. Breakeven = strike + premium
 - Assignment / expiration: There is tremendous assignment risk. Early assignment, while possible at any time, generally occurs only when the stock goes ex-dividend. The option writer cannot know until the Monday following expiration whether or not assignment occurred. And unless the investor is prepared (and approved) to hold a short stock position that is already 'under water' at the strike price, the goal is to buy back the assigned stock as soon as possible.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility would have a negative impact on this strategy, all other things equal. It means the market perceives there to be a greater chance than before of the option becoming in-the-money or more in-the-money.
 - Time decay: The passage of time will have an extremely positive impact on this strategy, all other things equal. As expiration approaches, option values tend to decline toward their intrinsic value.

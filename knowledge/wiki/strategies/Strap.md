@@ -3,7 +3,7 @@ type: entity
 title: Strap
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -29,7 +29,7 @@ A long-volatility combination with a bullish tilt: two long calls and one long p
 - Review status: `published`
 - Futu category: 带式策略 / Strap (topic474 #8)
 
-Wikipedia and Futu agree on the legs and the bullish tilt. Neither publishes a numeric max gain, max loss, or breakeven for strap. Those three numbers stay blank rather than being borrowed from a 1x1 straddle.
+Wikipedia and Futu agree on the legs and the bullish tilt. Neither publishes a numeric max gain, max loss, or breakeven for strap. Those three numbers stay blank rather than being borrowed from a one-call-plus-one-put straddle.
 
 ## Legs
 
@@ -48,9 +48,9 @@ Expect a large move, and treat an increase as more likely than a decrease.
 
 ## Method
 
-- Max gain: Not published on Wikipedia or Futu. Wikipedia only says a strap can profit from a large move in either direction, more so if the move is up.
-- Max loss: Not published on Wikipedia or Futu as a strap-specific number.
-- Breakeven: Not published on Wikipedia or Futu.
+- Maximum profit: Not published on Wikipedia or Futu. Wikipedia only says a strap can profit from a large move in either direction, more so if the move is up.
+- Maximum loss: Not published on Wikipedia or Futu as a strap-specific number.
+- Break-even: Not published on Wikipedia or Futu.
 - Assignment / expiration: All three options are long; the holder chooses exercise. No short-leg assignment.
 
 ## Evidence

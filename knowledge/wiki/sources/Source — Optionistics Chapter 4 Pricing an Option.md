@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 4 Pricing an Option
 
-Discusses theoretical pricing versus market price and put-call parity style identities. Kept as a Source note only; conversion/synthetic identities are not turned into a Futu strategy entity, and no P/L is copied.
+Discusses theoretical pricing versus market price and put-call parity style identities. Kept as a Source note only; conversion/synthetic identities are not turned into a Futu strategy entity, and no profit-and-loss numbers are copied.
 
 - Publisher: Optionistics
 - Body eligible: yes

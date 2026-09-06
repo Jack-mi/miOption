@@ -3,7 +3,7 @@ type: entity
 title: Bear Call Spread (Credit Call Spread)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -43,12 +43,12 @@ For investors seeking premium income with defined maximum loss equal to the widt
 
 ## Method
 
-- Max gain: The maximum gain is limited. The best that can happen at expiration is for the stock to be below both strike prices.
-- Max loss: The maximum loss is limited. The worst that can happen at expiration is for the stock price to be above the higher strike.
-- Breakeven: This strategy breaks even at expiration if the stock price is above the lower strike by the amount of the initial credit received. In that case the long call would expire worthless, and the short call's intrinsic value would equal the net credit.
+- Maximum profit: The maximum gain is limited. The best that can happen at expiration is for the stock to be below both strike prices.
+- Maximum loss: The maximum loss is limited. The worst that can happen at expiration is for the stock price to be above the higher strike.
+- Break-even: This strategy breaks even at expiration if the stock price is above the lower strike by the amount of the initial credit received. In that case the long call would expire worthless, and the short call's intrinsic value would equal the net credit.
 - Assignment / expiration: Yes. Early assignment, while possible at any time, generally occurs when the stock goes ex-dividend. Yes. The investor cannot know for sure whether or not they were assigned on the short call until the Monday after expiration.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Slight, all other things being equal. Since the strategy involves being short one call and long another with the same expiration, the effects of volatility shifts on the two contracts may offset each other to a large degree.
 - Time decay: The passage of time helps the position, though not quite as much as it does a plain short call position. Since the strategy involves being short one call and long another with the same expiration, the effects of time decay on the two contracts may offset each other to a large degree.

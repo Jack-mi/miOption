@@ -19,7 +19,7 @@ related: []
 
 # Short Straddle
 
-Collect premium when expecting a narrow trading range and stable or falling implied volatility. Optionistics: collect two premiums; maximum profit when the underlying equals the strike. P/L stays OIC.
+Collect premium when expecting a narrow trading range and stable or falling implied volatility. Optionistics: collect two premiums; maximum profit when the underlying equals the strike. Profit-and-loss numbers stay with the Options Industry Council.
 
 - Underlying: equity option
 - Knowledge id: `strategy.short_straddle`
@@ -28,8 +28,8 @@ Collect premium when expecting a narrow trading range and stable or falling impl
 
 ## Legs
 
-- short ATM call (call option)
-- short ATM put, same strike and expiration (put option)
+- short at-the-money call (strike near the current stock price)
+- short at-the-money put, same strike and expiration
 
 ## Meaning
 
@@ -43,12 +43,12 @@ Only for investors who can margin short options and accept large or theoreticall
 
 ## Method
 
-- Max gain: The maximum gain is limited to the premiums received at the outset. The best that can happen is for the stock price, at expiration, to be exactly at the strike price.
-- Max loss: The maximum risk is unlimited. The worst that can happen is for the stock to rise to infinity, and the next-to-worst outcome is for the stock to fall to zero.
-- Breakeven: This strategy breaks even if, at expiration, the stock price is either above or below the strike price by the total amount of premium income received. At either of those levels, one option's intrinsic value will equal the premium received for selling both options, while the other option will be expiring worthless.
+- Maximum profit: The maximum gain is limited to the premiums received at the outset. The best that can happen is for the stock price, at expiration, to be exactly at the strike price.
+- Maximum loss: The maximum risk is unlimited. The worst that can happen is for the stock to rise to infinity, and the next-to-worst outcome is for the stock to fall to zero.
+- Break-even: This strategy breaks even if, at expiration, the stock price is either above or below the strike price by the total amount of premium income received. At either of those levels, one option's intrinsic value will equal the premium received for selling both options, while the other option will be expiring worthless.
 - Assignment / expiration: Early assignment, while possible at any time, is more of a risk under certain circumstances: for a call, just before the stock goes ex-dividend; for a put, when it goes deep in-the-money. But the short straddle involves two short legs that could be assigned at any time during the life of the options, so investors shoul The investor cannot know for sure whether or not they were assigned until the Monday after expiration. If the stock hovers just above and below the strike price on the day before expiration, it is even conceivable that both options might be assigned.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Extremely important. This strategy's chances of success would be better if implied volatility were to fall.
 - Time decay: Extremely important positive effect. Every day that passes without a move in the underlying stock price brings both options one day closer to expiring, which would obviously be the investor's best-case scenario.

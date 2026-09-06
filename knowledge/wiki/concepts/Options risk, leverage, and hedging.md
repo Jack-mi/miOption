@@ -45,7 +45,7 @@ Like other securities including stocks, bonds and mutual funds, options carry no
 But as an options writer, you take on a much higher level of risk. For example, if you write an uncovered call, you face unlimited potential loss, since there is no cap on how high a stock price can rise.
 Since initial options investments usually require less capital than equivalent stock positions, your potential cash losses as an options investor are usually smaller than if you'd bought the underlying stock or sold the stock short. The exception to this general rule occurs when you use options to provide leverage. Percentage returns are often high, but percentage losses can be high as well.
 
-Optionistics: options can limit risk, hedge, or speculate. A protective put hedges a stock holding; a covered call can add income but does not protect against a decline in the stock. Buying the option instead of the stock limits loss to the premium and uses less capital than the equivalent shares. Do not treat Optionistics probability remarks as published P/L fields.
+Optionistics: options can limit risk, hedge, or speculate. A protective put hedges a stock holding; a covered call can add income but does not protect against a decline in the stock. Buying the option instead of the stock limits loss to the premium and uses less capital than the equivalent shares. Do not treat Optionistics probability remarks as published profit-and-loss fields.
 
 ## Evidence
 

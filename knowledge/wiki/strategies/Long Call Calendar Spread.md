@@ -3,7 +3,7 @@ type: entity
 title: Long Call Calendar Spread
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -40,18 +40,18 @@ Benefit if the near-term call decays while retaining a longer-dated call; often 
 
 ## Scenario
 
-Near-term steady or soft, longer-term still constructive; IV changes matter.
+Near-term steady or soft, longer-term still constructive; changes in implied volatility matter.
 
 For traders comfortable managing the front-month expiration and the remaining long call afterward.
 
 ## Method
 
-- Max gain: At the expiration of the near-term option, the maximum gain would occur should the underlying stock be at the strike price of the expiring option. If the stock were any higher, the expiring option would have intrinsic value, and if the stock were any lower, the longer-term option would have less value.
-- Max loss: The maximum loss would occur should the two options reach parity. This could happen if the underlying stock declined enough that both options became worthless, or if the stock rose enough that both options went deep in-the-money and traded at their intrinsic value.
-- Breakeven: Since the options differ in their time to expiration, the level where the strategy breaks even is a function of the underlying stock price, implied volatility and rates of time decay. Should the near-term option expire worthless, breakeven at the longer-term option's expiration would occur if the stock were above the s
+- Maximum profit: At the expiration of the near-term option, the maximum gain would occur should the underlying stock be at the strike price of the expiring option. If the stock were any higher, the expiring option would have intrinsic value, and if the stock were any lower, the longer-term option would have less value.
+- Maximum loss: The maximum loss would occur should the two options reach parity. This could happen if the underlying stock declined enough that both options became worthless, or if the stock rose enough that both options went deep in-the-money and traded at their intrinsic value.
+- Break-even: Since the options differ in their time to expiration, the level where the strategy breaks even is a function of the underlying stock price, implied volatility and rates of time decay. Should the near-term option expire worthless, breakeven at the longer-term option's expiration would occur if the stock were above the s
 - Assignment / expiration: Yes. Early assignment, while possible at any time, generally occurs for a call only when the stock goes ex-dividend. Slight. Should the near-term call (the short side of the spread) be exercised when it expires, the longer-term call option would remain to provide a hedge.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, would have an extremely positive impact on this strategy. In general, longer-term options have a greater sensitivity to changes in market volatility, i.e., a higher Vega.
 - Time decay: The passage of time, all other things equal, would have a positive impact on this strategy in the beginning. That changes, however, once the near-term option has expired and the strategy becomes simply a long call whose value will be eroded by the passage of time.

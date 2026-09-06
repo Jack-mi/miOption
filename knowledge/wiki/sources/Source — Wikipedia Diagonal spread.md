@@ -3,7 +3,7 @@ type: source
 title: Source — Wikipedia Diagonal spread
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - source
   - wikipedia
@@ -22,7 +22,7 @@ Wikipedia stub on diagonal spreads: different strikes and expirations; each vari
 
 - Publisher: Wikipedia
 - License: CC BY-SA 4.0
-- Body eligible: yes (structure; no single P/L formula)
+- Body eligible: yes (structure; no single profit-and-loss formula)
 - Knowledge type: strategy
 - Immutable capture: `.raw/captured/bbd3764d45fa5b4f1f86d9033aee5bfc4aba3ad64745dbb4447b6d378d909012.md`
 

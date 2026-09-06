@@ -13,13 +13,13 @@
 原始期权页面 → 页面准入 → vault `.raw/captured` → wiki 源笔记 / 概念 / 策略实体 → wikilink
 ```
 
-产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)。清单用富途；P/L 以 OIC 为准。对角用 Wikipedia：没有单一盈亏公式。Strap/Strip 用 Wikipedia+Futu 腿结构，不填具体最多赚/亏/打平数字。vault 内 **13** 张概念、**27** 张策略实体、**70** 条源笔记、5 条关系。
+产品代码在 `vendor/claude-obsidian/`（pin 见 `vendor/claude-obsidian.pin`），与 vault 分离。策略覆盖是**一套**：富途 App 菜单 ∪ [常用期权组合简介](https://support.futunn.com/topic474)。清单用富途；盈亏数字以期权行业协会（OIC）文字为准。对角用 Wikipedia：没有单一盈亏公式。Strap/Strip 用 Wikipedia+Futu 腿结构，不填具体最多赚/亏/打平数字。vault 内 **13** 张概念、**27** 张策略实体、**70** 条源笔记、5 条关系。
 
 ## 2. 范围与准入边界
 
 ### 收录范围
 
-- 期权基础、定价、Greeks、交易生命周期、风险规则和策略；
+- 期权基础、定价、价格敏感度（Delta、Gamma、Theta、Vega 等）、交易生命周期、风险规则和策略；
 - 页面主体是期权的期货期权（options on futures）内容；
 - 有独立、可引用文字正文，并能填充明确知识字段的内容。
 
@@ -30,6 +30,18 @@
 - 只有 URL、不能形成可验证知识字段的页面。
 
 课程和视频页可保留在来源目录中作为导航线索，但不会生成 chunk、知识卡、策略卡或进入知识检索。
+
+### 来源角色（教育 ≠ 行情）
+
+抓取白名单里的网站不是同一类对象。问答 Agent 只用教育证据；行情与交易执行不走 Apify 网页抓取。细则见 vault `wiki/meta/Source roles.md`。
+
+| 角色 | 本仓库怎么用 | 不是什么 |
+|---|---|---|
+| 教育证据 | OIC 正文为主；Wikipedia 定点补洞；CME Institute **白皮书/有独立文字的教育页**；Optionistics Learning Center 课文（结构可融，盈亏数字仍以 OIC 为准） | 不是期权链、成交明细、隐含波动曲面 |
+| 产品形态（设计规格） | OptionStrat 教程、Option Alpha 公开 Bot 结构 → `wiki/meta/Product patterns.md`。不写进 27 张策略卡，不是问答默认路径 | 不是这些网站的数据接口 |
+| 禁止当行情源 | CME Market Data API、Cboe DataShop / LiveVol、OptionStrat / Option Alpha / Optionistics Screener 的报价与筛表 | 不得用本仓库爬虫去接 |
+
+CME Institute 教育页 ≠ CME 行情接口。Cboe Options Institute 教育页 ≠ Cboe DataShop。只收有独立文字的 Cboe 教育页；课程目录不再花抓取预算。`/optionsinstitute/` 白名单仍可保留，但目录型 landing 不再批准。
 
 ## 3. 当前数据快照
 
@@ -148,6 +160,12 @@ wiki
 | [data/pipeline/apify-actor-matrix.md](data/pipeline/apify-actor-matrix.md) | 四站爬虫赢家与 `$5` 试跑账本 |
 | [knowledge/](knowledge/) | Obsidian vault（知识成品） |
 | [knowledge/wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md) | 富途清单 ↔ 策略笔记 |
+| [knowledge/wiki/meta/Source roles.md](knowledge/wiki/meta/Source%20roles.md) | 教育证据 vs 禁止当行情源 |
+| [knowledge/wiki/meta/Product patterns.md](knowledge/wiki/meta/Product%20patterns.md) | Builder / Bot 产品形态规格（非策略证据） |
+| [knowledge/wiki/meta/Futu OpenAPI integration.md](knowledge/wiki/meta/Futu%20OpenAPI%20integration.md) | OpenD + futu-api 接入规格（默认 SIMULATE） |
+| [runtime/](runtime/) | Bot / Agent / 富途桥接运行时（与抓取隔离；默认 mock）。默认 agent harness 为 Claude Agent SDK；Codex 为可选 overlay。 |
+| [docs/futu-api/](docs/futu-api/) | 富途官方 Markdown 文档落点（脚本拉取说明） |
+| [knowledge/wiki/canvases/product-stack.canvas](knowledge/wiki/canvases/product-stack.canvas) | 产品能力三层：知识问答 / 行情数据 / Builder+Bot |
 | [archive/knowledge-json-2026-09-02/](archive/knowledge-json-2026-09-02/) | 迁移前 JSON 快照 |
 | [vendor/claude-obsidian/](vendor/claude-obsidian/) | 知识库运行时（技能/CLI） |
 | [scripts/probe.py](scripts/probe.py) | 抓取（默认索引 `data/raw/index.json`） |
@@ -176,15 +194,15 @@ python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge
 - Put butterfly / put calendar / Naked Put 的 vault 笔记来自本地捕获，尚未全部经 Apify 写入 `data/raw/pages`。
 - taxonomy 的 `options_on_futures` 已有 CME 白皮书笔记；保证金与买卖价差已有概念卡。期权专用流动性宽度（典型 spread）仍没有独立来源。
 - 短 chunk 与 taxonomy 100 字门槛仍未强制对齐（可选后续处理）。
-- Cboe canonical `/en/optionsinstitute/` 路径策略未定。
+- Cboe：课程目录不再抓；仅当存在独立文字/PDF 教育页时再单批审核。DataShop / LiveVol 不走 Apify。
 - 归档 JSON（`build_knowledge.py --check`）仍为迁移前 22 张策略，vault 已领先。
 
 ## 8. 下一步待办
 
 1. 可选：把仍停在本地捕获的 OIC 页（put butterfly / put calendar / Naked Put）批进 `data/raw/pages`。
 2. 期权专用流动性（典型买卖价差宽度）还没有独立文字页。
-3. Optionistics LC 本轮已完成；转换/合成仅 Source 笔记。不要把 SharePredictions 信号灌进策略卡；OPC `/calculator/*` 需先烟雾再批准。
-4. 不做整站抓取；Investopedia 仍不自动采。
+3. Optionistics LC 本轮已完成；转换/合成仅 Source 笔记。不要把 SharePredictions 信号灌进策略卡。OptionStrat `/build/*` stub、OPC www 计算器空壳、Optionistics `/s/tutorial` 目录已标 `skipped`，不再批准为知识抓取。
+4. 不做整站抓取；Investopedia 仍不自动采。产品形态见 vault `wiki/meta/Product patterns.md`、`wiki/meta/Futu OpenAPI integration.md` 与 canvas `wiki/canvases/product-stack.canvas`。Bot / 富途运行时在 `runtime/`（默认 `MIOPTION_FUTU_MOCK=1`），不混进 Apify 抓取。本机 OpenD 登录后设 `MIOPTION_FUTU_MOCK=0` 再跑 `runtime/scripts/check_opend.py`。
 
 ## 9. 交接注意事项
 

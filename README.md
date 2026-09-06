@@ -1,10 +1,10 @@
 # miOption options knowledge base
 
-This project builds a source-backed local knowledge base for options education and strategy research. URLs are evidence locations, not the knowledge product. The live knowledge layer is an [Obsidian](https://obsidian.md) vault at [`knowledge/`](knowledge/), operated with [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian).
+This project builds a source-backed local knowledge base for options education and strategy research. Broker/bot/agent runtime (Futu OpenD bridge, default SIMULATE/mock) lives under [`runtime/`](runtime/) and is separate from the crawl pipeline. URLs are evidence locations, not the knowledge product. The live knowledge layer is an [Obsidian](https://obsidian.md) vault at [`knowledge/`](knowledge/), operated with [claude-obsidian](https://github.com/AgriciDaniel/claude-obsidian).
 
 ## Scope
 
-- Include option concepts, pricing, Greeks, lifecycle, strategies, and option-focused courses.
+- Include option concepts, pricing, price-sensitivity measures (Delta, Gamma, Theta, Vega), lifecycle, strategies, and option-focused courses.
 - Include options on futures when the material is about option contracts and their risk or pricing.
 - Exclude standalone futures education and other material that is not materially about options.
 - Exclude videos, webinars, course catalogs, interactive course pages, and marketing/landing pages from the usable knowledge corpus.
@@ -41,7 +41,7 @@ See [STATUS.md](STATUS.md) for the live snapshot, known gaps, and sequenced to-d
 python3 scripts/probe.py --check
 python3 scripts/build_knowledge.py --check
 python3 vendor/claude-obsidian/scripts/claude-obsidian.py doctor --vault knowledge
-python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-02
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-03
 ```
 
 Agents should read `knowledge/wiki/` (index, concepts, strategies, sources) and query through claude-obsidian skills (`wiki`, `wiki-query`, `wiki-ingest`). Cursor skill links live in `.cursor/skills/` and point at `vendor/claude-obsidian/skills/`. Do not treat `items.json` as the live product.
@@ -77,6 +77,5 @@ The source URL stays attached to each source note for verification. Retrieval sh
 
 Full sequence is in [STATUS.md](STATUS.md). In short:
 
-1. Merged coverage is in [wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md). Put butterfly / put calendar are in the vault; Strap / Strip are developing.
-2. Finish Diagonal: find a dedicated text source or rewrite P/L fields before promoting that note from developing to evergreen.
-3. Approve `futu-topic474-gaps` if those two OIC pages should land in `data/raw/pages`. Liquidity, margin, and options-on-futures settlement remain later gaps.
+1. Merged coverage is in [wiki/meta/Futu strategy coverage.md](knowledge/wiki/meta/Futu%20strategy%20coverage.md). Put butterfly / put calendar, Strap / Strip, and Diagonal are evergreen; strap/strip and diagonal publish structure, not a single profit-and-loss formula.
+2. Approve `futu-topic474-gaps` if those two OIC pages should land in `data/raw/pages`. Typical option bid-ask width still has no dedicated source.

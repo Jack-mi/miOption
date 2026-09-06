@@ -23,7 +23,7 @@ related:
 
 # Long Straddle
 
-Profit from a large move in either direction or a sharp rise in implied volatility. Optionistics: equal number of puts and calls on the same stock at the same strike. P/L stays OIC.
+Profit from a large move in either direction or a sharp rise in implied volatility. Optionistics: equal number of puts and calls on the same stock at the same strike. Profit-and-loss numbers stay with the Options Industry Council.
 
 - Underlying: equity option
 - Knowledge id: `strategy.long_straddle`
@@ -32,8 +32,8 @@ Profit from a large move in either direction or a sharp rise in implied volatili
 
 ## Legs
 
-- long ATM call (call option)
-- long ATM put, same strike and expiration (put option)
+- long at-the-money call (strike near the current stock price)
+- long at-the-money put, same strike and expiration
 
 ## Meaning
 
@@ -47,12 +47,12 @@ For investors who can afford two premiums and need a sufficiently large move bef
 
 ## Method
 
-- Max gain: The maximum gain is unlimited. The best that can happen is for the stock to make a big move in either direction.
-- Max loss: The maximum loss is limited to the two premiums paid. The worst that can happen is for the stock price to hold steady and implied volatility to decline.
-- Breakeven: This strategy breaks even if, at expiration, the stock price is either above or below the strike price by the amount of premium paid. At either of those levels, one option's intrinsic value will equal the premium paid for both options while the other option will be expiring worthless.
+- Maximum profit: The maximum gain is unlimited. The best that can happen is for the stock to make a big move in either direction.
+- Maximum loss: The maximum loss is limited to the two premiums paid. The worst that can happen is for the stock price to hold steady and implied volatility to decline.
+- Break-even: This strategy breaks even if, at expiration, the stock price is either above or below the strike price by the amount of premium paid. At either of those levels, one option's intrinsic value will equal the premium paid for both options while the other option will be expiring worthless.
 - Assignment / expiration: None. The investor is in control. Slight. If the options are held into expiration, one of them may be subject to automatic exercise.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Extremely important. This strategy's success would be fueled by an increase in implied volatility.
 - Time decay: Extremely important, negative effect. Because this strategy consists of being long a call and a put, both of them at-the-money at least at the beginning, every day that passes without a move in the stock's price will cause the total premium of this position to suffer a significant erosion of value.

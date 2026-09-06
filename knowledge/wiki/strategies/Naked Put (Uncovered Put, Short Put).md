@@ -3,7 +3,7 @@ type: entity
 title: Naked Put (Uncovered Put, Short Put)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -45,15 +45,15 @@ Not suitable for most investors: limited income, substantial downside, and assig
 
 ## Method
 
-- Max gain: Premium received. If the stock is above the strike at expiration, the put expires worthless.
-- Max loss: Strike price minus premium received (substantial). Worst case is the stock falling to zero, forcing a purchase of worthless stock at the strike.
-- Breakeven: At expiration, stock price below the strike by the premium received. Breakeven = strike – premium
+- Maximum profit: Premium received. If the stock is above the strike at expiration, the put expires worthless.
+- Maximum loss: Strike price minus premium received (substantial). Worst case is the stock falling to zero, forcing a purchase of worthless stock at the strike.
+- Break-even: At expiration, stock price below the strike by the premium received. Breakeven = strike – premium
 - Assignment / expiration: Assignment is the chief worry; the writer has neither reserved cash nor a desire to own the stock. Early assignment generally occurs when the put goes deep in-the-money. After expiration the writer may not know assignment until the following Monday.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility would have a negative impact, including a higher cost to buy the put back.
-- Time decay: Extremely positive. Passing days reduce the chance an OTM put finishes in-the-money.
+- Time decay: Extremely positive. Passing days reduce the chance an out-of-the-money put finishes in-the-money.
 
 ## Evidence
 

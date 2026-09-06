@@ -3,7 +3,7 @@ type: source
 title: Source — Futu 常用期权组合简介
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - source
   - futu
@@ -19,7 +19,7 @@ review_state: active
 
 # Source — Futu 常用期权组合简介
 
-富途帮助中心对 12 种常用期权组合的腿结构定义。用于和 App 策略菜单合并成一套覆盖图。P/L 与 Greeks 仍以 OIC 文字页为准。
+富途帮助中心对 12 种常用期权组合的腿结构定义。用于和 App 策略菜单合并成一套覆盖图。盈亏数字和价格敏感度仍以期权行业协会（OIC）文字页为准。
 
 - Publisher: Futu
 - Body eligible: yes (structure definitions only)

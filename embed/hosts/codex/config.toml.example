@@ -1,0 +1,13 @@
+# Copy into a trusted project `.codex/config.toml` if you use Codex as a host.
+# Same FastMCP entry as Cursor. Replace <repo> with the miOption checkout.
+
+[mcp_servers.mioption]
+command = "<repo>/runtime/.venv/bin/python"
+args = ["-m", "mioption_runtime.agent.stdio_mcp"]
+startup_timeout_sec = 15
+
+# Optional env (Codex may also inherit the process environment):
+# [mcp_servers.mioption.env]
+# PYTHONPATH = "<repo>/runtime"
+# MIOPTION_FUTU_MOCK = "1"
+# MIOPTION_VAULT = "<repo>/knowledge"

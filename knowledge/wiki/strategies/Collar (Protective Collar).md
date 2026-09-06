@@ -3,7 +3,7 @@ type: entity
 title: Collar (Protective Collar)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -44,12 +44,12 @@ For stock holders seeking a temporary hedge who accept selling shares at the cal
 
 ## Method
 
-- Max gain: The maximum gain is limited for the term of the strategy. The short-term maximum gains are reached just as the stock price rises to the call strike.
-- Max loss: The maximum loss is limited for the term of the collar hedge. The worst that can happen is for the stock price to fall below the put strike, which prompts the investor to exercise the put and sell the stock at the 'floor' price: the put strike.
-- Breakeven: In principle, the strategy breaks even if, at expiration, the stock is above (below) its initial level by the amount of the debit (credit). If the stock is a long-term holding purchased at a much lower price, the concept of breakeven isn't relevant.
+- Maximum profit: The maximum gain is limited for the term of the strategy. The short-term maximum gains are reached just as the stock price rises to the call strike.
+- Maximum loss: The maximum loss is limited for the term of the collar hedge. The worst that can happen is for the stock price to fall below the put strike, which prompts the investor to exercise the put and sell the stock at the 'floor' price: the put strike.
+- Break-even: In principle, the strategy breaks even if, at expiration, the stock is above (below) its initial level by the amount of the debit (credit). If the stock is a long-term holding purchased at a much lower price, the concept of breakeven isn't relevant.
 - Assignment / expiration: Yes. Early assignment of the short call option, while possible at any time, generally occurs only just before the stock goes ex-dividend. The option writer cannot know for sure whether or not assignment actually occurred on the short call until the following Monday. However, this is generally not an issue since the investor has stock to deliver if assigned on the call.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: Volatility is usually not a major consideration in this strategy, all things being equal. Since the strategy involves being long one option and short another with the same expiration (and generally equidistant from the stock value), the effects of implied volatility shifts may offset each other to a large degree.
 - Time decay: Usually not a major consideration. Since the strategy involves being long one option and short another with the same expiration (and generally equidistant from the stock value), the effects of time decay should roughly offset each other.

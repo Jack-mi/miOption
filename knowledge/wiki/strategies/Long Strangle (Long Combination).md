@@ -3,7 +3,7 @@ type: entity
 title: Long Strangle (Long Combination)
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -28,8 +28,8 @@ Profit from a large move either way at lower cost than a straddle, needing a big
 
 ## Legs
 
-- long OTM call (call option)
-- long OTM put, same expiration (put option)
+- long out-of-the-money call (strike farther from the current stock price)
+- long out-of-the-money put, same expiration
 
 ## Meaning
 
@@ -43,12 +43,12 @@ For investors seeking cheaper long-volatility exposure who accept a wider breake
 
 ## Method
 
-- Max gain: The maximum gain is unlimited. The maximum gain occurs if the underlying stock goes to infinity, and a very substantial gain would occur if the stock became worthless.
-- Max loss: The maximum loss is limited. The maximum loss occurs if the underlying stock remains between the strike prices until expiration.
-- Breakeven: This strategy breaks even if, at expiration, the stock price is either above the call strike price or below the put strike price by the amount of premium paid. At either of those levels, one option's intrinsic value will equal the premium paid for both options while the other option will be expiring worthless.
+- Maximum profit: The maximum gain is unlimited. The maximum gain occurs if the underlying stock goes to infinity, and a very substantial gain would occur if the stock became worthless.
+- Maximum loss: The maximum loss is limited. The maximum loss occurs if the underlying stock remains between the strike prices until expiration.
+- Break-even: This strategy breaks even if, at expiration, the stock price is either above the call strike price or below the put strike price by the amount of premium paid. At either of those levels, one option's intrinsic value will equal the premium paid for both options while the other option will be expiring worthless.
 - Assignment / expiration: None. The investor is in control. If the options are held into expiration, one of them may be subject to auto-exercise.
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility: An increase in implied volatility, all other things equal, would have a very positive impact on this strategy. Even if the stock price holds steady, a quick rise in implied volatility would push up the value of both options and might allow the investor to close out the position for a profit well before expiration.
 - Time decay: The passage of time, all other things equal, will have a very negative impact on this strategy. Because the strategy consists of being long two options, every day that passes without a move in the stock's price will cause their value to suffer a significant erosion of value.

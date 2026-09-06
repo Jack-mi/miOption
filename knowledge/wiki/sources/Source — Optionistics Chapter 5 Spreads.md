@@ -3,7 +3,7 @@ type: source
 title: Source — Optionistics Chapter 5 Spreads
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - source
   - optionistics
@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 5 Spreads
 
-Optionistics Learning Center chapter on two-leg spreads: vertical (same expiry, different strikes), horizontal/calendar (same strike, different expiries), and diagonal (both differ). Names bull/bear call and put variants; does not publish a single numeric P/L for diagonals.
+Optionistics Learning Center chapter on two-leg spreads: vertical (same expiry, different strikes), horizontal/calendar (same strike, different expiries), and diagonal (both differ). Names bull/bear call and put variants; does not publish a single numeric profit-and-loss figure for diagonals.
 
 - Publisher: Optionistics
 - Body eligible: yes

@@ -3,7 +3,7 @@ type: entity
 title: Strip
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -29,7 +29,7 @@ A long-volatility combination with a bearish tilt: two long puts and one long ca
 - Review status: `published`
 - Futu category: 条式策略 / Strip (topic474 #9)
 
-Wikipedia and Futu agree on the legs and the bearish tilt. Neither publishes a numeric max gain, max loss, or breakeven for strip. Those three numbers stay blank rather than being borrowed from a 1x1 straddle.
+Wikipedia and Futu agree on the legs and the bearish tilt. Neither publishes a numeric max gain, max loss, or breakeven for strip. Those three numbers stay blank rather than being borrowed from a one-call-plus-one-put straddle.
 
 ## Legs
 
@@ -48,9 +48,9 @@ Expect a large move, and treat a decrease as more likely than an increase.
 
 ## Method
 
-- Max gain: Not published on Wikipedia or Futu. Wikipedia only says a strip can profit from a large move in either direction, more so if the move is down.
-- Max loss: Not published on Wikipedia or Futu as a strip-specific number.
-- Breakeven: Not published on Wikipedia or Futu.
+- Maximum profit: Not published on Wikipedia or Futu. Wikipedia only says a strip can profit from a large move in either direction, more so if the move is down.
+- Maximum loss: Not published on Wikipedia or Futu as a strip-specific number.
+- Break-even: Not published on Wikipedia or Futu.
 - Assignment / expiration: All three options are long; the holder chooses exercise. No short-leg assignment.
 
 ## Evidence

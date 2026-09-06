@@ -3,7 +3,7 @@ type: entity
 title: Diagonal Call Spread
 status: evergreen
 created: 2026-09-02
-updated: 2026-09-02
+updated: 2026-09-03
 tags:
   - entity
   - strategy
@@ -47,23 +47,23 @@ A diagonal spread shares features of both a calendar spread and a vertical sprea
 
 OIC: a calendar most commonly uses the same strike (horizontal); different strikes make it a diagonal, with a slightly different profit/loss profile.
 
-Optionistics: a spread is two same-type legs (both calls or both puts), one short and one long. Vertical = different strikes, same expiry; horizontal/calendar = same strike, different expiries; diagonal = any combination of the two. No single numeric P/L is published for the diagonal case.
+Optionistics: a spread is two same-type legs (both calls or both puts), one short and one long. Vertical = different strikes, same expiry; horizontal/calendar = same strike, different expiries; diagonal = any combination of the two. No single numeric profit-and-loss figure is published for the diagonal case.
 
 ## Scenario
 
-Strike choice tilts bullish or bearish versus a same-strike calendar. A one-to-one diagonal with similar deltas behaves much like a calendar: close to delta-neutral, P/L driven mainly by volatility and time, not direction.
+Strike choice tilts bullish or bearish versus a same-strike calendar. A one-to-one diagonal with similar deltas behaves much like a calendar: close to nearly insensitive to small moves in the stock, profit and loss driven mainly by volatility and time, not direction.
 
 ## Method
 
-- Max gain: Not a single published number. Wikipedia: each diagonal must be analyzed individually for its risk and reward profile.
-- Max loss: Not a single published number. Same reason.
-- Breakeven: Not a single published number. Same reason.
+- Maximum profit: Not a single published number. Wikipedia: each diagonal must be analyzed individually for its risk and reward profile.
+- Maximum loss: Not a single published number. Same reason.
+- Break-even: Not a single published number. Same reason.
 - Assignment / expiration: The short near-term option can be assigned. For a short call, OIC calendar assignment text still applies to that short call leg (early assignment generally when the stock goes ex-dividend).
 
-## Greeks and time
+## How the price reacts to volatility and time
 
 - Volatility / time: Wikipedia: when constructed one-to-one with similar deltas, profit or loss is driven mainly by changes in volatility and the passage of time.
-- Do not treat same-strike calendar max-gain/max-loss formulas as the diagonal's published P/L.
+- Do not treat same-strike calendar max-gain/max-loss formulas as the diagonal's published profit and loss.
 
 ## Evidence
 

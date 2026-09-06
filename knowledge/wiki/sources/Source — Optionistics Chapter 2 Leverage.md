@@ -18,7 +18,7 @@ review_state: active
 
 # Source — Optionistics Chapter 2 Leverage
 
-Buying calls instead of stock limits loss to the premium and uses less capital than the equivalent stock. Labels leveraging as inherently risky. Does not publish a reusable P/L formula; do not copy example probabilities onto strategy cards.
+Buying calls instead of stock limits loss to the premium and uses less capital than the equivalent stock. Labels leveraging as inherently risky. Does not publish a reusable profit-and-loss formula; do not copy example probabilities onto strategy cards.
 
 - Publisher: Optionistics
 - Body eligible: yes
