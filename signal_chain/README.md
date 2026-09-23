@@ -60,6 +60,13 @@
 | TA deep / quick | → 8790（受管 patch 强制 Responses） | kimi-k3 / deepseek-v4.1-flash |
 | DSA | → 8799 shim（litellm 不可直连 8790） | glm-5.3 |
 
+## 风控账户权益
+
+不需要手工填写账户金额。每次生成结构时，系统通过 Futu OpenD 只读查询 REAL 账户，
+美股结构使用 `usd_assets`（USD），港股结构使用 `hkd_assets`（HKD），并以
+`max_position_risk_pct` 限制单个结构的最大亏损。读取失败时只跳过该项检查并显式告警，
+不影响信号研究链路，也不会调用任何下单接口。
+
 ## 已知坑（M0 实记，详见 UPSTREAM.md）
 
 1. TA 必须 editable 安装；普通 install 会让 patch 静默失效（走 chat/completions 被 8790 打回 502）。

@@ -20,6 +20,7 @@ from .options.chain_fetch import fetch_chain
 from .options.iv import derive_volatility_view
 from .pipeline.steps import extract_signal, propose_strategies, synthesize_notes
 from .risk.limits import check_proposal, check_signal
+from .risk.account_equity import read_account_equity
 from .schema import EngineSignal, EnsembleSignal, make_signal_id
 from .storage import RunLedger, append_signal, write_chain, write_report
 from .synth.combine import combine
@@ -173,13 +174,16 @@ async def process_ticker(
             entry["agents"]["strategy"] = {"thread_id": meta.thread_id,
                                            "model": meta.model}
         risk_cfg = settings.risk
+        account = read_account_equity(t.market, settings) if risk_cfg.get("auto_account_equity") else None
+        entry["risk"]["account_equity"] = account
         for p in proposals:
             d = check_proposal(
                 p, ensemble, chain,
                 earnings_blackout_days=risk_cfg["earnings_blackout_days"],
                 min_open_interest=risk_cfg["min_open_interest"],
                 max_spread_pct=risk_cfg["max_spread_pct"],
-                equity_usd=risk_cfg["equity_usd"],
+                account_equity=account["value"] if account else None,
+                equity_currency=account["currency"] if account else None,
                 max_position_risk_pct=risk_cfg["max_position_risk_pct"])
             decisions.append(d)
         entry["risk"]["proposals"] = [

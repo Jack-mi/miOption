@@ -4,7 +4,7 @@
 - conflicted 信号；
 - 财报窗口（earnings_blackout_days）内的 short-vol 结构；volatility_view=rising 时 short-vol；
 - 单腿流动性不达标：OI < min_open_interest 或 spread_pct > max_spread_pct；
-- 单标的新结构最大亏损 > max_position_risk_pct * equity（equity 未配置时跳过并告警）。
+- 单标的新结构最大亏损 > max_position_risk_pct * 同币种账户权益（读取失败时跳过并告警）。
 """
 
 from __future__ import annotations
@@ -42,7 +42,8 @@ def check_proposal(
     earnings_blackout_days: int = 10,
     min_open_interest: int = 100,
     max_spread_pct: float = 0.10,
-    equity_usd: float | None = None,
+    account_equity: float | None = None,
+    equity_currency: str | None = None,
     max_position_risk_pct: float = 0.05,
     today: date | None = None,
 ) -> RiskDecision:
@@ -77,12 +78,13 @@ def check_proposal(
         if row.open_interest is None and row.spread_pct is None:
             warnings.append(f"腿 {leg.code} 缺少 OI/报价数据，流动性未校验")
 
-    if equity_usd is None:
-        warnings.append("equity_usd 未配置，跳过敞口上限检查")
-    elif proposal.max_loss is not None and proposal.max_loss > max_position_risk_pct * equity_usd:
+    if account_equity is None:
+        warnings.append("Futu 账户权益读取失败，跳过敞口上限检查")
+    elif proposal.max_loss is not None and proposal.max_loss > max_position_risk_pct * account_equity:
+        currency = equity_currency or "账户币种"
         vetoes.append(
-            f"最大亏损 ${proposal.max_loss:.0f} 超过单标的上限 "
-            f"{max_position_risk_pct:.0%} x ${equity_usd:.0f}"
+            f"最大亏损 {proposal.max_loss:.0f} {currency} 超过单标的上限 "
+            f"{max_position_risk_pct:.0%} x {account_equity:.0f} {currency}"
         )
 
     return RiskDecision(approved=not vetoes, vetoes=vetoes, warnings=warnings)

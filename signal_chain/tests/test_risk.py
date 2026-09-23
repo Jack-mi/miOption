@@ -74,10 +74,12 @@ def test_liquidity_veto():
 
 def test_equity_exposure():
     d = check_proposal(_spread(), _ensemble(), _chain(),
-                       equity_usd=5000.0, max_position_risk_pct=0.05)
+                       account_equity=5000.0, equity_currency="USD",
+                       max_position_risk_pct=0.05)
     assert any("上限" in v for v in d.vetoes)  # 450 > 250
 
 
 def test_clean_pass():
-    d = check_proposal(_spread(), _ensemble(), _chain(), equity_usd=100000.0)
+    d = check_proposal(_spread(), _ensemble(), _chain(),
+                       account_equity=100000.0, equity_currency="USD")
     assert d.approved

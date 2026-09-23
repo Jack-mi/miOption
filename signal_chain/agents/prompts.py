@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Literal
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class ExtractionCatalyst(BaseModel):
@@ -130,6 +130,25 @@ class StrategyResult(BaseModel):
     proposals: list[StrategyProposalOut] = Field(default_factory=list)
     decline_reason: str | None = None
 
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_leg_shaped_proposals(cls, data):
+        """容错：模型把腿平铺成 proposal 时（缺 name/thesis/legs），归拢为一个结构。"""
+        if not isinstance(data, dict):
+            return data
+        props = data.get("proposals")
+        if not isinstance(props, list):
+            return data
+        leg_shaped = [p for p in props if isinstance(p, dict) and "legs" not in p and "code" in p]
+        if leg_shaped and len(leg_shaped) == len(props):
+            data = dict(data)
+            data["proposals"] = [{
+                "name": "未命名结构（模型输出已归拢）",
+                "thesis": leg_shaped[0].get("note") or leg_shaped[0].get("thesis") or "",
+                "legs": props,
+            }]
+        return data
+
 
 STRATEGY_OUTPUT_SCHEMA = StrategyResult.model_json_schema()
 
@@ -152,4 +171,7 @@ def strategy_prompt(signal_json: str, chain_digest: str) -> str:
 - 每个结构给出 max_loss / max_profit / net_premium（正=净收入）与 is_short_vol 标记
 - thesis 用中文说明结构与信号、催化剂、波动率的关系，100 字内
 
-只输出一个 JSON 对象：{{"proposals": [...], "decline_reason": null}}。不要输出 JSON 之外的内容。"""
+# 输出格式示例（结构必须长这样：proposals 的每一项是一个完整结构，legs 是它的腿数组）
+{{"proposals": [{{"name": "牛市看涨价差", "thesis": "……", "legs": [{{"code": "合约代码", "option_type": "CALL", "strike": 340.0, "expiry": "2026-10-02", "side": "buy", "quantity": 1}}], "max_loss": 150.0, "max_profit": 100.0, "net_premium": -150.0, "is_short_vol": false, "notes": null}}], "decline_reason": null}}
+
+不要输出 JSON 之外的内容。"""
