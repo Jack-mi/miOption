@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.mioption.signal-chain-shim</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/Users/miller/Projects/miOption/.venv-sc/bin/python</string>
+    <string>-m</string><string>signal_chain.router_shim</string>
+    <string>--port</string><string>8799</string>
+  </array>
+  <key>WorkingDirectory</key><string>/Users/miller/Projects/miOption</string>
+  <key>KeepAlive</key><true/>
+  <key>RunAtLoad</key><true/>
+  <key>StandardOutPath</key><string>/Users/miller/Projects/miOption/runs/shim.log</string>
+  <key>StandardErrorPath</key><string>/Users/miller/Projects/miOption/runs/shim.log</string>
+</dict>
+</plist>

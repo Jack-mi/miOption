@@ -1,0 +1,17 @@
+diff --git a/tradingagents/llm_clients/openai_client.py b/tradingagents/llm_clients/openai_client.py
+index b1d7b65..1e6ce7d 100644
+--- a/tradingagents/llm_clients/openai_client.py
++++ b/tradingagents/llm_clients/openai_client.py
+@@ -317,7 +317,11 @@ class OpenAIClient(BaseLLMClient):
+             # The Responses API only exists on native OpenAI; if the user points
+             # the openai provider at a custom base_url (proxy/gateway/local), it
+             # only speaks Chat Completions, so keep Responses off there (#1024).
+-            if spec.use_responses_api and _is_native_openai_base_url(base_url):
++            # miOption managed patch: allow forcing the Responses API on custom
++            # base_url endpoints that speak Responses only (e.g. a local gateway)
++            # via TRADINGAGENTS_FORCE_RESPONSES_API=1. Upstream default unchanged.
++            force_responses = os.environ.get("TRADINGAGENTS_FORCE_RESPONSES_API") == "1"
++            if (spec.use_responses_api and _is_native_openai_base_url(base_url)) or force_responses:
+                 llm_kwargs["use_responses_api"] = True
+         elif self.base_url:
+             llm_kwargs["base_url"] = self.base_url

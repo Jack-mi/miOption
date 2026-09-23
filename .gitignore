@@ -1,4 +1,6 @@
 __pycache__/
+.DS_Store
+/.omo/run-continuation/
 *.py[cod]
 .env
 .env.*
@@ -9,3 +11,12 @@ __pycache__/
 knowledge/.vault-meta/
 knowledge/.mcp.json
 knowledge/.obsidian/workspace*.json
+
+# signal_chain: vendor 引擎克隆（钉版见 vendor.lock.json）、venv、运行产物
+/vendor/TradingAgents/
+/vendor/daily_stock_analysis/
+/.venv-sc/
+/signals/
+/chains/
+/reports/
+/runs/
