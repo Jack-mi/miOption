@@ -42,14 +42,15 @@ def main() -> int:
     policy = TradePolicy()
     trade = get_trade_backend(policy=policy) if args.submit and args.legs == "sequential" else None
     names = [x.strip() for x in args.whitelist.split(",") if x.strip()]
-    payload = follow_once(
-        store,
-        trade=trade,
-        policy=policy,
-        submit=args.submit,
-        sequential=args.legs == "sequential",
-        whitelist=names,
-    )
+    with store.transaction():
+        payload = follow_once(
+            store,
+            trade=trade,
+            policy=policy,
+            submit=args.submit,
+            sequential=args.legs == "sequential",
+            whitelist=names,
+        )
     payload["stop_file"] = str(stop_path(store))
     print(json.dumps(payload, indent=2, default=str))
     return 0 if payload.get("ok") else 2

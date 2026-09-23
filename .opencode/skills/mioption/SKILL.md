@@ -27,7 +27,7 @@ If MCP `wiki_query` is unavailable, fall back to the `wiki-query` skill / claude
 - `futu_quote_chain` — chain for an underlying (`US.SPY` style). Mock unless `MIOPTION_FUTU_MOCK=0`.
 - `futu_place_option_order` — default `env=SIMULATE`. REAL only if the user explicitly asked and policy unlocks it.
 - `bot_run_automation` — Trigger → Condition → Action engine. Not Option Alpha.
-- `seller_scan` / `seller_list_cards` / `seller_verdict` / `seller_monitor_tick` — local seller desk (OpenD). Not OSM.AI. Verdicts do not place orders.
+- `seller_scan` / `seller_list_cards` / `seller_verdict` / `seller_monitor_tick` — local seller desk (OpenD). Not OSM.AI. Verdicts do not place orders. Same loop is on the vault-map H5 `desk.html` (`python runtime/scripts/serve_h5.py`).
 
 Never invent fill prices. Use tool return values. Naked shorts stay blocked unless policy allows.
 

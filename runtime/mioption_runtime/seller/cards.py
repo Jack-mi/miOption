@@ -71,6 +71,8 @@ class SellerCard:
     mark_close_debit: float | None = None
     created_at: str = ""
     updated_at: str = ""
+    quote_source: str = "unknown"
+    quoted_at: str = ""
 
     def as_dict(self) -> dict[str, Any]:
         d = asdict(self)

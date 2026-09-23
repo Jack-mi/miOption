@@ -1,7 +1,17 @@
 # miOption：当前项目现状
 
-更新时间：2026-09-03
+更新时间：2026-09-20
 状态：知识库已迁入 claude-obsidian vault（`knowledge/`）。**13** 张概念 + **27** 张策略（全部 evergreen：对角/Strap/Strip 已按 Wikipedia 落地结构；裸卖 put 已补）。App 菜单与 topic474 为一套覆盖。Optionistics Learning Center 续爬已入库（19 课 Source 笔记；转换/合成不建第 28 张策略卡）。
+
+## 2026-09-20 端到端交付
+
+- 本地研究工作台可一条命令启动：`runtime/.venv/bin/python runtime/scripts/serve_h5.py --mode live --chat`。H5 默认 `8765`，OpenCode 默认 `4097`；未占用 Headroom 的 `8787`，不会杀已有监听进程。
+- 真实 OpenD 已恢复连接并于本日拉取 BIDU：612 个合约、6 个到期日、564 个有报价、612 个含 Greeks。此为本次拉取快照，不承诺交易所实时流。
+- 已在浏览器验证行情展示、知识库 MCP 问答、卖方卡片临时采纳、CLI dry-run、监控保护提醒。未向券商下单；验收临时采纳已清除，验收事件保留并注明用途。
+- mock/live 数据分目录。卡片记录来源和拉取时间；过期快照拒绝扫描/标记；重扫保留已采纳卡片、原始权利金及历史；到期只提醒核对，不用当前股价伪造已实现结算。
+- 浏览器与 chat 为研究专用，MCP 不暴露下单和订单自动化工具，分发层再次拒绝。CLI 的可选提交能力不属于本轮自动验收范围。
+- 回归覆盖 HTTP 拉取→扫描→采纳→dry-run→监控→落盘重读、来源混用、过期、越权访问、MCP 安全模式与启动退出。归档检查已修复为读取匹配的冻结索引，不改写 2026-09-02 快照。
+- 完整启动、验收证据与边界见 `docs/end-to-end.md`。以下知识库内容保留作为知识层快照；不再用旧章节判断工作台运行状态。
 
 ## 1. 结论
 
@@ -195,7 +205,7 @@ python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge
 - taxonomy 的 `options_on_futures` 已有 CME 白皮书笔记；保证金与买卖价差已有概念卡。期权专用流动性宽度（典型 spread）仍没有独立来源。
 - 短 chunk 与 taxonomy 100 字门槛仍未强制对齐（可选后续处理）。
 - Cboe：课程目录不再抓；仅当存在独立文字/PDF 教育页时再单批审核。DataShop / LiveVol 不走 Apify。
-- 归档 JSON（`build_knowledge.py --check`）仍为迁移前 22 张策略，vault 已领先。
+- 归档 JSON（`build_knowledge.py --check`）仍为迁移前 22 张策略，使用归档自己的 39 页索引；vault 已领先。当前 72 页原始索引与冻结归档不应强行对齐。
 
 ## 8. 下一步待办
 
@@ -210,4 +220,4 @@ python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge
 - 原始页面是带版权约束的证据材料，不重新发布为自有内容。
 - 完整 Apify 运行元数据在 `data/raw/runs/`（Git 忽略）；仓库内为脱敏 `data/run-summaries/`。
 - 产品仓库 `vendor/claude-obsidian` 不是 vault；不要往里面写知识。
-- 工作区含大量未提交的知识层与新原始页；不要用 `reset` / `checkout` 丢弃。
+- 工作区保留已有未提交修改与新增 H5/行情/验收代码；本轮未 commit/push。不要用 `reset` / `checkout` 丢弃。

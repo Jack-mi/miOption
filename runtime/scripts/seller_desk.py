@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from mioption_runtime.seller.desk import SellerDesk  # noqa: E402
+from mioption_runtime.futu.quote_store import QuoteStore  # noqa: E402
 from mioption_runtime.seller.scan import DEFAULT_WATCHLIST  # noqa: E402
 
 
@@ -31,13 +32,13 @@ def main() -> int:
 
     sv = sub.add_parser("verdict", help="adopt/watch/reject (no order)")
     sv.add_argument("card_id")
-    sv.add_argument("verdict", choices=["adopt", "watch", "reject"])
+    sv.add_argument("verdict", choices=["adopt", "watch", "reject", "clear"])
     sv.add_argument("--note", default="")
 
     sub.add_parser("monitor", help="Mark tracked cards; remind-only")
 
     args = p.parse_args()
-    desk = SellerDesk()
+    desk = SellerDesk(quote_store=QuoteStore())
     if args.cmd == "scan":
         names = [x.strip() for x in args.underlyings.split(",") if x.strip()]
         _print(desk.scan(names))

@@ -13,12 +13,24 @@ This project builds a source-backed local knowledge base for options education a
 
 See [STATUS.md](STATUS.md) for the live snapshot, known gaps, and sequenced to-dos.
 
-- The raw evidence layer has 43 normalized source documents; 35 substantive text pages are eligible, while 8 video/course/catalog pages are retained only as navigation metadata.
-- The vault contains 49 source notes, 13 concept notes, 27 evergreen strategy entities, and five relations as wikilinks. Coverage is one set: Futu App menu ∪ topic474.
+- The raw evidence layer has 72 normalized source documents; 64 substantive text pages are eligible, while 8 video/course/catalog pages are retained only as navigation metadata.
+- The vault contains 70 source notes, 13 concept notes, 27 evergreen strategy entities, and five relations as wikilinks. Coverage is one set: Futu App menu ∪ topic474.
 - There is no `approved` crawl batch. `new-topics-1usd` is ingested (`dwOriSJHmglF1wbJA`, ~$0.004). Two OIC URLs remain `proposed` as `futu-topic474-gaps`.
 - Crawl scope is enforced in code: HTTPS-only source/path allowlists, fixed URL batches, depth `0`, robots.txt checks, and post-run validation of page count, status, source path, and cost.
 - Investopedia is excluded from automated crawling because its robots/terms prohibit automated scraping and AI dataset use.
 - Complete Apify run metadata is local-only and ignored by Git because it can contain signed URLs and runtime secrets. The repository contains only sanitized run summaries.
+
+## Run the local research workbench
+
+From the repository root, after the runtime setup in `runtime/README.md`:
+
+```bash
+runtime/.venv/bin/python runtime/scripts/serve_h5.py --mode mock --chat
+```
+
+Open `http://127.0.0.1:8765/chain.html`, `desk.html`, or `chat.html`. Mock prices are explicitly labeled and stored separately. For real market data, start and login to Futu OpenD, then replace `--mode mock` with `--mode live`. Chat requires an authenticated OpenCode provider; omit `--chat` to run the market/research pages alone. Use `--model provider/model` to select another configured model.
+
+The browser/chat path is research-only: it cannot place orders or run order automations. Live means real market data, not permission to trade. Freshness, source separation, scan/adopt/dry-run/monitor/reload, and expired-card review are covered by the runtime tests. See `docs/end-to-end.md` for acceptance evidence and the manual checks.
 
 ## Layout
 
@@ -41,7 +53,7 @@ See [STATUS.md](STATUS.md) for the live snapshot, known gaps, and sequenced to-d
 python3 scripts/probe.py --check
 python3 scripts/build_knowledge.py --check
 python3 vendor/claude-obsidian/scripts/claude-obsidian.py doctor --vault knowledge
-python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-03
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-20
 ```
 
 Agents should read `knowledge/wiki/` (index, concepts, strategies, sources) and query through claude-obsidian skills (`wiki`, `wiki-query`, `wiki-ingest`). Cursor skill links live in `.cursor/skills/` and point at `vendor/claude-obsidian/skills/`. Do not treat `items.json` as the live product.

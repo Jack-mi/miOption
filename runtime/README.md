@@ -66,7 +66,43 @@ python scripts/seller_follow.py
 python scripts/seller_follow.py --submit --legs sequential
 ```
 
-JSON archive: `runtime/data/seller/` (gitignored). Touch `runtime/data/seller/STOP` to halt follow. Futu SIMULATE cannot place combo option orders; sequential legs are opt-in and tagged `leg_risk: sequential`.
+JSON archives and quote databases are separated under `runtime/data/mock/` and `runtime/data/live/` (gitignored). The mode is selected by `MIOPTION_FUTU_MOCK`, default `1`; the workbench sets it from `--mode`. `MIOPTION_SELLER_DIR` and `MIOPTION_QUOTES_DB` override explicit locations. Old `runtime/data/seller/` and `runtime/data/quotes.sqlite` remain untouched and are not silently imported. Touch `STOP` inside the active seller directory to halt follow. Futu SIMULATE cannot place combo option orders; sequential legs remain a separate opt-in CLI path, not part of browser acceptance.
+
+H5 workbench (scan / list / verdict / monitor, **never places orders**):
+
+```bash
+python scripts/serve_h5.py --mode mock --chat
+# open http://127.0.0.1:8765/chain.html, desk.html, or chat.html
+```
+
+Use `--mode live` after logging into OpenD for real market data. The default H5 port is `8765`; the managed OpenCode chat port is `4097` (`--port` / `--chat-port` override them). The launcher never kills an existing listener. Ctrl-C or SIGTERM stops only the child chat it created. `--chat` uses the installed `opencode serve --pure`, skips external plugins, and defaults to `opencode-go/deepseek-v4-flash`; use `--model` for another authenticated provider/model. The workspace, backend address and model reach the frontend through `/api/config`, not hardcoded personal paths.
+
+H5 and its chat MCP share the same mode and data paths, including the `futu_quote_chain` cache. The child chat disables external Claude/agent skills without changing global configuration, so unrelated malformed skills do not break the workbench. `MIOPTION_RESEARCH_ONLY=1` removes the order and bot-automation MCP tools and independently rejects their dispatch. Browser writes are same-origin and the server only accepts loopback Host values.
+
+Research workflow: pull one symbol on `chain.html` → scan it on `desk.html` → inspect the source note → adopt/watch/reject → monitor. Quotes older than 72 hours (or with missing timestamps) cannot be scanned or marked until refreshed; this is a local snapshot-age guard, not an exchange-session or latency guarantee. Mock data never marks a live card. Rescanning preserves adopted cards and their original credit basis. Expired cards emit `expiry_review`; the system does not invent a realized settlement P/L from the current spot price.
+
+For dry-run follow of the live-data archive, from `runtime/`:
+
+```bash
+MIOPTION_FUTU_MOCK=0 .venv/bin/python scripts/seller_follow.py --whitelist US.BIDU
+```
+
+No `--submit` is needed for research. Monitor is on-demand; an unattended scheduler and broker settlement reconciliation are not enabled.
+
+## Verify
+
+From the repository root:
+
+```bash
+scratch=$(mktemp -d)
+PYTHONPATH=runtime MIOPTION_FUTU_MOCK=1 MIOPTION_SELLER_DIR="$scratch/seller" MIOPTION_QUOTES_DB="$scratch/quotes.sqlite" runtime/.venv/bin/python -m pytest runtime/tests -q
+python3 scripts/probe.py --check
+python3 scripts/build_knowledge.py --check
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py doctor --vault knowledge
+python3 vendor/claude-obsidian/scripts/claude-obsidian.py lint --vault knowledge --as-of 2026-09-20
+```
+
+The archive builder intentionally reads its frozen 39-document index, not the live 72-document crawl index. It validates 22 historical strategies; the active vault contains 27. See `docs/end-to-end.md` for the browser/live acceptance checklist.
 
 ## Layout
 
@@ -75,7 +111,7 @@ mioption_runtime/
   futu/     OpenD probe, quote, trade, policy (no Claude/Codex imports)
   bot/      Trigger → Condition → Action + exit monitor (no Claude/Codex imports)
   seller/   Credit-vertical cards, scan, monitor, follow (no OSM)
-  ingress/  POST /hooks/{id}
+  ingress/  POST /hooks/{id}; vault-map H5 + /api/seller/*
   agent/    FastMCP stdio server; optional Claude/Codex CLI overlays
 ```
 

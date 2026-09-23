@@ -3,7 +3,7 @@
     {
       "id": "9cda27f57187583a",
       "type": "text",
-      "text": "# Product capability map\n\nThree layers for the options agent. **Knowledge Q&A is landed.** Seller desk v1 (scan / cards / monitor / local follow) lives in `runtime/`, not in this vault.",
+      "text": "# Product capability map\n\nThree layers for the options agent. **Knowledge Q&A is landed.** Seller desk v1 (scan / cards / monitor) is on H5 `desk.html` via `runtime/scripts/serve_h5.py`.",
       "x": 0,
       "y": -140,
       "width": 1580,

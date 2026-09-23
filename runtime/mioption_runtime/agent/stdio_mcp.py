@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any
 
 from fastmcp import FastMCP
@@ -11,6 +12,7 @@ from .tool_handlers import ToolRuntime
 
 _READ = ToolAnnotations(readOnlyHint=True, destructiveHint=False, openWorldHint=False)
 _TRADE = ToolAnnotations(readOnlyHint=False, destructiveHint=True, openWorldHint=True)
+_RESEARCH_WRITE = ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=False)
 
 
 def build_mcp(runtime: ToolRuntime | None = None) -> FastMCP:
@@ -75,7 +77,7 @@ def build_mcp(runtime: ToolRuntime | None = None) -> FastMCP:
             args["context_json"] = context_json
         return rt.dispatch("bot_run_automation", args)
 
-    @mcp.tool(annotations=_READ, tags={"trade"})
+    @mcp.tool(annotations=_RESEARCH_WRITE, tags={"trade"})
     def seller_scan(underlyings: str | None = None) -> dict[str, Any]:
         """Scan OpenD watchlist for bull-put / bear-call cards. Does not call OSM."""
         args: dict[str, Any] = {}
@@ -91,7 +93,7 @@ def build_mcp(runtime: ToolRuntime | None = None) -> FastMCP:
             args["status"] = status
         return rt.dispatch("seller_list_cards", args)
 
-    @mcp.tool(annotations=_TRADE, tags={"trade"})
+    @mcp.tool(annotations=_RESEARCH_WRITE, tags={"trade"})
     def seller_verdict(card_id: str, verdict: str, note: str = "") -> dict[str, Any]:
         """Record adopt/watch/reject. Does not place an order."""
         return rt.dispatch(
@@ -99,11 +101,13 @@ def build_mcp(runtime: ToolRuntime | None = None) -> FastMCP:
             {"card_id": card_id, "verdict": verdict, "note": note},
         )
 
-    @mcp.tool(annotations=_TRADE, tags={"trade"})
+    @mcp.tool(annotations=_RESEARCH_WRITE, tags={"trade"})
     def seller_monitor_tick() -> dict[str, Any]:
         """Mark tracked cards; emit protect/TP/settle events. Remind-only."""
         return rt.dispatch("seller_monitor_tick", {})
 
+    if os.environ.get("MIOPTION_RESEARCH_ONLY") == "1":
+        mcp.disable(names={"futu_place_option_order", "bot_run_automation"}, components={"tool"})
     return mcp
 
 

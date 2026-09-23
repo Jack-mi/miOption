@@ -263,7 +263,7 @@ def build_evidence_index(items: list[dict], strategies: list[dict], relations: l
 
 
 ARCHIVE_DIR = Path("archive/knowledge-json-2026-09-02")
-INDEX_PATH = Path("data/raw/index.json")
+INDEX_PATH = ARCHIVE_DIR / "index.json"
 
 
 def build_artifacts(root: Path, archive: Path, index_path: Path) -> dict:

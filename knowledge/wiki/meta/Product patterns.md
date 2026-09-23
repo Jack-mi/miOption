@@ -144,6 +144,7 @@ Public product pages describe a research desk for **defined-risk credit vertical
 | Protection / take-profit windows | `seller/monitor.py` — mid-mark alerts; default is remind-only |
 | Decision archive | `runtime/data/seller/` JSON (gitignored); research basis = mids, no fees |
 | Local follow script | `runtime/scripts/seller_follow.py` against **our** cards; default dry-run |
+| H5 workbench | `docs/vault-map/desk.html` via `runtime/scripts/serve_h5.py` — scan / verdict / monitor; no order buttons |
 
 Do not call osmtrade APIs, scrape live OSM cards, or copy their opportunity score / IV Rank. Payoff on a card is OIC width-minus-credit math plus OpenD bids and asks. Futu SIMULATE does not support combo option orders; follow either research-marks only or optional sequential legs with an explicit warning.
 

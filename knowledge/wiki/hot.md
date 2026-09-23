@@ -21,7 +21,7 @@ Default runtime agent harness remains Claude Agent SDK (2026-09-04). Codex is an
 - Futu App menu and help topic474 are one coverage set.
 - Bot shape: Trigger → Condition → Action; exit rules monitored in-process; Global Controls before opens.
 - Broker path is OpenD + futu-api; default SIMULATE; not Option Alpha as an API.
-- Seller desk v1 is local (`runtime/mioption_runtime/seller/`): credit-vertical cards from OpenD, not OSM.AI.
+- Seller desk v1 is local (`runtime/mioption_runtime/seller/`): credit-vertical cards from OpenD, not OSM.AI. H5 at `docs/vault-map/desk.html` via `python runtime/scripts/serve_h5.py`.
 - Agent overlay is Claude by default; Codex Sandbox is not a substitute for `TradePolicy`.
 - Education crawl ≠ market data. Do not treat [[Product patterns]] or [[Futu OpenAPI integration]] as textbook payoff evidence.
 
@@ -33,5 +33,5 @@ Default runtime agent harness remains Claude Agent SDK (2026-09-04). Codex is an
 
 - OpenD live login still required for non-mock quote/trade.
 - Anthropic/Codex API login is separate from OpenD.
-- Builder UI and full decision-recipe library remain future work.
+- Seller desk H5 is scan / verdict / monitor only; follow submit stays CLI.
 - Seller follow is dry-run by default; Futu SIMULATE has no combo option orders.

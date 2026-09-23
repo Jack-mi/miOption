@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070b10" />
+  <title>miOption chain — 标的行情看板</title>
+  <meta name="description" content="本机 SQLite 当前快照：正股 + 60 天期权链。拉取走 OpenD，页面不下单。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="map.css" />
+  <link rel="stylesheet" href="chain.css" />
+</head>
+<body>
+  <div class="shell">
+    <div class="rails" aria-hidden="true"></div>
+
+    <nav class="nav-min" aria-label="子页面">
+      <a class="wordmark" href="index.html">mioption</a>
+      <ul>
+        <li><a href="desk.html">研究台</a></li>
+        <li><a href="chain.html" aria-current="page">行情</a></li>
+        <li><a href="chat.html">对话</a></li>
+      </ul>
+    </nav>
+
+    <section class="band" id="chain" aria-labelledby="chain-h">
+      <div class="band-head">
+        <p class="label">标的行情</p>
+        <h2 id="chain-h">option chain<span class="period" aria-hidden="true"></span></h2>
+        <p class="meta">当前快照来自本机 SQLite。点「拉取」才打 OpenD。刷新只读库。这页不下单。</p>
+      </div>
+      <p class="chain-status" data-state="down">正在连接本机 <code>/api/health</code>…</p>
+      <form class="chain-form" action="#">
+        <div class="chain-toolbar">
+          <label class="chain-field">
+            <span>搜索标的</span>
+            <input name="q" value="" placeholder="nvidia / BIDU / US.BIDU" autocomplete="off" />
+          </label>
+          <div class="chain-actions">
+            <button type="submit" data-act="pull">拉取</button>
+            <button type="button" data-act="refresh">刷新</button>
+          </div>
+        </div>
+      </form>
+      <div class="chain-equity" hidden></div>
+      <div class="chain-tabs" role="tablist" aria-label="到期"></div>
+      <div class="chain-table-wrap" aria-live="polite"></div>
+    </section>
+
+    <footer class="foot-line">
+      <p>行情页不下单 · <a href="desk.html">研究台</a> · <a href="chat.html">对话</a> · <a href="index.html">知识地图</a></p>
+    </footer>
+  </div>
+
+  <aside class="chain-drawer" hidden>
+    <div class="chain-drawer-head">
+      <h3>合约详情</h3>
+      <button type="button" class="chain-drawer-close" aria-label="关闭">关闭</button>
+    </div>
+    <div class="chain-drawer-body"></div>
+  </aside>
+  <script src="chain.js?v=3"></script>
+</body>
+</html>

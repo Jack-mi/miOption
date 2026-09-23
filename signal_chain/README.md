@@ -3,6 +3,8 @@
 基于 Codex SDK 编排：TradingAgents + DSA 并行出信号 → Codex 合成 → Futu/yfinance 期权链+IV
 → Codex 策略选结构 → 确定性风控闸 → 中文决策简报。v1 只做决策支持，不下单。
 
+下一轮数据源、信号质量与验收任务见 [CHECKLIST.md](CHECKLIST.md)。
+
 ## 架构
 
     orchestrator (纯 Python)

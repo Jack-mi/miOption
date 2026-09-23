@@ -7,7 +7,8 @@ from datetime import date
 from typing import Any, Callable
 
 from ..futu.quote import OptionContract, QuoteBackend
-from .cards import SellerCard, Verdict
+from ..futu.quote_store import QuoteStore, StoredQuoteBackend
+from .cards import SellerCard
 from .payoff import close_debit, settlement_pnl
 from .scan import overlay_snapshot
 from .store import SellerStore
@@ -30,16 +31,18 @@ def _quotes_from_backend(backend: QuoteBackend, codes: list[str]) -> dict[str, d
     return {code: backend.snapshot(code) for code in codes}
 
 
-def _leg_quote(backend: QuoteBackend, code: str, fallback_bid: float, fallback_ask: float) -> tuple[float, float]:
+def _leg_quote(backend: QuoteBackend, code: str) -> tuple[float, float]:
     snap = backend.snapshot(code)
-    bid = float(snap.get("bid_price") or snap.get("bid") or fallback_bid or 0)
-    ask = float(snap.get("ask_price") or snap.get("ask") or fallback_ask or 0)
+    bid = float(snap.get("bid_price") or snap.get("bid") or 0)
+    ask = float(snap.get("ask_price") or snap.get("ask") or 0)
+    if bid <= 0 or ask <= 0 or bid > ask:
+        raise ValueError(f"invalid_quote: {code}; cannot mark using old leg prices")
     return bid, ask
 
 
 def mark_card(card: SellerCard, backend: QuoteBackend) -> SellerCard:
-    short_bid, short_ask = _leg_quote(backend, card.short.code, card.short.bid, card.short.ask)
-    long_bid, long_ask = _leg_quote(backend, card.long.code, card.long.bid, card.long.ask)
+    short_bid, short_ask = _leg_quote(backend, card.short.code)
+    long_bid, long_ask = _leg_quote(backend, card.long.code)
     debit = close_debit(long_bid=long_bid, short_ask=short_ask)
     card.mark_close_debit = debit
     card.mark_pnl = round((card.credit - debit) * 100.0, 2)
@@ -106,15 +109,27 @@ def settle_card(card: SellerCard, spot: float) -> dict[str, Any]:
     }
 
 
-def apply_verdict(store: SellerStore, card_id: str, verdict: Verdict, note: str = "") -> dict[str, Any]:
+def apply_verdict(store: SellerStore, card_id: str, verdict: str, note: str = "") -> dict[str, Any]:
     card = store.get_card(card_id)
     if card is None:
         return {"ok": False, "error": "unknown_card", "card_id": card_id}
-    card.verdict = verdict
+    if verdict == "clear":
+        card.verdict = None
+        if card.status != "settled":
+            card.status = "signal"
+            card.follow_status = ""
+        store.save_card(card)
+        mark = store.save_mark(card_id, "", note=note)
+        return {"ok": True, "card": card.as_dict(), "mark": mark}
+    card.verdict = verdict  # type: ignore[assignment]
     if verdict == "adopt":
         card.status = "tracked"
         if not card.follow_status:
             card.follow_status = "research_open"
+    elif verdict in ("watch", "reject") and card.status != "settled":
+        card.status = "signal"
+        if verdict == "reject":
+            card.follow_status = ""
     store.save_card(card)
     mark = store.save_mark(card_id, verdict, note=note)
     return {"ok": True, "card": card.as_dict(), "mark": mark}
@@ -127,11 +142,13 @@ def monitor_tick(
     today: date | None = None,
     params: MonitorParams | None = None,
     chain_for: Callable[[str], list[OptionContract]] | None = None,
+    quote_store: QuoteStore | None = None,
 ) -> dict[str, Any]:
     """Mark tracked/adopted cards. Emits events; never places orders."""
     params = params or MonitorParams()
     today = today or date.today()
     events: list[dict[str, Any]] = []
+    errors: dict[str, str] = {}
     tracked = [
         c
         for c in store.list_cards()
@@ -139,14 +156,27 @@ def monitor_tick(
     ]
     for card in tracked:
         exp = date.fromisoformat(card.expiry[:10])
-        if today >= exp:
-            snap = backend.snapshot(card.underlying)
-            spot = float(snap.get("last_price") or snap.get("last") or card.spot)
-            ev = settle_card(card, spot)
-            store.save_card(card)
-            events.append(store.append_event(ev))
+        if today > exp:
+            seen = {event.get("kind") for event in store.list_events(card.id)}
+            if "expiry_review" not in seen:
+                events.append(store.append_event({
+                    "kind": "expiry_review", "card_id": card.id, "place_order": False,
+                    "message": "Expired: broker settlement or assignment confirmation required; no realized P/L inferred.",
+                }))
             continue
-        mark_card(card, backend)
+        card_backend = backend
+        try:
+            pack = quote_store.current(card.underlying) if quote_store is not None else None
+            if pack and pack.get("contracts"):
+                if card.quote_source not in ("unknown", pack.get("source")):
+                    raise ValueError("quote_source_mismatch: cannot mix mock and live research")
+                card_backend = StoredQuoteBackend(pack)
+            elif type(backend).__name__ == "MockQuoteBackend" and card.quote_source == "futu":
+                raise ValueError("quote_source_mismatch: live card cannot be monitored with mock quotes")
+            mark_card(card, card_backend)
+        except Exception as exc:
+            errors[card.id] = str(exc)
+            continue
         store.save_card(card)
         seen = {(e.get("kind") or "") for e in store.list_events(card.id)}
         if take_profit_hit(card, params) and "take_profit" not in seen:
@@ -162,10 +192,14 @@ def monitor_tick(
                     }
                 )
             )
-        chain = chain_for(card.underlying) if chain_for else backend.option_chain(card.underlying)
+        try:
+            chain = chain_for(card.underlying) if chain_for else card_backend.option_chain(card.underlying)
+        except Exception as exc:
+            errors[card.id] = str(exc)
+            continue
         extra = _protection_candidate(card, chain, params)
         if extra is not None:
-            snap = backend.snapshot(extra.code)
+            snap = card_backend.snapshot(extra.code)
             extra = overlay_snapshot(extra, snap) if snap else extra
             if protection_hit(card, extra, params) and "protect" not in seen:
                 events.append(
@@ -183,7 +217,8 @@ def monitor_tick(
                     )
                 )
     return {
-        "ok": True,
+        "ok": not errors,
+        "errors": errors,
         "tracked": len(tracked),
         "events": events,
         "as_of": today.isoformat(),

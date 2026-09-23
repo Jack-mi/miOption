@@ -4,9 +4,12 @@ from __future__ import annotations
 
 import json
 import os
+import fcntl
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from uuid import uuid4
 
 from .cards import SellerCard
 
@@ -15,7 +18,8 @@ def default_root() -> Path:
     env = os.environ.get("MIOPTION_SELLER_DIR")
     if env:
         return Path(env)
-    return Path(__file__).resolve().parents[2] / "data" / "seller"
+    mode = "mock" if os.environ.get("MIOPTION_FUTU_MOCK", "1") == "1" else "live"
+    return Path(__file__).resolve().parents[2] / "data" / mode / "seller"
 
 
 def _now() -> str:
@@ -34,9 +38,23 @@ class SellerStore:
         if not self.ledger_path.is_file():
             self._write_json(self.ledger_path, {"entries": []})
 
+    @contextmanager
+    def transaction(self):
+        with (self.root / ".lock").open("a") as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
     def _write_json(self, path: Path, payload: Any) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+        temporary = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
+        try:
+            temporary.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+            temporary.replace(path)
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def _read_json(self, path: Path) -> Any:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -49,10 +67,17 @@ class SellerStore:
         return card
 
     def get_card(self, card_id: str) -> SellerCard | None:
+        if not card_id or Path(card_id).name != card_id or "\\" in card_id:
+            raise ValueError("invalid card_id")
         path = self.signals / f"{card_id}.json"
         if not path.is_file():
             return None
         return SellerCard.from_dict(self._read_json(path))
+
+    def delete_card(self, card_id: str) -> None:
+        path = self.signals / f"{card_id}.json"
+        if path.is_file():
+            path.unlink()
 
     def list_cards(self, status: str | None = None) -> list[SellerCard]:
         out: list[SellerCard] = []
@@ -76,7 +101,7 @@ class SellerStore:
     def append_event(self, event: dict[str, Any]) -> dict[str, Any]:
         event = dict(event)
         event.setdefault("at", _now())
-        eid = str(event.get("id") or f"{event.get('kind', 'event')}-{event['at']}")
+        eid = str(event.get("id") or f"{event.get('kind', 'event')}-{uuid4().hex}")
         event["id"] = eid
         self._write_json(self.events / f"{eid}.json", event)
         ledger = self._read_json(self.ledger_path)
@@ -98,4 +123,4 @@ class SellerStore:
             if card_id and ev.get("card_id") != card_id:
                 continue
             out.append(ev)
-        return out
+        return sorted(out, key=lambda event: str(event.get("at") or ""))

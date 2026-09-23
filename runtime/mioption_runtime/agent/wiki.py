@@ -20,6 +20,14 @@ MAX_SNIPPET = 480
 MAX_TOP = 20
 
 
+def wiki_page(page_path: str) -> dict[str, Any]:
+    vault = vault_root()
+    path = (vault / page_path).resolve()
+    if not path.is_relative_to(vault / "wiki") or path.suffix != ".md" or not path.is_file():
+        raise ValueError("page_not_found")
+    return {"page_path": path.relative_to(vault).as_posix(), "content": path.read_text(encoding="utf-8")}
+
+
 def vault_root() -> Path:
     raw = os.environ.get("MIOPTION_VAULT") or str(DEFAULT_VAULT)
     return Path(raw).expanduser().resolve()
@@ -182,9 +190,12 @@ def wiki_query(query: str, top: int = 5) -> dict[str, Any]:
             "note": "Provide a non-empty query.",
         }
     retrieved = _run_retrieve(q, n, vault)
-    if retrieved and retrieved.get("candidates"):
-        return retrieved
-    fallback = fallback_search(q, n, vault)
-    if retrieved is not None:
-        fallback["retrieve_empty"] = True
-    return fallback
+    result = retrieved if retrieved and retrieved.get("candidates") else fallback_search(q, n, vault)
+    for candidate in result.get("candidates", []):
+        try:
+            page = wiki_page(str(candidate.get("page_path") or ""))
+            candidate["content"] = page["content"][:16000]
+            candidate["content_truncated"] = len(page["content"]) > 16000
+        except (OSError, ValueError):
+            continue
+    return result

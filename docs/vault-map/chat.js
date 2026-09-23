@@ -1,26 +1,31 @@
 (() => {
   const DEFAULT_URL = "http://127.0.0.1:4096";
-  const WORKSPACE = "/Users/miller/Projects/miOption";
-  const AUTO_ALLOW = /wiki_query|futu_probe|futu_quote_chain/;
-  const GO_MODEL = { providerID: "opencode-go", modelID: "deepseek-v4-flash" };
+  const SAFE_TOOLS = ["wiki_query", "futu_probe", "futu_quote_chain", "seller_list_cards"];
+  let GO_MODEL = { providerID: "opencode-go", modelID: "deepseek-v4-flash" };
+
+  const root = document.querySelector("#chat");
+  if (!root) return;
 
   const params = new URLSearchParams(location.search);
-  const base = (params.get("opencode") || localStorage.getItem("mioption.opencode") || DEFAULT_URL).replace(/\/$/, "");
-  const directory = encodeURIComponent(WORKSPACE);
+  let base = DEFAULT_URL;
+  let directory = "";
 
-  const launch = document.querySelector(".chat-launch");
-  const panel = document.querySelector(".chat-panel");
-  const log = document.querySelector(".chat-log");
-  const statusEl = document.querySelector(".chat-status");
-  const form = document.querySelector(".chat-form");
+  const log = root.querySelector(".chat-log");
+  const emptyEl = root.querySelector(".gpt-empty");
+  const statusEl = root.querySelector(".chat-status");
+  const form = root.querySelector(".chat-form");
   const input = form.querySelector("textarea");
   const send = form.querySelector("button[type=submit]");
-  const close = document.querySelector(".chat-close");
+  const listEl = root.querySelector(".gpt-sessions");
+  const titleEl = root.querySelector(".gpt-title");
+  const toggle = root.querySelector(".gpt-rail-toggle");
 
-  let sessionId = null;
+  let sessionId = params.get("id") || "";
   let eventAbort = null;
   let busy = false;
+  let sessions = [];
   const parts = new Map();
+  const messageRoles = new Map();
 
   function setStatus(text) {
     statusEl.textContent = text;
@@ -29,6 +34,20 @@
   function qs(path) {
     const join = path.includes("?") ? "&" : "?";
     return `${base}${path}${join}directory=${directory}`;
+  }
+
+  function asList(data) {
+    if (Array.isArray(data)) return data;
+    if (!data || typeof data !== "object") return [];
+    return data.data || data.sessions || data.messages || data.items || [];
+  }
+
+  function sessionKey(item) {
+    return String((item && (item.id || item.sessionID || (item.info && item.info.id))) || "");
+  }
+
+  function sessionTitle(item) {
+    return String((item && (item.title || item.slug || (item.info && item.info.title))) || "新对话");
   }
 
   async function api(path, options = {}) {
@@ -57,7 +76,13 @@
     return data;
   }
 
+  function showThread(hasMessages) {
+    emptyEl.hidden = hasMessages;
+    log.hidden = !hasMessages;
+  }
+
   function bubbleUser(text) {
+    showThread(true);
     const wrap = document.createElement("article");
     wrap.className = "chat-msg chat-msg--user";
     wrap.innerHTML = `<div class="chat-bubble"></div>`;
@@ -67,6 +92,7 @@
   }
 
   function assistantRoot(messageID) {
+    showThread(true);
     let el = log.querySelector(`[data-message="${messageID}"]`);
     if (!el) {
       el = document.createElement("article");
@@ -78,18 +104,18 @@
   }
 
   function ensurePart(part) {
-    const root = assistantRoot(part.messageID);
-    let node = root.querySelector(`[data-part="${part.id}"]`);
+    const rootEl = assistantRoot(part.messageID);
+    let node = rootEl.querySelector(`[data-part="${part.id}"]`);
     if (node) return node;
     if (part.type === "reasoning") {
       node = document.createElement("details");
       node.className = "chat-reason";
-      node.open = true;
+      node.open = false;
       node.innerHTML = `<summary>推理</summary><pre></pre>`;
     } else if (part.type === "tool") {
-      node = document.createElement("div");
+      node = document.createElement("details");
       node.className = "chat-tool";
-      node.innerHTML = `<strong></strong><pre class="chat-tool-in"></pre><pre class="chat-tool-out"></pre>`;
+      node.innerHTML = `<summary><strong></strong></summary><pre class="chat-tool-in"></pre><pre class="chat-tool-out"></pre>`;
     } else if (part.type === "text") {
       node = document.createElement("div");
       node.className = "chat-text";
@@ -97,7 +123,7 @@
       return null;
     }
     node.dataset.part = part.id;
-    root.appendChild(node);
+    rootEl.appendChild(node);
     return node;
   }
 
@@ -122,6 +148,7 @@
   }
 
   function showError(message) {
+    showThread(true);
     const el = document.createElement("p");
     el.className = "chat-error";
     el.textContent = message;
@@ -147,15 +174,12 @@
     if (!perm || !perm.id) return;
     const existing = log.querySelector(`[data-perm="${perm.id}"]`);
     if (existing) return;
-    if (AUTO_ALLOW.test(permBlob(perm))) {
-      replyPermission(perm, "once");
-      return;
-    }
+    showThread(true);
     const el = document.createElement("div");
     el.className = "chat-perm";
     el.dataset.perm = perm.id;
     el.innerHTML = `<p></p><button type="button" data-act="once">允许一次</button><button type="button" data-act="reject">拒绝</button>`;
-    el.querySelector("p").textContent = perm.title || perm.permission || perm.action || perm.type || "需要许可";
+    el.querySelector("p").textContent = permBlob(perm) || "需要许可";
     el.addEventListener("click", (ev) => {
       const act = ev.target && ev.target.dataset && ev.target.dataset.act;
       if (!act) return;
@@ -167,9 +191,12 @@
 
   async function replyPermission(perm, response) {
     try {
-      await api(`/session/${perm.sessionID}/permissions/${perm.id}`, {
+      const path = perm.action
+        ? `/api/session/${perm.sessionID}/permission/${perm.id}/reply`
+        : `/permission/${perm.id}/reply`;
+      await api(path, {
         method: "POST",
-        body: JSON.stringify({ response }),
+        body: JSON.stringify({ reply: response }),
       });
     } catch (err) {
       showError(`许可失败：${err.message}`);
@@ -179,9 +206,26 @@
   function handleEvent(evt) {
     if (!evt || !evt.type) return;
     const payload = evt.properties || evt.data || {};
+    if (evt.type === "message.updated" && payload.info) {
+      const info = payload.info;
+      if (info.sessionID !== sessionId) return;
+      messageRoles.set(info.id, info.role);
+      if (info.role === "user") log.querySelector(`[data-message="${info.id}"]`)?.remove();
+      return;
+    }
+    if (evt.type === "message.part.delta") {
+      if (payload.sessionID !== sessionId) return;
+      const part = parts.get(payload.partID);
+      if (part && payload.field === "text") {
+        part.text = (part.text || "") + (payload.delta || "");
+        renderPart(part);
+      }
+      return;
+    }
     if (evt.type === "message.part.updated" && payload.part) {
       const part = payload.part;
       if (!sessionId || (part.sessionID && part.sessionID !== sessionId)) return;
+      if (messageRoles.get(part.messageID) === "user") return;
       renderPart(part, payload.delta);
       return;
     }
@@ -203,11 +247,12 @@
       send.disabled = false;
       return;
     }
-    if (evt.type === "session.idle") {
+    if (evt.type === "session.idle" || (evt.type === "session.status" && payload.status?.type === "idle")) {
       if (!sessionId || payload.sessionID === sessionId) {
         busy = false;
         send.disabled = false;
         setStatus(`OpenCode · ${GO_MODEL.modelID}`);
+        refreshSessions();
       }
     }
   }
@@ -221,6 +266,7 @@
         signal: eventAbort.signal,
       });
       if (!res.ok || !res.body) throw new Error(`event ${res.status}`);
+      setStatus(`OpenCode · ${GO_MODEL.modelID}`);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buf = "";
@@ -244,6 +290,7 @@
           }
         }
       }
+      if (!eventAbort.signal.aborted) setStatus("事件流已结束，请刷新恢复连接。");
     } catch (err) {
       if (err.name === "AbortError") return;
       setStatus("事件流断开。确认 OpenCode 已加 --cors " + location.origin);
@@ -262,34 +309,121 @@
     }
   }
 
-  async function bindGoModel(id) {
-    const bound = { id: GO_MODEL.modelID, providerID: GO_MODEL.providerID };
-    try {
-      await api(`/api/session/${id}/model`, {
-        method: "POST",
-        body: JSON.stringify({ model: bound }),
-      });
-    } catch {
-      /* 1.18 prompt_async still carries model; create already set it */
+  function renderSessions() {
+    listEl.replaceChildren();
+    for (const item of sessions) {
+      const id = sessionKey(item);
+      if (!id) continue;
+      const li = document.createElement("li");
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = sessionTitle(item);
+      btn.dataset.id = id;
+      if (id === sessionId) btn.setAttribute("aria-current", "true");
+      btn.addEventListener("click", () => selectSession(id));
+      li.append(btn);
+      listEl.append(li);
     }
+  }
+
+  async function refreshSessions() {
+    try {
+      sessions = asList(await api("/session")).filter((item) => item.title?.startsWith("miOption"));
+    } catch {
+      sessions = sessions.filter((item) => sessionKey(item));
+    }
+    renderSessions();
+  }
+
+  function setTitle(text) {
+    titleEl.textContent = text || "新对话";
+  }
+
+  async function loadMessages(id) {
+    log.replaceChildren();
+    parts.clear();
+    messageRoles.clear();
+    const msgs = asList(await api(`/session/${id}/message`));
+    for (const msg of msgs) {
+      const info = msg.info || msg;
+      const role = info.role || msg.role;
+      messageRoles.set(info.id, role);
+      const msgParts = msg.parts || [];
+      if (role === "user") {
+        const text = msgParts
+          .filter((part) => part.type === "text")
+          .map((part) => part.text || "")
+          .join("\n");
+        if (text) bubbleUser(text);
+      } else {
+        for (const part of msgParts) renderPart(part);
+      }
+    }
+    showThread(log.childElementCount > 0);
+  }
+
+  async function selectSession(id) {
+    sessionId = id;
+    const current = sessions.find((item) => sessionKey(item) === id);
+    setTitle(current ? sessionTitle(current) : "对话");
+    const url = new URL(location.href);
+    url.searchParams.set("id", id);
+    history.replaceState({}, "", url);
+    renderSessions();
+    root.classList.remove("rail-open");
+    try {
+      await loadMessages(id);
+      const statuses = await api("/session/status");
+      busy = Boolean(statuses?.[id] && statuses[id].type !== "idle");
+      send.disabled = busy;
+      const permissions = asList(await api("/permission"));
+      permissions.filter((permission) => permission.sessionID === id).forEach(showPermission);
+    } catch (err) {
+      showError(err.message || String(err));
+    }
+  }
+
+  function newChat() {
+    busy = false;
+    send.disabled = false;
+    sessionId = "";
+    parts.clear();
+    messageRoles.clear();
+    log.replaceChildren();
+    showThread(false);
+    setTitle("新对话");
+    const url = new URL(location.href);
+    url.searchParams.delete("id");
+    history.replaceState({}, "", url);
+    renderSessions();
+    root.classList.remove("rail-open");
+    input.focus();
   }
 
   async function ensureSession() {
     if (sessionId) {
-      await bindGoModel(sessionId);
       return sessionId;
     }
     const created = await api("/session", {
       method: "POST",
       body: JSON.stringify({
-        title: "vault-map",
+        title: "miOption research",
         model: { id: GO_MODEL.modelID, providerID: GO_MODEL.providerID },
+        permission: [
+          { permission: "*", pattern: "*", action: "deny" },
+          ...SAFE_TOOLS.map((name) => ({ permission: `mioption_${name}`, pattern: "*", action: "allow" })),
+          ...["seller_scan", "seller_verdict", "seller_monitor_tick"].map((name) => ({ permission: `mioption_${name}`, pattern: "*", action: "ask" })),
+        ],
       }),
     });
     sessionId = created.id || created.sessionID || (created.data && created.data.id);
     if (!sessionId) throw new Error("OpenCode 未返回 session id");
-    const got = (created.model && (created.model.id || created.model.modelID)) || "";
-    if (got !== GO_MODEL.modelID) await bindGoModel(sessionId);
+    const url = new URL(location.href);
+    url.searchParams.set("id", sessionId);
+    history.replaceState({}, "", url);
+    await refreshSessions();
+    const current = sessions.find((item) => sessionKey(item) === sessionId);
+    setTitle(current ? sessionTitle(current) : "新对话");
     return sessionId;
   }
 
@@ -301,7 +435,6 @@
     }
     try {
       const id = await ensureSession();
-      listen();
       bubbleUser(text);
       busy = true;
       send.disabled = true;
@@ -309,14 +442,8 @@
         method: "POST",
         body: JSON.stringify({
           model: { providerID: GO_MODEL.providerID, modelID: GO_MODEL.modelID },
-          tools: {
-            write: false,
-            edit: false,
-            bash: false,
-            apply_patch: false,
-          },
           system:
-            "For option strategy questions, call MCP wiki_query or mioption_wiki_query. Cite the returned page_path. Do not invent P/L numbers. Do not edit files.",
+            "You are miOption's research assistant. Answer in the user's language. For option strategy questions, call mioption_wiki_query, using English strategy names when helpful; use returned content and cite page_path. For cards use mioption seller tools. Ask before changing a verdict. Use no other tools. Never place any orders, including simulated orders. Never edit files. Do not invent prices, payoff evidence or realized P/L. An empty scan is a valid result. State quote sources and timestamps when available.",
           parts: [{ type: "text", text }],
         }),
       });
@@ -327,38 +454,18 @@
     }
   }
 
-  function openPanel() {
-    panel.hidden = false;
-    launch.setAttribute("aria-expanded", "true");
-    health();
-    listen();
-    input.focus();
-  }
-
-  function closePanel() {
-    panel.hidden = true;
-    launch.setAttribute("aria-expanded", "false");
-  }
-
-  launch.addEventListener("click", () => {
-    if (panel.hidden) openPanel();
-    else closePanel();
+  root.querySelector('[data-act="new"]').addEventListener("click", newChat);
+  toggle.addEventListener("click", () => {
+    const open = root.classList.toggle("rail-open");
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
   });
-  close.addEventListener("click", closePanel);
-
-  document.querySelectorAll('a[href="#chat-panel"]').forEach((link) => {
-    link.addEventListener("click", (ev) => {
-      ev.preventDefault();
-      openPanel();
-    });
-  });
-  if (location.hash === "#chat-panel") openPanel();
 
   form.addEventListener("submit", (ev) => {
     ev.preventDefault();
     const text = input.value.trim();
     if (!text || busy) return;
     input.value = "";
+    input.style.height = "auto";
     sendPrompt(text);
   });
 
@@ -369,5 +476,37 @@
     }
   });
 
-  health();
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = `${Math.min(input.scrollHeight, 160)}px`;
+  });
+
+  (async () => {
+    try {
+      const response = await fetch("/api/config");
+      if (!response.ok) throw new Error("workbench config unavailable");
+      const config = await response.json();
+      base = (params.get("opencode") || config.opencode_url).replace(/\/$/, "");
+      directory = encodeURIComponent(config.workspace);
+      GO_MODEL = config.model;
+    } catch (error) {
+      setStatus(`请从 miOption 工作台打开此页：${error.message}`);
+      return;
+    }
+    const ok = await health();
+    if (ok) {
+      listen();
+      await refreshSessions();
+    }
+    if (sessionId) {
+      try {
+        await selectSession(sessionId);
+      } catch (err) {
+        showError(err.message || String(err));
+      }
+    } else {
+      showThread(false);
+      input.focus();
+    }
+  })();
 })();

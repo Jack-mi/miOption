@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 from mioption_runtime.futu.quote import OptionContract
@@ -179,3 +179,128 @@ def test_mark_card_uses_quotes(tmp_path: Path):
     marked = mark_card(card, MapQuote(99.47, puts))
     assert marked.mark_close_debit is not None
     assert marked.mark_pnl is not None
+
+
+def test_mock_put_and_call_credits_differ():
+    from mioption_runtime.futu.quote import MockQuoteBackend
+    from mioption_runtime.seller.scan import scan_watchlist
+
+    out = scan_watchlist(MockQuoteBackend(), underlyings=["US.SPY"])
+    puts = [c for c in out["cards"] if c["structure_id"] == "bull_put_spread"]
+    calls = [c for c in out["cards"] if c["structure_id"] == "bear_call_spread"]
+    assert puts and calls
+    assert {c["credit"] for c in puts} != {c["credit"] for c in calls}
+
+
+def test_clear_verdict_restores_signal(tmp_path: Path):
+    store = SellerStore(tmp_path)
+    card = credit_vertical_candidates(
+        "US.BIDU",
+        99.47,
+        _bidu_puts(),
+        today=date(2026, 8, 30),
+        params=BIDU_SCAN,
+    )[0]
+    store.save_card(card)
+    apply_verdict(store, card.id, "adopt")
+    out = apply_verdict(store, card.id, "clear")
+    assert out["ok"] is True
+    saved = store.get_card(card.id)
+    assert saved is not None
+    assert saved.verdict is None
+    assert saved.status == "signal"
+
+
+def test_scan_uses_quote_store_pack(tmp_path: Path):
+    from mioption_runtime.futu.quote import MockQuoteBackend
+    from mioption_runtime.futu.quote_store import QuoteStore
+    from mioption_runtime.seller.scan import scan_watchlist
+
+    store = QuoteStore(tmp_path / "quotes.sqlite")
+    store.replace_current(
+        {
+            "ok": True,
+            "underlying": "US.BIDU",
+            "pulled_at": datetime.now(timezone.utc).isoformat(),
+            "source": "futu",
+            "days": 60,
+            "windows": [],
+            "coverage": {},
+            "equity": {"code": "US.BIDU", "last_price": 99.47},
+            "options": [
+                {
+                    "code": "US.BIDU260911P95000",
+                    "option_type": "PUT",
+                    "strike_time": "2026-09-11",
+                    "option_strike_price": 95.0,
+                    "bid_price": 0.64,
+                    "ask_price": 0.91,
+                    "last_price": 0.70,
+                    "option_delta": -0.22,
+                },
+                {
+                    "code": "US.BIDU260911P90000",
+                    "option_type": "PUT",
+                    "strike_time": "2026-09-11",
+                    "option_strike_price": 90.0,
+                    "bid_price": 0.20,
+                    "ask_price": 0.38,
+                    "last_price": 0.28,
+                    "option_delta": -0.08,
+                },
+                {
+                    "code": "US.BIDU260911C105000",
+                    "option_type": "CALL",
+                    "strike_time": "2026-09-11",
+                    "option_strike_price": 105.0,
+                    "bid_price": 0.50,
+                    "ask_price": 0.70,
+                    "last_price": 0.60,
+                    "option_delta": 0.22,
+                },
+                {
+                    "code": "US.BIDU260911C110000",
+                    "option_type": "CALL",
+                    "strike_time": "2026-09-11",
+                    "option_strike_price": 110.0,
+                    "bid_price": 0.10,
+                    "ask_price": 0.25,
+                    "last_price": 0.18,
+                    "option_delta": 0.10,
+                },
+            ],
+        }
+    )
+    out = scan_watchlist(
+        MockQuoteBackend(),
+        underlyings=["US.BIDU"],
+        today=date(2026, 8, 30),
+        params=BIDU_SCAN,
+        quote_store=store,
+    )
+    assert out["quote_source"] == "sqlite"
+    assert out["mock"] is False
+    credits = {c["structure_id"]: c["credit"] for c in out["cards"]}
+    assert credits["bull_put_spread"] == 0.26
+    assert credits["bear_call_spread"] == 0.25
+    assert any("2026-09-11" in c["id"] and "95" in c["id"] for c in out["cards"])
+
+
+def test_scan_prunes_stale_cards_for_underlying(tmp_path: Path):
+    from mioption_runtime.futu.quote import MockQuoteBackend
+    from mioption_runtime.seller.scan import scan_watchlist
+
+    seller = SellerStore(tmp_path / "seller")
+    stale = credit_vertical_candidates(
+        "US.BIDU",
+        99.47,
+        _bidu_puts(),
+        today=date(2026, 8, 30),
+        params=BIDU_SCAN,
+    )[0]
+    stale.id = "US.BIDU-stale-old"
+    seller.save_card(stale)
+    out = scan_watchlist(MockQuoteBackend(), underlyings=["US.BIDU"], store=seller)
+    assert seller.get_card("US.BIDU-stale-old") is None
+    assert out["count"] >= 1
+    assert all(c.id != "US.BIDU-stale-old" for c in seller.list_cards())

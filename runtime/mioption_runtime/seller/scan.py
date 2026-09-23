@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Any, Iterable
 
 from ..futu.quote import OptionContract, QuoteBackend
+from ..futu.quote_store import QuoteStore
 from .cards import WIKI_PATHS, LegQuote, SellerCard, card_id
 from .payoff import StructureId, conservative_credit, credit_vertical_payoff
 from .store import SellerStore
@@ -21,6 +23,59 @@ DEFAULT_WATCHLIST = (
     "US.META",
     "US.BIDU",
 )
+
+# Common names people type in the H5 search box → Futu codes.
+SYMBOL_ALIASES = {
+    "nvidia": "US.NVDA",
+    "nvda": "US.NVDA",
+    "spy": "US.SPY",
+    "qqq": "US.QQQ",
+    "aapl": "US.AAPL",
+    "apple": "US.AAPL",
+    "tsla": "US.TSLA",
+    "tesla": "US.TSLA",
+    "amd": "US.AMD",
+    "meta": "US.META",
+    "facebook": "US.META",
+    "bidu": "US.BIDU",
+    "baidu": "US.BIDU",
+    "百度": "US.BIDU",
+}
+
+
+def resolve_symbol(raw: str) -> str:
+    text = (raw or "").strip()
+    if not text:
+        return ""
+    key = "".join(text.casefold().split())
+    if key in SYMBOL_ALIASES:
+        return SYMBOL_ALIASES[key]
+    compact = text.replace(" ", "").upper()
+    if "." in compact:
+        market, _, ticker = compact.partition(".")
+        if market in ("US", "HK", "SH", "SZ") and re.fullmatch(r"[A-Z0-9][A-Z0-9.-]{0,19}", ticker):
+            return f"{market}.{ticker}"
+        return ""
+    if re.fullmatch(r"[A-Z0-9]{1,20}", compact):
+        return f"US.{compact}"
+    return ""
+
+
+def resolve_underlyings(raw: Iterable[str] | str | None) -> list[str]:
+    if raw is None:
+        return list(DEFAULT_WATCHLIST)
+    if isinstance(raw, str):
+        parts = [p for p in re.split(r"[,;\s]+", raw) if p.strip()]
+    else:
+        parts = [str(p).strip() for p in raw if str(p).strip()]
+    out: list[str] = []
+    seen: set[str] = set()
+    for part in parts:
+        code = resolve_symbol(part)
+        if code and code not in seen:
+            seen.add(code)
+            out.append(code)
+    return out
 
 
 @dataclass
@@ -312,9 +367,9 @@ def _calls(
 
 def _best_per_expiry(cards: list[SellerCard]) -> list[SellerCard]:
     """Keep the highest credit/width ratio per structure+expiry+width."""
-    best: dict[tuple[str, float], SellerCard] = {}
+    best: dict[tuple[str, str, float], SellerCard] = {}
     for card in cards:
-        key = (card.structure_id, card.width)
+        key = (card.structure_id, card.expiry, card.width)
         prev = best.get(key)
         if prev is None or card.credit > prev.credit:
             best[key] = card
@@ -346,6 +401,40 @@ def enrich_chain(backend: QuoteBackend, chain: list[OptionContract]) -> list[Opt
     return out
 
 
+def contracts_from_pack(pack: dict[str, Any]) -> list[OptionContract]:
+    """Turn a QuoteStore current pack into scan legs (already quoted)."""
+    underlying = str(pack.get("underlying") or "")
+    out: list[OptionContract] = []
+    for row in pack.get("contracts") or []:
+        code = str(row.get("code") or "")
+        if not code:
+            continue
+        delta = row.get("delta")
+        try:
+            delta_f = float(delta) if delta is not None and str(delta) not in ("", "nan") else None
+        except (TypeError, ValueError):
+            delta_f = None
+        out.append(
+            OptionContract(
+                code=code,
+                underlying=underlying,
+                strike=float(row.get("strike") or 0),
+                expiry=str(row.get("expiry") or "")[:10],
+                option_type="PUT" if "PUT" in str(row.get("option_type") or "").upper() else "CALL",
+                bid=float(row.get("bid") or 0),
+                ask=float(row.get("ask") or 0),
+                last=float(row.get("last") or 0),
+                delta=delta_f,
+            )
+        )
+    return out
+
+
+def _spot_from_pack(pack: dict[str, Any]) -> float:
+    equity = pack.get("equity") or {}
+    return float(equity.get("last_price") or equity.get("last") or 0)
+
+
 def scan_underlying(
     backend: QuoteBackend,
     underlying: str,
@@ -353,11 +442,21 @@ def scan_underlying(
     today: date | None = None,
     params: ScanParams | None = None,
     store: SellerStore | None = None,
+    quote_store: QuoteStore | None = None,
 ) -> list[SellerCard]:
-    spot = _spot(backend, underlying)
+    pack = quote_store.current(underlying) if quote_store is not None else None
+    if pack and pack.get("contracts"):
+        if pack.get("stale"):
+            raise ValueError("quote_snapshot_stale: refresh the option chain before scanning")
+        spot = _spot_from_pack(pack) or _spot(backend, underlying)
+        chain = contracts_from_pack(pack)
+    else:
+        spot = _spot(backend, underlying)
+        if spot <= 0:
+            return []
+        chain = enrich_chain(backend, backend.option_chain(underlying))
     if spot <= 0:
         return []
-    chain = enrich_chain(backend, backend.option_chain(underlying))
     cards = credit_vertical_candidates(
         underlying,
         spot,
@@ -365,9 +464,26 @@ def scan_underlying(
         today=today,
         params=params,
     )
+    for card in cards:
+        card.quote_source = str(pack.get("source") or "unknown") if pack else (
+            "mock" if type(backend).__name__ == "MockQuoteBackend" else "futu"
+        )
+        card.quoted_at = str(pack.get("pulled_at") or "") if pack else datetime.now(timezone.utc).isoformat()
     if store is not None:
-        for card in cards:
+        keep = {card.id for card in cards}
+        for existing in store.list_cards():
+            if (
+                existing.underlying == underlying
+                and existing.id not in keep
+                and existing.status == "signal"
+                and not existing.verdict
+            ):
+                store.delete_card(existing.id)
+        for index, card in enumerate(cards):
             existing = store.get_card(card.id)
+            if existing and (existing.status in ("tracked", "settled") or existing.verdict == "adopt"):
+                cards[index] = existing
+                continue
             if existing and existing.verdict:
                 card.verdict = existing.verdict
                 card.status = existing.status
@@ -383,12 +499,16 @@ def scan_watchlist(
     today: date | None = None,
     params: ScanParams | None = None,
     store: SellerStore | None = None,
+    quote_store: QuoteStore | None = None,
 ) -> dict[str, Any]:
-    names = list(underlyings or DEFAULT_WATCHLIST)
+    names = resolve_underlyings(underlyings)
     cards: list[SellerCard] = []
     errors: dict[str, str] = {}
+    sources: list[str] = []
     for name in names:
         try:
+            pack = quote_store.current(name) if quote_store is not None else None
+            sources.append("sqlite" if pack and pack.get("contracts") else "")
             cards.extend(
                 scan_underlying(
                     backend,
@@ -396,10 +516,19 @@ def scan_watchlist(
                     today=today,
                     params=params,
                     store=store,
+                    quote_store=quote_store,
                 )
             )
         except Exception as exc:  # noqa: BLE001 — keep other names scanning
             errors[name] = str(exc)
+    if sources and all(source == "sqlite" for source in sources):
+        quote_source = "sqlite"
+    elif any(source == "sqlite" for source in sources):
+        quote_source = "mixed"
+    elif type(backend).__name__ == "MockQuoteBackend":
+        quote_source = "mock"
+    else:
+        quote_source = "futu"
     return {
         "ok": not errors,
         "watchlist": names,
@@ -408,4 +537,9 @@ def scan_watchlist(
         "errors": errors,
         "as_of": (today or date.today()).isoformat(),
         "scanned_at": datetime.now().isoformat(timespec="seconds"),
+        "quote_source": quote_source,
+        "mock": bool(cards) and all(card.quote_source == "mock" for card in cards) if cards else quote_source == "mock",
+        "sources": sorted({card.quote_source for card in cards}),
+        "quoted_at": sorted({card.quoted_at for card in cards}),
+        "place_order": False,
     }

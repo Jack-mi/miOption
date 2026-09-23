@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any
 
 from ..bot.engine import BotEngine, demo_automation
 from ..futu.opend import probe_permissions
 from ..futu.policy import TradeEnv, TradePolicy
-from ..futu.quote import get_quote_backend
+from ..futu.quote import mock_underlying_pack, pull_underlying_pack
+from ..futu.quote_store import QuoteStore
 from ..futu.trade import Leg, OrderRequest, get_trade_backend
 from ..seller.desk import SellerDesk
+from ..seller.scan import resolve_symbol
 from .wiki import wiki_query
 
 TOOL_DEFS: list[dict[str, Any]] = [
@@ -144,21 +147,39 @@ class ToolRuntime:
             policy=self.policy,
             prefer_mock=True,
         )
-        self.seller = SellerDesk(policy=self.policy)
+        self.seller = SellerDesk(policy=self.policy, quote_store=QuoteStore())
 
     def dispatch(self, name: str, args: dict[str, Any] | None) -> dict[str, Any]:
         args = args or {}
+        if os.environ.get("MIOPTION_RESEARCH_ONLY") == "1" and name in ("futu_place_option_order", "bot_run_automation"):
+            return {"ok": False, "error": "research_only", "place_order": False}
         if name == "wiki_query":
             return wiki_query(str(args.get("query") or ""), top=int(args.get("top") or 5))
         if name == "futu_probe":
             return probe_permissions()
         if name == "futu_quote_chain":
-            backend = get_quote_backend()
-            chain = backend.option_chain(
-                str(args["underlying"]),
-                expiry=args.get("expiry") or None,
-            )
-            return {"contracts": [c.as_dict() for c in chain[:50]]}
+            underlying = resolve_symbol(str(args["underlying"]))
+            if not underlying:
+                return {"ok": False, "error": "invalid_underlying", "contracts": []}
+            store = self.seller.quote_store
+            pack = store.current(underlying)
+            source = "mock" if os.environ.get("MIOPTION_FUTU_MOCK", "1") == "1" else "futu"
+            if pack and pack["source"] != source:
+                return {"ok": False, "error": "quote_source_mismatch", "contracts": []}
+            if pack is None or pack.get("stale"):
+                pull = mock_underlying_pack if source == "mock" else pull_underlying_pack
+                store.replace_current(pull(underlying))
+                pack = store.current(underlying)
+            contracts = pack["contracts"]
+            if args.get("expiry"):
+                contracts = [contract for contract in contracts if contract["expiry"] == args["expiry"]]
+            return {
+                "ok": True, "underlying": underlying, "source": pack["source"],
+                "pulled_at": pack["pulled_at"], "stale": pack["stale"],
+                "count": len(contracts), "contracts": contracts[:100],
+                "truncated": len(contracts) > 100, "expiries": pack["expiries"],
+                "place_order": False,
+            }
         if name == "futu_place_option_order":
             env = TradeEnv(str(args.get("env") or "SIMULATE").upper())
             trade = get_trade_backend(policy=self.policy)

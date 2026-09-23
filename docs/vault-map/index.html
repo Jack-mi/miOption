@@ -3,37 +3,35 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#070b10" />
   <title>miOption vault map — 知识库架构与策略卡</title>
   <meta name="description" content="富途定覆盖，OIC 与 Wikipedia 定含义。72 页证据，70 条源笔记，13 张概念，27 张策略卡。教育抓取，不是行情接口。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="map.css" />
-  <link rel="stylesheet" href="chat.css" />
 </head>
 <body>
   <div class="shell">
     <div class="rails" aria-hidden="true"></div>
 
-    <nav class="nav-min" aria-label="页面分区">
+    <nav class="nav-min" aria-label="子页面">
       <a class="wordmark" href="#top">mioption</a>
       <ul>
-        <li><a href="#map">架构</a></li>
-        <li><a href="#roles">角色</a></li>
-        <li><a href="#strategies">策略</a></li>
-        <li><a href="#concepts">概念</a></li>
-        <li><a href="#chat-panel">对话</a></li>
+        <li><a href="desk.html">研究台</a></li>
+        <li><a href="chain.html">行情</a></li>
+        <li><a href="chat.html">对话</a></li>
       </ul>
     </nav>
 
     <header class="band band--hero" id="top">
       <div class="grid-12">
         <div class="span-copy">
-          <p class="label">Knowledge vault · 2026-09-03</p>
+          <p class="label">Knowledge vault · 2026-09-06</p>
           <h1>the vault<span class="period" aria-hidden="true"></span></h1>
           <span class="bar" aria-hidden="true"></span>
-          <p class="lede">Futu 定覆盖。OIC 与 Wikipedia 定含义。成品在 <code>knowledge/wiki</code>，不是 JSON。抓的是教育正文，不是期权链。</p>
-          <p class="meta">27 张策略卡全部 evergreen。对角没有单一盈亏公式；Strap / Strip 只发表腿与方向，不填最多赚、最多亏、打平价。知识问答已落地；行情与 Builder 未做。</p>
+          <p class="lede">Futu 定覆盖。OIC 与 Wikipedia 定含义。成品在 <code>knowledge/wiki</code>，不是 JSON。卖方研究台在独立页 <a href="desk.html">desk.html</a>。</p>
+          <p class="meta">27 张策略卡全部 evergreen。研究台默认 mock 报价；OpenD 登录后设 <code>MIOPTION_FUTU_MOCK=0</code>。裁决与监控都不下单。</p>
         </div>
       </div>
     </header>
@@ -146,7 +144,7 @@
           </summary>
           <div class="flow-body">
             <p>Cboe DataShop、Screener 报价、OptionStrat <code>/build</code> 空壳不走 Apify。</p>
-            <p>行情、回测、Bot 执行以后另开模块，不和课文抓取混在一条流水线。</p>
+            <p>行情走本机 OpenD。卖方研究台在 <a href="desk.html">desk.html</a>，不和课文抓取混在一条流水线。</p>
           </div>
         </details>
       </li>
@@ -208,7 +206,7 @@
           </div>
         </details>
       </div>
-      <p class="meta" style="margin-top: 1.5rem">正文证据页 64，目录/课程页 8。来源构成：OIC 31 · Optionistics 23 · Option Alpha 5 · CME 4 · OPC 3 · OptionStrat 2 · Wikipedia 2 · Cboe 1 · Share Predictions 1。关系笔记 5 条。产品能力：知识问答已落地；行情数据、Builder 与 Bot 未做。</p>
+      <p class="meta" style="margin-top: 1.5rem">正文证据页 64，目录/课程页 8。来源构成：OIC 31 · Optionistics 23 · Option Alpha 5 · CME 4 · OPC 3 · OptionStrat 2 · Wikipedia 2 · Cboe 1 · Share Predictions 1。关系笔记 5 条。产品能力：知识问答在 vault；卖方研究台在 <a href="desk.html">desk.html</a>。</p>
     </section>
 
     <section class="band" id="strategies" aria-labelledby="strat-h">
@@ -613,25 +611,8 @@
     </section>
 
     <footer class="foot-line">
-      <p>证据不进笔记，笔记不发明数字 · knowledge/wiki · 2026-09-03</p>
+      <p>证据不进笔记，笔记不发明数字 · 研究台不下单 · knowledge/wiki · 2026-09-06</p>
     </footer>
   </div>
-
-  <button type="button" class="chat-launch" aria-expanded="false" aria-controls="chat-panel">对话</button>
-  <aside id="chat-panel" class="chat-panel" hidden>
-    <div class="chat-head">
-      <div>
-        <h2>vault chat</h2>
-        <p class="chat-status">连接本机 OpenCode…</p>
-      </div>
-      <button type="button" class="chat-close" aria-label="关闭">关闭</button>
-    </div>
-    <div class="chat-log" role="log" aria-live="polite"></div>
-    <form class="chat-form">
-      <textarea name="prompt" rows="2" placeholder="问策略含义，或让它探盘 / 模拟下单" required></textarea>
-      <button type="submit">发送</button>
-    </form>
-  </aside>
-  <script src="chat.js?v=ds-v4"></script>
 </body>
 </html>
