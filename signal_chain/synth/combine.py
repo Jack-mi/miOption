@@ -2,10 +2,13 @@
 
 规则（方案 v5 锁定）：
 - 时间对齐：两信号 as_of 相差 > max_asof_gap_days 时，旧者 degraded 仅作参考；
+- 富途缺报价/日线（data_status=insufficient_data）才弃权，不进入投票；
+- opinion 是引擎自身没行情但仍保留的观点，与 actionable 一样投票；
+- 全部弃权 -> insufficient_data，方向中性，不拿缺数票凑合成；
 - 同向且档位差 <=1 -> aligned，conviction = 均值 * aligned_boost（封顶 ±1）；
 - 一方向 + 一中性 -> partial，conviction = 简单平均；
 - 方向异号 -> conflicted，conviction 取平均，下游默认不行动；
-- 单源 -> single_source，conviction * single_source_discount，degraded=True。
+- 单源 -> single_source，conviction * single_source_discount。
 """
 
 from __future__ import annotations
@@ -75,6 +78,33 @@ def align_asof(signals: list[EngineSignal], max_gap_days: int) -> list[EngineSig
     return out
 
 
+_OPINION_NOTE = "自身未取到行情，观点保留，价格以富途快照为准"
+_FUTU_ONLY_NOTE = "价格证据只有富途，不是双源行情互证"
+
+
+def _quality_note(voting: list[EngineSignal], abstain: str | None) -> str | None:
+    parts: list[str] = []
+    if any(s.data_status == "opinion" for s in voting):
+        parts.append(_OPINION_NOTE)
+    if voting and all(s.data_status == "opinion" for s in voting):
+        parts.append(_FUTU_ONLY_NOTE)
+    if abstain:
+        parts.append(abstain)
+    return " | ".join(parts) or None
+
+
+def _abstain_note(signals: list[EngineSignal]) -> str | None:
+    parts = []
+    for s in signals:
+        if s.data_status != "insufficient_data":
+            continue
+        gaps = "；".join(s.data_gaps) if s.data_gaps else "缺关键报价或日线"
+        parts.append(f"{s.engine}: {gaps}")
+    if not parts:
+        return None
+    return "弃权 " + " | ".join(parts)
+
+
 def combine(
     signals: list[EngineSignal],
     *,
@@ -83,33 +113,51 @@ def combine(
     single_source_discount: float = 0.7,
     max_asof_gap_days: int = 1,
 ) -> EnsembleSignal:
-    """把 1~2 条 EngineSignal 合成 EnsembleSignal（notes/dissent 由 Codex 后补）。"""
+    """把全部可投票的 EngineSignal 合成。notes/dissent 由 Codex 后补。"""
     if not signals:
         raise ValueError("combine() 需要至少一条信号")
 
     signals = align_asof(signals, max_asof_gap_days)
-    active = [s for s in signals if not s.degraded] or signals
+    voting = [s for s in signals if s.data_status != "insufficient_data" and not s.degraded]
+    if not voting:
+        # 缺数票不能回退成有效票。仅 as-of / 抽取降级、数据仍可行动的，沿用原降级回退。
+        voting = [s for s in signals if s.data_status != "insufficient_data"]
+    note = _quality_note(voting, _abstain_note(signals))
+    if not voting:
+        return EnsembleSignal(
+            ticker=signals[0].ticker,
+            market=signals[0].market,
+            as_of=as_of,
+            components=signals,
+            agreement="insufficient_data",
+            direction=Direction.NEUTRAL,
+            conviction=0.0,
+            quality_notes=note or "无可信报价或日线，信号弃权",
+        )
 
-    first = active[0]
-    if len(active) == 1:
+    first = voting[0]
+    if len(voting) == 1:
         conviction = round(first.conviction * single_source_discount, 4)
         agreement: Agreement = "single_source"
     else:
-        a, b = active[0], active[1]
-        sa, sb = _SIGN[a.direction], _SIGN[b.direction]
-        avg = (a.conviction + b.conviction) / 2
-        if sa != 0 and sa == sb and abs(_TIER[a.direction] - _TIER[b.direction]) <= 1:
-            agreement = "aligned"
-            conviction = max(-1.0, min(1.0, avg * aligned_boost))
-        elif sa == 0 or sb == 0:
+        signs = [_SIGN[s.direction] for s in voting]
+        avg = sum(s.conviction for s in voting) / len(voting)
+        tiers = [_TIER[s.direction] for s in voting]
+        if any(s > 0 for s in signs) and any(s < 0 for s in signs):
+            agreement = "conflicted"
+            conviction = avg
+        elif any(s == 0 for s in signs) and any(s != 0 for s in signs):
             agreement = "partial"
             conviction = avg
+        elif max(tiers) - min(tiers) <= 1:
+            agreement = "aligned"
+            conviction = max(-1.0, min(1.0, avg * aligned_boost))
         else:
-            agreement = "conflicted"
+            agreement = "partial"
             conviction = avg
         conviction = round(conviction, 4)
 
-    vol_views = {s.volatility_view for s in active}
+    vol_views = {s.volatility_view for s in voting}
     if "rising" in vol_views:
         vol = "rising"
     elif vol_views == {"neutral"}:
@@ -128,5 +176,6 @@ def combine(
         direction=direction_from_conviction(conviction),
         conviction=conviction,
         volatility_view=vol,  # type: ignore[arg-type]
-        catalysts=_merge_catalysts(active),
+        catalysts=_merge_catalysts(voting),
+        quality_notes=note,
     )

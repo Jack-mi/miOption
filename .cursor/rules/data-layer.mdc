@@ -1,0 +1,8 @@
+---
+description: 数据层是自建的，决策链只读这份快照
+alwaysApply: true
+---
+
+# 数据层
+
+`signal_chain/data` 自己取数：富途、Yahoo、Alpha Vantage、EDGAR、东财、StockTwits、纽约联储。决策链只读这份快照。

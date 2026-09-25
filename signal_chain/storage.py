@@ -43,6 +43,25 @@ def write_report(day: date, ticker: str, markdown: str) -> Path:
     return path
 
 
+def write_coverage(
+    day: date, ticker: str, snapshot: BaseModel,
+    sources: list | None = None, runs_dir: Path | None = None,
+) -> Path:
+    """runs/{date}.coverage.json — 同一运行日的字段覆盖，不含价格。"""
+    from .options.underlying_fetch import coverage_entry
+
+    root = runs_dir or RUNS_DIR
+    root.mkdir(parents=True, exist_ok=True)
+    path = root / f"{day.isoformat()}.coverage.json"
+    if path.exists():
+        data = json.loads(path.read_text(encoding="utf-8"))
+    else:
+        data = {"date": day.isoformat(), "tickers": {}}
+    data["tickers"][ticker] = coverage_entry(snapshot, sources)  # type: ignore[arg-type]
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+    return path
+
+
 class RunLedger:
     """runs/{date}.json - 每标的的引擎状态、thread id、降级标记、耗时。"""
 

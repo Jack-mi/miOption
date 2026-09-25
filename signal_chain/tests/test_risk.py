@@ -48,6 +48,12 @@ def _spread(short_vol=True):
     )
 
 
+def test_insufficient_data_veto():
+    d = check_signal(_ensemble(agreement="insufficient_data"))
+    assert not d.approved
+    assert any("insufficient_data" in v for v in d.vetoes)
+
+
 def test_conflicted_veto():
     d = check_signal(_ensemble(agreement="conflicted"))
     assert not d.approved and d.vetoes

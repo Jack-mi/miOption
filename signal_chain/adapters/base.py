@@ -24,6 +24,8 @@ class RawBundle:
     llm_model: str | None = None
     texts: dict[str, str] = field(default_factory=dict)   # section -> content
     meta: dict = field(default_factory=dict)
+    data_status: str = "actionable"          # actionable / insufficient_data
+    data_gaps: list[str] = field(default_factory=list)
 
     @property
     def valid(self) -> bool:

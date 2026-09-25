@@ -16,6 +16,8 @@ knowledge/.obsidian/workspace*.json
 /vendor/TradingAgents/
 /vendor/daily_stock_analysis/
 /.venv-sc/
+/signal_chain/.env.data
+/signal_chain/.data_state.json
 /signals/
 /chains/
 /reports/

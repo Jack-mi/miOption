@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import sys
+
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -15,13 +17,7 @@ SIGNALS_DIR = REPO_ROOT / "signals"
 CHAINS_DIR = REPO_ROOT / "chains"
 REPORTS_DIR = REPO_ROOT / "reports"
 RUNS_DIR = REPO_ROOT / "runs"
-VENDOR_DIR = REPO_ROOT / "vendor"
-TA_DIR = VENDOR_DIR / "TradingAgents"
-DSA_DIR = VENDOR_DIR / "daily_stock_analysis"
-TA_VENV_PY = TA_DIR / ".venv" / "bin" / "python"
-DSA_VENV_PY = DSA_DIR / ".venv" / "bin" / "python"
-RUNTIME_VENV_PY = REPO_ROOT / "runtime" / ".venv" / "bin" / "python"
-VENDOR_LOCK = REPO_ROOT / "vendor.lock.json"
+RUNTIME_VENV_PY = Path(sys.executable)
 
 
 def _load_yaml() -> dict[str, Any]:
@@ -32,10 +28,6 @@ def _load_yaml() -> dict[str, Any]:
 @dataclass(frozen=True)
 class Settings:
     raw: dict[str, Any] = field(default_factory=_load_yaml)
-
-    @property
-    def router_base_url(self) -> str:
-        return self.raw["router"]["base_url"]
 
     @property
     def models(self) -> dict[str, str]:
@@ -56,14 +48,6 @@ class Settings:
     @property
     def chain(self) -> dict[str, Any]:
         return dict(self.raw["chain"])
-
-    def engine_enabled(self, name: str) -> bool:
-        return bool(self.raw.get("engines", {}).get(name, {}).get("enabled", False))
-
-    def ta_results_dir(self) -> Path:
-        rel = self.raw["engines"]["tradingagents"].get("results_dir", "runs/ta")
-        return REPO_ROOT / rel
-
 
 def load_settings() -> Settings:
     return Settings()

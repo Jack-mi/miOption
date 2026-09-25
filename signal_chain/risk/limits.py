@@ -29,6 +29,9 @@ def _find_row(chain: ChainSnapshot, code: str):
 def check_signal(signal: EnsembleSignal) -> RiskDecision:
     """信号级门禁：conflicted 直接否。"""
     vetoes: list[str] = []
+    if signal.agreement == "insufficient_data":
+        detail = signal.quality_notes or "缺关键报价或日线"
+        vetoes.append(f"数据不足（insufficient_data）：{detail}")
     if signal.agreement == "conflicted":
         vetoes.append("信号分歧（conflicted）：双引擎方向异号，默认不行动")
     return RiskDecision(approved=not vetoes, vetoes=vetoes)

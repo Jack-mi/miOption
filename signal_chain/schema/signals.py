@@ -19,7 +19,8 @@ class Direction(str, Enum):
 
 
 VolatilityView = Literal["rising", "falling", "neutral", "unknown"]
-Agreement = Literal["aligned", "partial", "conflicted", "single_source"]
+Agreement = Literal["aligned", "partial", "conflicted", "single_source", "insufficient_data"]
+DataStatus = Literal["actionable", "opinion", "insufficient_data"]
 
 
 class Catalyst(BaseModel):
@@ -63,8 +64,10 @@ class EngineSignal(BaseModel):
     volatility_view: VolatilityView = "unknown"
     catalysts: list[Catalyst] = Field(default_factory=list)
     price_map: PriceMap = Field(default_factory=PriceMap)
-    # 质量元数据
+    # 质量元数据。insufficient_data 表示缺关键报价/日线，不能当完整一票。
     degraded: bool = False
+    data_status: DataStatus = "actionable"
+    data_gaps: list[str] = Field(default_factory=list)
     quality_notes: str | None = None
 
 
@@ -80,3 +83,4 @@ class EnsembleSignal(BaseModel):
     catalysts: list[Catalyst] = Field(default_factory=list)
     synthesis_notes: str = ""
     dissent_summary: str | None = None
+    quality_notes: str | None = None

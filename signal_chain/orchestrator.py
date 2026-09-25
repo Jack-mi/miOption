@@ -1,8 +1,8 @@
 """Orchestrator：每标的完整链路编排。确定性代码，LLM 只在 pipeline.steps 里出现。
 
 用法:
-  python -m signal_chain.orchestrator --tickers US.AAPL,HK.00700 [--date 2026-09-23]
-      [--engines-only] [--use-existing] [--no-codex] [--skip-report]
+  python -m signal_chain.orchestrator --tickers US.AAPL [--date 2026-09-23]
+      [--no-llm] [--skip-report] [--bias bull|bear|neutral] [--shares 0]
 """
 
 from __future__ import annotations
@@ -12,35 +12,41 @@ import asyncio
 import time
 from datetime import date
 
-from .adapters import DsaAdapter, TaAdapter
-from .agents.codex import CodexAgentRunner
-from .config import DSA_DIR, load_settings, parse_ticker
-from .engines.runner import EngineRunResult, run_engines_parallel
-from .options.chain_fetch import fetch_chain
+from .agents.llm import LlmRunner
+from .config import RUNS_DIR, load_settings, parse_ticker
 from .options.iv import derive_volatility_view
-from .pipeline.steps import extract_signal, propose_strategies, synthesize_notes
-from .risk.limits import check_proposal, check_signal
+from .options.strategy_menu import apply_user_bias, decision_action, render_menu, screen_menu
+from .data.layer import clear_macro_cache, load as load_market
+from .decision import build_signals, render_signals, to_engine_signal
+from .pipeline.steps import synthesize_notes
+from .risk.limits import check_signal
 from .risk.account_equity import read_account_equity
-from .schema import EngineSignal, EnsembleSignal, make_signal_id
-from .storage import RunLedger, append_signal, write_chain, write_report
+from .research.berkshire import earnings_catalyst
+from .schema import Direction, EngineSignal, EnsembleSignal, make_signal_id
+from .storage import RunLedger, append_signal, write_chain, write_coverage, write_report
 from .synth.combine import combine
 
 
-def _fallback_report(ticker: str, ensemble: EnsembleSignal, proposals, decisions) -> str:
+def _fallback_report(ticker: str, ensemble: EnsembleSignal, proposals, decisions, snapshot=None) -> str:
     """Reporter agent 失败/跳过时的确定性简报。"""
     lines = [
         f"# {ticker} 期权决策简报（{ensemble.as_of}）",
         "",
         f"- 合成方向: **{ensemble.direction.value}**（强度 {ensemble.conviction:+.2f}，一致性 {ensemble.agreement}）",
         f"- 波动率视图: {ensemble.volatility_view}",
+        f"- 数据质量: {ensemble.quality_notes or '报价与日线可核对'}",
         f"- 合成说明: {ensemble.synthesis_notes or '（无）'}",
     ]
+    if snapshot is not None:
+        lines += [
+            "",
+            "## 富途价格",
+            f"- 报价: {snapshot.quote.meta.status}（{snapshot.quote.meta.as_of}）",
+            f"- 日线: {snapshot.kline.meta.status}（最后交易日 {snapshot.kline.meta.as_of}）",
+            f"- 技术: {snapshot.technical.meta.status}",
+        ]
     if ensemble.dissent_summary:
         lines.append(f"- 分歧: {ensemble.dissent_summary}")
-    lines += ["", "## 成分信号"]
-    for c in ensemble.components:
-        flag = "（降级）" if c.degraded else ""
-        lines.append(f"- [{c.engine}] {c.direction.value} {c.conviction:+.2f}{flag}: {c.reasoning[:200]}")
     lines += ["", "## 候选结构"]
     if not proposals:
         lines.append("- （无候选结构）")
@@ -55,12 +61,12 @@ def _fallback_report(ticker: str, ensemble: EnsembleSignal, proposals, decisions
 async def process_ticker(
     ticker_text: str,
     trade_date: date,
-    runner: CodexAgentRunner | None,
+    runner: LlmRunner | None,
     ledger: RunLedger,
     *,
-    engines_only: bool = False,
-    use_existing: bool = False,
     skip_report: bool = False,
+    bias: str | None = None,
+    shares: int = 0,
 ) -> dict:
     settings = load_settings()
     models = settings.models
@@ -68,69 +74,50 @@ async def process_ticker(
     entry: dict = {"engines": {}, "agents": {}}
     entry["error"] = None  # 清掉上一次运行的陈旧错误（ledger 是合并语义）
     t0 = time.monotonic()
+    market = load_market(t, trade_date, settings, include_chain=True)
+    snapshot = market.snapshot
+    write_coverage(trade_date, t.canonical, snapshot, sources=market.sources)
+    entry["data_layer"] = [
+        {"id": row.id, "field": row.field, "state": row.state, "note": row.note}
+        for row in market.sources
+    ]
+    entry["macro"] = [
+        {"series": point.series, "as_of": point.as_of.isoformat()}
+        for point in market.macro
+    ]
+    entry["coverage"] = {
+        "quote": snapshot.quote.meta.status,
+        "kline": snapshot.kline.meta.status,
+        "technical": snapshot.technical.meta.status,
+        "capital_flow": snapshot.capital_flow.status,
+        "fundamentals": snapshot.fundamentals.status,
+        "news": snapshot.news.status,
+    }
 
-    # 1. 引擎并行（或复用既有产物）
-    if use_existing:
-        results: dict[str, EngineRunResult] = {}
-        ta_dir = settings.ta_results_dir() / f"{trade_date.isoformat()}_{t.canonical.replace('.', '-')}"
-        ta_state = ta_dir / "state.json"
-        dsa_report = DSA_DIR / "reports" / f"report_{trade_date.strftime('%Y%m%d')}.md"
-        if ta_state.exists():
-            results["tradingagents"] = EngineRunResult(
-                "tradingagents", True, out_dir=ta_dir, report_path=ta_state)
-        if dsa_report.exists():
-            results["dsa"] = EngineRunResult("dsa", True, report_path=dsa_report)
-    else:
-        results = await run_engines_parallel(t, trade_date, settings)
-    for name, r in results.items():
-        entry["engines"][name] = {"ok": r.ok, "error": r.error,
-                                  "elapsed_sec": round(r.elapsed_sec, 1)}
-    ledger.record(t.canonical, entry)
+    selected = await build_signals(
+        market, runner, models.get("synthesis"),
+        trace_dir=RUNS_DIR / "research",
+    )
 
-    # 2. 适配
-    bundles = []
-    if results.get("tradingagents") and results["tradingagents"].ok:
-        bundles.append(TaAdapter().load(
-            results["tradingagents"].report_path, t, trade_date,
-            llm_model=f"{models['ta_deep_think']}/{models['ta_quick_think']}"))
-    if results.get("dsa") and results["dsa"].ok:
-        bundles.append(DsaAdapter().load(
-            results["dsa"].report_path, t, trade_date, llm_model=models["dsa"]))
-    valid = [b for b in bundles if b.valid]
-    if not valid:
-        entry["error"] = "无有效引擎信号（全部失败或评级作废）"
-        ledger.record(t.canonical, entry)
-        return entry
-    if engines_only:
-        entry["engines_only"] = True
-        entry["bundles"] = [
-            {"engine": b.engine, "direction": b.direction.value if b.direction else None,
-             "conviction": b.conviction, "report_ref": b.report_ref}
-            for b in valid
-        ]
-        ledger.record(t.canonical, entry)
-        return entry
-
-    # 3. [CODEX] 抽取 -> EngineSignal
     signals: list[EngineSignal] = []
-    for b in valid:
-        if runner is not None:
-            sig, meta = await extract_signal(runner, b, models["extraction"])
-            if meta:
-                entry["agents"][f"extract:{b.engine}"] = {
-                    "thread_id": meta.thread_id, "model": meta.model,
-                    "elapsed_ms": meta.elapsed_ms, "attempts": meta.attempts}
-        else:
-            sig = EngineSignal(
-                signal_id=make_signal_id(b.engine, b.ticker, b.as_of, seed=b.report_ref),
-                engine=b.engine, raw_report_ref=b.report_ref,
-                data_sources=b.data_sources, llm_model=b.llm_model,
-                ticker=b.ticker, market=b.market, as_of=b.as_of,
-                direction=b.direction, conviction=b.conviction,
-                reasoning=" ".join(b.texts.values())[:500], degraded=True,
-                quality_notes="no-codex 模式：跳过抽取 agent")
+    for b in selected:
+        sig = to_engine_signal(b)
+        if b.meta.get("calls"):
+            entry["agents"][b.engine] = b.meta["calls"]
         signals.append(sig)
         append_signal(trade_date, t.canonical, sig)
+    entry["signals"] = [
+        {
+            "engine": sig.engine,
+            "direction": sig.direction.value,
+            "conviction": sig.conviction,
+            "data_status": sig.data_status,
+            "faces": sig.quality_notes,
+            "gaps": list(sig.data_gaps),
+            "analysis": sig.reasoning,
+        }
+        for sig in signals
+    ]
 
     # 4. 规则合成
     syn_cfg = settings.synthesis
@@ -142,16 +129,19 @@ async def process_ticker(
     )
 
     # 5. 取链 + IV 派生
-    chain = None
-    try:
-        chain = fetch_chain(t, settings)
+    chain = market.chain
+    if market.chain_error:
+        entry["chain"] = {"error": market.chain_error}
+    elif chain is not None:
         write_chain(trade_date, t.canonical, chain)
         entry["chain"] = {"source": chain.source, "rows": len(chain.rows),
                           "degraded": chain.degraded}
-    except Exception as exc:
-        entry["chain"] = {"error": str(exc)[:300]}
     ensemble = ensemble.model_copy(update={
         "volatility_view": derive_volatility_view(ensemble, chain)})
+    earnings = earnings_catalyst(snapshot)
+    if earnings is not None:
+        ensemble = ensemble.model_copy(update={
+            "catalysts": [*ensemble.catalysts, earnings]})
 
     # 6. [CODEX] 合成说明
     if runner is not None:
@@ -160,49 +150,62 @@ async def process_ticker(
             entry["agents"]["synthesize"] = {"thread_id": meta.thread_id,
                                              "model": meta.model}
     append_signal(trade_date, t.canonical, ensemble)
+    entry["ensemble"] = {
+        "agreement": ensemble.agreement,
+        "direction": ensemble.direction.value,
+        "quality_notes": ensemble.quality_notes,
+    }
 
-    # 7. 风控信号闸 -> [CODEX] 策略 -> 风控结构闸
-    proposals, decisions, decline = [], [], None
+    # 7. 结构菜单：27 项先给结论，过关的才选合约并过风控。不再让模型挑结构。
+    risk_cfg = settings.risk
+    account = read_account_equity(t.market, settings) if risk_cfg.get("auto_account_equity") else None
     sig_gate = check_signal(ensemble)
-    entry["risk"] = {"signal_gate": sig_gate.model_dump(mode="json")}
+    verdicts = screen_menu(
+        apply_user_bias(ensemble, bias), chain,
+        holds_shares=shares >= 100,
+        account_equity=account["value"] if account else None,
+        equity_currency=account["currency"] if account else None,
+        earnings_blackout_days=risk_cfg["earnings_blackout_days"],
+        min_open_interest=risk_cfg["min_open_interest"],
+        max_spread_pct=risk_cfg["max_spread_pct"],
+        max_position_risk_pct=risk_cfg["max_position_risk_pct"],
+        today=trade_date,
+    )
+    proposals = [v.proposal for v in verdicts if v.proposal is not None]
+    decisions = [v.risk for v in verdicts if v.risk is not None]
+    action = decision_action(verdicts)
+    entry["risk"] = {
+        "signal_gate": sig_gate.model_dump(mode="json"),
+        "account_equity": account,
+        "decision": action,
+        "menu": [
+            {
+                "name": v.name, "status": v.status, "reason": v.reason,
+                "approved": None if v.risk is None else v.risk.approved,
+                "vetoes": [] if v.risk is None else v.risk.vetoes,
+                "max_loss": None if v.proposal is None else v.proposal.max_loss,
+            }
+            for v in verdicts
+        ],
+    }
     if not sig_gate.approved:
-        decline = "; ".join(sig_gate.vetoes)
-    elif runner is not None and chain is not None:
-        proposals, decline, meta = await propose_strategies(
-            runner, ensemble, chain, models["strategy"])
-        if meta:
-            entry["agents"]["strategy"] = {"thread_id": meta.thread_id,
-                                           "model": meta.model}
-        risk_cfg = settings.risk
-        account = read_account_equity(t.market, settings) if risk_cfg.get("auto_account_equity") else None
-        entry["risk"]["account_equity"] = account
-        for p in proposals:
-            d = check_proposal(
-                p, ensemble, chain,
-                earnings_blackout_days=risk_cfg["earnings_blackout_days"],
-                min_open_interest=risk_cfg["min_open_interest"],
-                max_spread_pct=risk_cfg["max_spread_pct"],
-                account_equity=account["value"] if account else None,
-                equity_currency=account["currency"] if account else None,
-                max_position_risk_pct=risk_cfg["max_position_risk_pct"])
-            decisions.append(d)
-        entry["risk"]["proposals"] = [
-            {"name": p.name, "approved": d.approved,
-             "vetoes": d.vetoes, "warnings": d.warnings}
-            for p, d in zip(proposals, decisions)
-        ]
-    if decline:
-        entry["risk"]["decline_reason"] = decline
+        entry["risk"]["decline_reason"] = "; ".join(sig_gate.vetoes)
 
     # 8. 简报
     if runner is not None and not skip_report:
         prompt = (
             f"你是中文金融简报撰写人。根据以下材料写一份 {t.canonical} 的期权决策简报"
             f"（markdown，不超过 600 字）：合成信号 {ensemble.model_dump_json()}；"
-            f"候选结构 {[p.model_dump(mode='json') for p in proposals]}；"
-            f"风控结果 {[d.model_dump(mode='json') for d in decisions]}；"
-            f"未提议原因 {decline}。"
-            "要求：先说结论，再说证据，风险条目逐条列出，禁止编造材料外的数字。"
+            f"决策动作 {action}。"
+            "结构菜单会附在简报后面，不要改写其中的适合、不适合、做不了，也不要另造结构。"
+            f"富途价格证据：报价 {snapshot.quote.meta.status} as_of {snapshot.quote.meta.as_of}，"
+            f"日线 {snapshot.kline.meta.status} 最后交易日 {snapshot.kline.meta.as_of}，"
+            f"技术 {snapshot.technical.meta.status}。"
+            "简报先写富途快照状态，再写合成结论。"
+            "三份信号已经单独成文，不要改写它们的方向、缺失和正文。"
+            "data_status=opinion 的观点保留，但不得把该引擎报告里的 RSI、均线、财报日写成富途事实。"
+            "agreement 为 insufficient_data 时结论必须写信号不足；"
+            "不得把只有富途价格、引擎自身缺行情写成双源行情互证。"
         )
         try:
             rep = await runner.run_text("reporter", models["reporter"], prompt)
@@ -210,10 +213,20 @@ async def process_ticker(
             entry["agents"]["reporter"] = {"thread_id": rep.meta.thread_id,
                                            "model": rep.meta.model}
         except Exception as exc:
-            markdown = _fallback_report(t.canonical, ensemble, proposals, decisions)
+            markdown = _fallback_report(t.canonical, ensemble, proposals, decisions, snapshot)
             entry["agents"]["reporter"] = {"error": str(exc)[:200]}
     else:
-        markdown = _fallback_report(t.canonical, ensemble, proposals, decisions)
+        markdown = _fallback_report(t.canonical, ensemble, proposals, decisions, snapshot)
+    view = ""
+    if bias or shares:
+        word = {"bull": "看多", "bear": "看空", "neutral": "中性"}.get(bias or "", bias or "未改方向")
+        view = f"用户看法：**{word}**，持股 {shares}。三份信号的方向没有改。\n\n"
+    markdown = (
+        f"决策动作：**{action}**。这条链路不下单。\n\n"
+        f"{view}"
+        f"{render_signals(signals)}\n\n"
+        f"{markdown}\n{render_menu(verdicts)}"
+    )
     write_report(trade_date, t.canonical, markdown)
 
     entry["elapsed_sec"] = round(time.monotonic() - t0, 1)
@@ -225,10 +238,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="signal_chain orchestrator")
     parser.add_argument("--tickers", default=None, help="逗号分隔，默认读 config watchlist")
     parser.add_argument("--date", default=date.today().isoformat())
-    parser.add_argument("--engines-only", action="store_true", help="只跑引擎+适配（M0 用）")
-    parser.add_argument("--use-existing", action="store_true", help="复用既有引擎产物，不重跑")
-    parser.add_argument("--no-codex", action="store_true", help="跳过所有 Codex agent（纯确定性干跑）")
+    parser.add_argument("--no-llm", action="store_true", help="跳过所有模型调用（纯确定性干跑）")
     parser.add_argument("--skip-report", action="store_true")
+    parser.add_argument("--bias", choices=["bull", "bear", "neutral"], default=None)
+    parser.add_argument("--shares", type=int, default=0)
     args = parser.parse_args()
 
     settings = load_settings()
@@ -237,20 +250,22 @@ def main() -> None:
     ledger = RunLedger(trade_date)
 
     async def _run():
-        if args.no_codex:
+        runner = None if args.no_llm else LlmRunner()
+        if runner is not None and not runner.api_key:
+            runner = None
+        if runner is None:
             for tk in tickers:
                 await process_ticker(tk, trade_date, None, ledger,
-                                     engines_only=args.engines_only,
-                                     use_existing=args.use_existing,
-                                     skip_report=args.skip_report)
+                                     skip_report=args.skip_report,
+                                     bias=args.bias, shares=args.shares)
         else:
-            async with CodexAgentRunner() as runner:
+            async with runner:
                 for tk in tickers:
                     await process_ticker(tk, trade_date, runner, ledger,
-                                         engines_only=args.engines_only,
-                                         use_existing=args.use_existing,
-                                         skip_report=args.skip_report)
+                                         skip_report=args.skip_report,
+                                         bias=args.bias, shares=args.shares)
 
+    clear_macro_cache()
     asyncio.run(_run())
     print(f"done. ledger: {ledger.path}")
 

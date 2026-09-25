@@ -8,7 +8,8 @@ from __future__ import annotations
 import json
 
 from ..adapters import RawBundle
-from ..agents.codex import AgentFailed, AgentMeta, CodexAgentRunner
+from ..adapters.quality import OPINION_NOTE
+from ..agents.llm import AgentFailed, AgentMeta, LlmRunner
 from ..agents.prompts import (
     EXTRACTION_OUTPUT_SCHEMA,
     STRATEGY_OUTPUT_SCHEMA,
@@ -23,6 +24,7 @@ from ..agents.prompts import (
 from ..schema import (
     Catalyst,
     ChainSnapshot,
+    Direction,
     EngineSignal,
     EnsembleSignal,
     PriceMap,
@@ -58,11 +60,14 @@ def build_chain_digest(chain: ChainSnapshot, per_expiry: int = 6, max_expiries: 
 
 
 async def extract_signal(
-    runner: CodexAgentRunner,
+    runner: LlmRunner,
     bundle: RawBundle,
     model: str,
 ) -> tuple[EngineSignal, AgentMeta | None]:
     """[CODEX] 抽取非确定性字段 + 确定性字段组装 EngineSignal。"""
+    direction = bundle.direction or Direction.NEUTRAL
+    conviction = bundle.conviction if bundle.direction is not None else 0.0
+    gap_note = "；".join(bundle.data_gaps) if bundle.data_gaps else None
     base = dict(
         signal_id=make_signal_id(bundle.engine, bundle.ticker, bundle.as_of,
                                  seed=bundle.report_ref),
@@ -74,9 +79,14 @@ async def extract_signal(
         ticker=bundle.ticker,
         market=bundle.market,
         as_of=bundle.as_of,
-        direction=bundle.direction,
-        conviction=bundle.conviction,
+        direction=direction,
+        conviction=conviction,
+        data_status=bundle.data_status,
+        data_gaps=list(bundle.data_gaps),
+        degraded=bundle.data_status == "insufficient_data",
     )
+    if bundle.data_status == "opinion":
+        gap_note = OPINION_NOTE if not gap_note else f"{OPINION_NOTE}；{gap_note}"
     try:
         result, meta = await runner.run_json(
             f"extract:{bundle.engine}", model,
@@ -84,6 +94,9 @@ async def extract_signal(
             ExtractionResult,
             output_schema=EXTRACTION_OUTPUT_SCHEMA,
         )
+        quality = result.quality_notes
+        if gap_note:
+            quality = gap_note if not quality else f"{gap_note} | {quality}"
         signal = EngineSignal(
             **base,
             reasoning=result.reasoning,
@@ -92,22 +105,23 @@ async def extract_signal(
             price_map=PriceMap(**result.price_map.model_dump()),
             horizon_days=result.horizon_days,
             volatility_view=result.volatility_view,
-            quality_notes=result.quality_notes,
+            quality_notes=quality,
         )
         return signal, meta
     except AgentFailed as exc:
         fallback_text = " ".join(bundle.texts.values())[:500]
+        fail_note = f"extraction agent 失败: {exc}"
         signal = EngineSignal(
             **base,
             reasoning=f"[抽取降级] {fallback_text}",
             degraded=True,
-            quality_notes=f"extraction agent 失败: {exc}",
+            quality_notes=fail_note if not gap_note else f"{gap_note} | {fail_note}",
         )
         return signal, None
 
 
 async def synthesize_notes(
-    runner: CodexAgentRunner,
+    runner: LlmRunner,
     ensemble: EnsembleSignal,
     model: str,
 ) -> tuple[EnsembleSignal, AgentMeta | None]:
@@ -135,7 +149,7 @@ async def synthesize_notes(
 
 
 async def propose_strategies(
-    runner: CodexAgentRunner,
+    runner: LlmRunner,
     ensemble: EnsembleSignal,
     chain: ChainSnapshot,
     model: str,

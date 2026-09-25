@@ -1,6 +1,7 @@
 from .signals import (
     Agreement,
     Catalyst,
+    DataStatus,
     Direction,
     EngineSignal,
     EnsembleSignal,
@@ -15,10 +16,20 @@ from .options import (
     StrategyLeg,
     StrategyProposal,
 )
+from .underlying import (
+    DailyBar,
+    FieldMeta,
+    FieldStatus,
+    KlineField,
+    QuoteField,
+    TechnicalField,
+    UnderlyingSnapshot,
+)
 
 __all__ = [
     "Agreement",
     "Catalyst",
+    "DataStatus",
     "Direction",
     "EngineSignal",
     "EnsembleSignal",
@@ -30,4 +41,11 @@ __all__ = [
     "RiskDecision",
     "StrategyLeg",
     "StrategyProposal",
+    "DailyBar",
+    "FieldMeta",
+    "FieldStatus",
+    "KlineField",
+    "QuoteField",
+    "TechnicalField",
+    "UnderlyingSnapshot",
 ]

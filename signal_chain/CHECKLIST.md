@@ -12,7 +12,7 @@
 ## 1. 确定性数据层（优先做）
 
 - [ ] 以 AAPL、HK.00700 为样本，先在同一运行日、同一标的记录 TA/DSA 每项实际输入与来源：报价/复权日线/技术指标、财报/公司行动、新闻、资金流、期权链；按 `available / missing / unsupported / stale` 标注，记录 fetch 时间、交易日、时区、错误和数据权限；禁止用 LLM 填空。
-- [ ] **验证富途权限后接报价/日线。** OpenD SDK 有 `get_market_snapshot`、`request_history_kline`、`get_cur_kline`；先用只读请求实测 AAPL 和 HK.00700 的订阅/历史额度、分页、复权、交易日与延迟。能取到的价格和日线可复用到 TA/DSA 共用的标准化快照；失败保留 Yahoo/原有源降级，并显式记录来源和失败原因。现有期权链桥只覆盖链，**不等于**引擎的股票数据已由富途提供。见 [`options/futu_bridge.py`](options/futu_bridge.py) 和 [`../runtime/mioption_runtime/futu/quote.py`](../runtime/mioption_runtime/futu/quote.py)。
+- [ ] **验证富途权限后接报价/日线。** OpenD SDK 有 `get_market_snapshot`、`request_history_kline`、`get_cur_kline`；先用只读请求实测 AAPL 和 HK.00700 的订阅/历史额度、分页、复权、交易日与延迟。能取到的价格和日线可复用到 TA/DSA 共用的标准化快照；失败保留 Yahoo/原有源降级，并显式记录来源和失败原因。现有期权链桥只覆盖链，**不等于**引擎的股票数据已由富途提供。见 [`options/futu_bridge.py`](options/futu_bridge.py)。
 - [ ] **资金面逐项验证。** 富途 SDK 暴露 `get_capital_flow`，验证 US/HK 标的权限、统计口径、历史窗口和返回完整度；成交量/成交额不冒称“主力资金净流入”；不可得的港股通、机构持仓等字段保持 unsupported，不推断。
 - [ ] **基本面与新闻保持独立来源。** 逐字段检查富途可返回的基本资料与财务数据及权限；不要把 `get_market_snapshot` 当作完整三表/公告。不能覆盖的报表/披露以原数据源或权威披露补齐，保存报表期间、披露时间和出处；财经新闻同理，缺失即标记。Yahoo/东财被限流应有上限重试和可观察告警。
 - [ ] 抽取 `UnderlyingSnapshot`（或等价最小数据契约）供引擎适配：每字段附 `source / as_of / fetched_at / status`，只在契约层做数值与时效校验；日级快照不得混入盘中旧价，港币/美元不得混算。复用现有 [`schema/`](schema/) / [`options/`](options/) 模式，避免另造全量数据平台。
@@ -32,6 +32,34 @@
 - [ ] M2：两源合成与链/策略/风控 E2E 在美股和港股各跑通一次；逐一核对模型、路由、快照时间、标的和账本/报告一致性；失败不掩盖为成功。
 - [ ] M3：watchlist ≤5 干跑、人工审阅报告与数据出处；确认只读、无下单路径。调度（港/美收盘后）和 aihf 离线回测等数据质量通过后再启用。
 - [ ] 上游月度检查只读；升级时按 [`UPSTREAM.md`](UPSTREAM.md) 与 [`scripts/upstream_check.py`](../scripts/upstream_check.py) 重建隔离环境、重应用 TA patch、跑探针/契约/E2E，全部通过才更新 [`vendor.lock.json`](../vendor.lock.json)；数据源漂移不等于代码版本漂移。
+
+## 4. 数据层缺口收口（2026-09-24）
+
+- [x] EDGAR 联系人已写入 gitignore 的 `signal_chain/.env.data`，不入库。
+- [x] Reddit 不申请。美股社交用 StockTwits，港股社交不支持。
+- [x] Polymarket 只认 `data/events.json`。空文件跳过，不按公司名搜索。赔率不进决策。
+- [x] 账户权益只读富途真实账户（美股 `usd_assets`，港股 `hkd_assets`）。失败只告警，并跳过敞口上限。
+- [x] 美股资金流只有富途 `in_flow`。没有则缺失。东财不补美股，成交额不当净流入。
+- [x] 港股财务仍要 Yahoo 与东财两个营收相差在 1% 以内才标可用。单源留在 `facts`。
+- [x] 宏观改走 Alpha Vantage 的联邦基金利率、CPI、失业率。利率失败再用纽约联储。账本不写数值。不再请求 FRED。
+- [x] 美股和港股 `earnings_date` 只接受 Yahoo `earningsDate` 的 `YYYY-MM-DD`。EDGAR 申报日只留在来源备注。
+- [x] Alpha Vantage 新闻代码用 `ta_format`，港股为 `0700.HK`。
+
+## 5. 数据层尚未接入（2026-09-25）
+
+只登记缺口。补上之后再勾选。现在不改取数。
+
+- [x] 美股商业模式取 10-K Item 1 正文，出处 edgar。护城河和收入结构仍不是字段。港股商业模式仍缺失。
+- [ ] 竞争没有行业、对手、份额字段。投研竞争包仍写缺失。
+- [x] 美股风险取 10-K Item 1A 和委托书治理段。港股风险仍缺失。这些正文不借给财务工人，宏观也不借。
+- [x] ROE、自由现金流、利息覆盖：两源相差在 1% 以内才写入 `ratios`。对不上的单源留在 `facts`。
+- [x] 没有 Reddit 官方凭据时读 Arctic Shift。帖子超过 14 天标 stale，不进社交条目。有官方凭据仍走官方接口。
+- [ ] 港股社交不支持。没有免登录的开源接口。
+- [ ] Polymarket 在 `events.json` 没有标的映射时跳过。赔率不进决策。补上映射后事件一节才有赔率。
+- [ ] 美股资金流只有富途 `in_flow`。13F、内部人交易和做空量都不是净流入。
+- [ ] 港股期权链仍只有富途。2026-09-25 核对港交所公开页面，没有返回带买卖价和持仓量的链。Yahoo 不兜港股。
+- [x] 宏观三项写入证据摘要。财务切片和风险包仍不读宏观。
+- [ ] 单源财务凑不齐两源 1% 时不标可用，数字留在 `facts`。EDGAR 申报日只留在来源备注，不当财报日。
 
 ## 完成判定
 

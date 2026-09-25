@@ -1,28 +1,13 @@
 # signal_chain v0.1 配置 —— 所有模型在此显式钉版，不继承本机交互端默认。
 
-router:
-  base_url: "http://localhost:8790"   # 本机 Friday 路由，Responses API（2026-09-23 实测可用）
-  shim_url: "http://localhost:8799/v1" # chat/completions 翻译 shim（signal_chain.router_shim，供 litellm 组件用）
-
 models:
-  extraction: "deepseek-v4.1-flash"
-  synthesis: "deepseek-v4.1-flash"
-  strategy: "kimi-k3"                 # gpt-6-sol 恢复可用后切回
-  reporter: "kimi-k3"
-  ta_deep_think: "kimi-k3"
-  ta_quick_think: "deepseek-v4.1-flash"
-  dsa: "deepseek-v4.1-flash"   # glm-5.3 上游今日不稳（502/271s，2026-09-23 实测），恢复后可换回
+  extraction: "deepseek-flash"
+  synthesis: "deepseek-flash"
+  strategy: "deepseek-flash"
+  reporter: "deepseek-flash"
 
 watchlist:
   - "US.AAPL"
-  - "HK.00700"
-
-engines:
-  tradingagents:
-    enabled: true
-    results_dir: "runs/ta"            # 相对仓库根；TA 报告树与子进程 state.json 落这里
-  dsa:
-    enabled: true
 
 synthesis:
   aligned_boost: 1.2                  # aligned 时 conviction 上浮系数（封顶 ±1）

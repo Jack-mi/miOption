@@ -1,4 +1,0 @@
-# Never translate line endings at checkout: frontmatter parsing requires exact
-# "---\n" and content hashes (templates, release manifests, approval plans)
-# must be byte-identical on every platform, including Windows checkouts.
-* -text

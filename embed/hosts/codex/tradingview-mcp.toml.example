@@ -1,7 +1,0 @@
-# Add alongside the miOption MCP server in a trusted Codex configuration.
-# Read-only external market-data and technical-analysis service; it does not
-# expose Futu/OpenD credentials or any order-placement capability.
-[mcp_servers.tradingview]
-command = "/Users/miller/.codex/venvs/tradingview-mcp/bin/tradingview-mcp"
-args = ["stdio"]
-startup_timeout_sec = 120
