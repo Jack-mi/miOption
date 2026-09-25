@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import threading
 from datetime import date
 from pathlib import Path
 
@@ -10,19 +11,21 @@ from ..config import REPO_ROOT
 
 STATE_PATH = REPO_ROOT / "signal_chain" / ".data_state.json"
 DAILY_LIMIT = 25
+_QUOTA_LOCK = threading.Lock()
 
 
 def take_quota(today: date, path: Path = STATE_PATH, limit: int = DAILY_LIMIT) -> bool:
-    data: dict = {}
-    if path.exists():
-        data = json.loads(path.read_text(encoding="utf-8"))
-    key = today.isoformat()
-    used = int(data.get(key) or 0)
-    if used >= limit:
-        return False
-    data[key] = used + 1
-    path.write_text(json.dumps(data), encoding="utf-8")
-    return True
+    with _QUOTA_LOCK:
+        data: dict = {}
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+        key = today.isoformat()
+        used = int(data.get(key) or 0)
+        if used >= limit:
+            return False
+        data[key] = used + 1
+        path.write_text(json.dumps(data), encoding="utf-8")
+        return True
 
 
 def note(payload: dict) -> str | None:

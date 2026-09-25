@@ -1,4 +1,4 @@
-"""数据层先后兜底。注入假响应，不访问 OpenD 或公网。"""
+"""数据层字段并行，价格仍按级联。注入假响应，不访问 OpenD 或公网。"""
 
 from datetime import date, datetime, timezone
 
@@ -177,6 +177,8 @@ def test_hk_capital_flow_falls_back_to_eastmoney():
     def get(url, headers=None):
         if "fflow" in url:
             return {"data": {"klines": ["2026-09-23,88.5,1"]}}
+        if "RPT_HKF10_FN_MAININDICATOR" in url:
+            return {"result": {"data": [{"OPERATE_INCOME": "50", "REPORT_DATE": "2025-12-31"}]}}
         raise AssertionError(url)
 
     market = _load(
@@ -252,6 +254,8 @@ def test_hk_news_uses_ta_format():
             return {"feed": [{"title": "港股标题"}]}
         if "function=FEDERAL_FUNDS_RATE" in url or "function=CPI" in url or "function=UNEMPLOYMENT" in url:
             return {"data": [{"date": "2026-08-01", "value": "1"}]}
+        if "RPT_HKF10_FN_MAININDICATOR" in url:
+            return {"result": {"data": [{"OPERATE_INCOME": "50", "REPORT_DATE": "2025-12-31"}]}}
         raise AssertionError(url)
 
     market = _load(
@@ -355,6 +359,46 @@ def test_10k_competition_heading_becomes_excerpt():
     sections = edgar.excerpts_from_10k(html)
     assert "smartphone" in sections["competition"]
     assert "Item 1A" not in sections["competition"]
+
+
+def test_revenue_pair_skips_the_outlier():
+    def get(url, headers=None):
+        if "OVERVIEW" in url:
+            return {"RevenueTTM": "200"}
+        if "companyfacts" in url:
+            return {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [
+                {"form": "10-K", "val": 100.0, "end": "2025-09-27"},
+            ]}}}}}
+        return _edgar_get(url, headers)
+
+    market = _load(
+        futu=_futu(), get=get, info={"totalRevenue": 100},
+        keys={"ALPHAVANTAGE_API_KEY": "k"}, quota=lambda: True,
+    )
+    assert market.snapshot.fundamentals.status == "available"
+    assert market.snapshot.fundamentals.source == "edgar,yfinance"
+    assert any(
+        fact.source == "alphavantage" and fact.metric == "revenue" and fact.value == 200
+        for fact in market.facts
+    )
+
+
+def test_revenue_stays_missing_when_no_pair_agrees():
+    def get(url, headers=None):
+        if "OVERVIEW" in url:
+            return {"RevenueTTM": "200"}
+        if "companyfacts" in url:
+            return {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [
+                {"form": "10-K", "val": 100.0, "end": "2025-09-27"},
+            ]}}}}}
+        return _edgar_get(url, headers)
+
+    market = _load(
+        futu=_futu(), get=get, info={"totalRevenue": 300},
+        keys={"ALPHAVANTAGE_API_KEY": "k"}, quota=lambda: True,
+    )
+    assert market.snapshot.fundamentals.status == "missing"
+    assert "1%" in (market.snapshot.fundamentals.error or "")
 
 
 def test_parsers():
