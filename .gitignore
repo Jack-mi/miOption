@@ -22,6 +22,3 @@ knowledge/.obsidian/workspace*.json
 /chains/
 /reports/
 /runs/
-
-# runtime/ 是本机跑的一层（.venv 富途桥 + mioption MCP），01864c5 起不入库，保留在本地
-/runtime/
