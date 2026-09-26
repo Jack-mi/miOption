@@ -1,0 +1,15 @@
+---
+description: 美股盘点先确认标的；对不上就停下来问，再走 MCP
+alwaysApply: true
+---
+
+# 美股盘点与收租
+
+盘一只美股、看期权链、或找收租结构时：
+
+1. 先调 MCP：`wiki_query`、`futu_probe`。然后只用富途快照或名称搜索确认标的，到此为止。
+2. 标的确认是必经环节，过不了就不往下走。用户给的代码必须在快照里对上唯一的 `name`，才能 `seller_scan` 或 `futu_quote_chain`。对不上、搜出多只、或只能靠猜的时候，把候选代码和 `name` 抛给用户并停住。不要扫描，不要拉链，不要写行情或收租分析。例：`NETS` 快照是 Unknown stock，名称搜索有多只；网易是 `US.NTES`，Cloudflare 是 `US.NET`，不能替用户选定再展开。
+3. 若错误是 `fastmcp.server.extensions`，停下来报告 `runtime/.venv` 里的 FastMCP 安装坏了。不要在仓库里搜 `seller_scan`，不要 `find /Users/miller`，不要往 `.venv-sc` 或 `/tmp` 装 `futu-api`，不要 `kill` / `pkill` 不是本会话拉起的进程。
+4. MCP 不可用时的唯一降级：`runtime/.venv/bin/python -m signal_chain.orchestrator --tickers US.XXX --no-llm`。降级也要先过第 2 步。公司名只有唯一快照 `name` 才当代码用（`APPL`→`AAPL`，`Reddit`→`RDDT`）。`spaceX` 不能只凭网页检索写成 `SPCX`。
+5. 期权买卖价和现价必须同一交易时段。盘前价单独标出，不拿来当链上现价。
+6. 用户没问持仓时，不打开 `OpenSecTradeContext`。
