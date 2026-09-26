@@ -1,9 +1,7 @@
 # signal_chain v0.1 配置 —— 所有模型在此显式钉版，不继承本机交互端默认。
 
 models:
-  extraction: "deepseek-flash"
   synthesis: "deepseek-flash"
-  strategy: "deepseek-flash"
   reporter: "deepseek-flash"
 
 watchlist:
@@ -12,7 +10,7 @@ watchlist:
 synthesis:
   aligned_boost: 1.2                  # aligned 时 conviction 上浮系数（封顶 ±1）
   single_source_discount: 0.7
-  max_asof_gap_days: 1                # 两信号 as_of 允许的最大交易日差（v1 用自然日近似）
+  max_asof_gap_days: 1                # 信号间 as_of 允许的最大交易日差（v1 用自然日近似）
 
 risk:
   earnings_blackout_days: 10          # 财报窗口内禁止 short-vol 结构
