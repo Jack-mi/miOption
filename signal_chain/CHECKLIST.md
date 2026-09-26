@@ -4,7 +4,7 @@
 
 ## 0. 当前基线与待修问题
 
-- [x] TA/DSA 子进程、Codex 合成、Futu 期权链与 IV、确定性风控、中文报告已接线；版本见 [`vendor.lock.json`](../vendor.lock.json)，模型/路由见 [`config.yaml`](config.yaml)。
+- [x] TA/DSA 子进程、Claude Agent SDK 合成、Futu 期权链与 IV、确定性风控、中文报告已接线；版本见 [`vendor.lock.json`](../vendor.lock.json)，模型/路由见 [`config.yaml`](config.yaml)。
 - [ ] **数据质量不得误判为成功。** `runs/2026-09-23.json`（本地忽略，不入库）曾将 DSA AAPL 标为 `ok=true`，但同日 DSA 报告写明行情、日线、技术、筹码、基本面、新闻缺失、质量 38/100；TA AAPL/HK 虽有 `rating`，还需逐字段验证价格/财报/日期/来源。历史报告不能证明当前可用。
 - [ ] **信号合成先治理缺数。** 当前适配器主要从 DSA 的评分/操作与 TA 的评级抽方向；补齐质量标记、时间戳和可验证证据后，缺关键行情/日线的信号不得被当成完整第二票；`single_source`/`conflicted` 降级应显式传至报告和风险闸。见 [`adapters/`](adapters/)、[`synth/combine.py`](synth/combine.py)。
 - [ ] **策略结构校验失败。** AAPL 一次长跑中 strategy 两次输出未通过 `StrategyResult`（缺 `name`/`thesis`/`legs`），导致无结构；检查输出 schema、提示词与模型 JSON 兼容性，失败时明确标记不交易，不拿空列表冒充无机会。见 [`pipeline/steps.py`](pipeline/steps.py) 和 [`agents/prompts.py`](agents/prompts.py)。

@@ -24,6 +24,19 @@ _GAP_TEXT = {
 ROLE_GAPS = ["商业模式缺失", "竞争缺失", "风险缺失"]
 
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
+_TOC_HEADING = re.compile(r"\d{1,3}\s+[A-Z]")
+_MEMO_CLIP = 180
+
+
+def looks_like_toc(text: str) -> bool:
+    """代理声明目录是连续的页码加标题，不是风险正文。"""
+    return len(_TOC_HEADING.findall(text)) >= 4
+
+
+def clip_memo(text: str, limit: int = _MEMO_CLIP) -> str:
+    if len(text) <= limit:
+        return text
+    return text[:limit].rstrip() + "…"
 
 
 class FinanceDraft(BaseModel):
@@ -126,7 +139,14 @@ def gap_memo() -> str:
 def role_packets(market: MarketData) -> list[Packet]:
     by = {item.section: item for item in market.excerpts}
     business = by.get("business")
-    risk_bits = [by[key].text for key in ("risk_factors", "governance") if key in by]
+    risk_bits = []
+    for key in ("risk_factors", "governance"):
+        item = by.get(key)
+        if item is None:
+            continue
+        if key == "governance" and looks_like_toc(item.text):
+            continue
+        risk_bits.append(item.text)
     competition = by.get("competition")
     packets = [
         Packet("business", "excerpt", f"商业模式：{business.text}") if business
@@ -140,7 +160,7 @@ def role_packets(market: MarketData) -> list[Packet]:
 
 
 def role_memo(market: MarketData) -> str:
-    return " ".join(packet.text for packet in role_packets(market))
+    return " ".join(clip_memo(packet.text) for packet in role_packets(market))
 
 
 def role_gap_labels(market: MarketData) -> list[str]:
@@ -214,8 +234,8 @@ async def run_workflow(
         _write_trace(finished, trace_dir)
         return finished
     if runner is None or not model:
-        finished = _finish(run, Packet("finance", "abstain", "没有 Codex，价值信号弃权"), market)
-        finished.abstain_reason = "没有 Codex，价值信号弃权"
+        finished = _finish(run, Packet("finance", "abstain", "未调用模型，价值信号弃权"), market)
+        finished.abstain_reason = "未调用模型，价值信号弃权"
         finished.memo = f"{role_memo(market)} {finished.abstain_reason}"
         _write_trace(finished, trace_dir)
         return finished

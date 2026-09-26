@@ -16,8 +16,8 @@ from signal_chain.schema import (
 
 def _signal(**kw):
     base = dict(
-        signal_id="dsa-US.AAPL-2026-09-23-deadbeef",
-        engine="dsa",
+        signal_id="trend-US.AAPL-2026-09-23-deadbeef",
+        engine="trend",
         raw_report_ref="/tmp/x.md",
         ticker="US.AAPL",
         market="US",
@@ -56,7 +56,7 @@ def test_ticker_parse():
     assert parse_ticker("600519").canonical == "CN.600519"
     assert parse_ticker("600519.SS").ta_format == "600519.SS"
     t = parse_ticker("HK.00700")
-    assert (t.ta_format, t.dsa_format, t.futu_format) == ("0700.HK", "hk00700", "HK.00700")
+    assert (t.ta_format, t.futu_format) == ("0700.HK", "HK.00700")
 
 
 def test_chain_atm_iv():

@@ -12,12 +12,12 @@ from ..schema import Direction
 class RawBundle:
     """引擎原始输出的归一化载体。确定性字段在此算好，文本留给抽取 agent。"""
 
-    engine: str                      # tradingagents / dsa
+    engine: str                      # 引擎标识
     ticker: str                      # 归一格式
     market: str
     as_of: date
     report_ref: str                  # 原始报告路径
-    direction: Direction | None      # None = 信号作废（如 TA REVIEW）
+    direction: Direction | None      # None = 信号作废
     conviction: float = 0.0
     data_sources: list[str] = field(default_factory=list)
     engine_version: str | None = None

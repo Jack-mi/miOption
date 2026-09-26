@@ -1,4 +1,4 @@
-"""三个信号只读 MarketData。研究信号和价值信号没有 Codex 就弃权。"""
+"""三个信号只读 MarketData。研究信号和价值信号未调用模型就弃权。"""
 
 from __future__ import annotations
 
@@ -126,7 +126,7 @@ def _with_calls(bundle: RawBundle, calls: list[dict], model: str | None) -> RawB
 
 async def research_signal(market: MarketData, pack: str, runner, model: str | None) -> RawBundle:
     if runner is None or not model:
-        return _abstain("research", market, "没有 Codex，研究信号弃权")
+        return _abstain("research", market, "未调用模型，研究信号弃权")
     prompt = (
         "你只根据下面的证据摘要做评级。缺失的均线、资金流、财务、新闻、社交不能写成事实。"
         "投研备忘录里已经写成缺失的商业模式、竞争、风险不能补成事实。"

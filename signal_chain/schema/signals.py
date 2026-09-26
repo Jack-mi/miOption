@@ -44,7 +44,7 @@ def make_signal_id(engine: str, ticker: str, as_of: date, seed: str) -> str:
 class EngineSignal(BaseModel):
     # 身份与溯源
     signal_id: str
-    engine: str  # tradingagents / dsa
+    engine: str
     engine_version: str | None = None
     raw_report_ref: str
     data_sources: list[str] = Field(default_factory=list)

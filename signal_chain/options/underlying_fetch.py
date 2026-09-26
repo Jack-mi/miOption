@@ -13,7 +13,7 @@ import subprocess
 from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
-from ..config import REPO_ROOT, RUNTIME_VENV_PY, NormTicker, Settings
+from ..config import REPO_ROOT, require_runtime_python, NormTicker, Settings
 from ..schema.underlying import (
     DailyBar,
     FieldMeta,
@@ -273,8 +273,12 @@ def _json_line(stdout: str) -> dict | None:
 
 def probe_futu(t: NormTicker, trade_date: date, settings: Settings) -> tuple[dict | None, str | None]:
     cfg = settings.chain
+    try:
+        runtime_py = require_runtime_python()
+    except FileNotFoundError as exc:
+        return None, str(exc)
     cmd = [
-        str(RUNTIME_VENV_PY), "-m", "signal_chain.options.underlying_bridge",
+        str(runtime_py), "-m", "signal_chain.options.underlying_bridge",
         t.futu_format, trade_date.isoformat(),
         str(cfg["futu_opend_host"]), str(cfg["futu_opend_port"]),
     ]
@@ -294,16 +298,21 @@ def probe_futu(t: NormTicker, trade_date: date, settings: Settings) -> tuple[dic
 
 
 def probe_yahoo(t: NormTicker, trade_date: date) -> tuple[dict | None, str | None]:
-    try:
-        import yfinance as yf
-        from zoneinfo import ZoneInfo
+    from .yfinance_chain import run_yahoo
 
-        hist = yf.Ticker(t.ta_format).history(
+    def _history():
+        import yfinance as yf
+        return yf.Ticker(t.ta_format).history(
             start=trade_date - timedelta(days=120),
             end=trade_date + timedelta(days=1),
             interval="1d",
             auto_adjust=True,
         )
+
+    try:
+        from zoneinfo import ZoneInfo
+
+        hist = run_yahoo(_history, label=t.ta_format)
     except Exception as exc:
         return None, str(exc)[:400]
     if hist is None or hist.empty:

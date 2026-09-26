@@ -419,6 +419,7 @@ def screen_menu(
     *,
     account_equity: float | None = None,
     equity_currency: str | None = None,
+    equity_note: str | None = None,
     earnings_blackout_days: int = 10,
     min_open_interest: int = 100,
     max_spread_pct: float = 0.10,
@@ -450,6 +451,7 @@ def screen_menu(
                     max_spread_pct=max_spread_pct,
                     account_equity=account_equity,
                     equity_currency=equity_currency,
+                    equity_note=equity_note,
                     max_position_risk_pct=max_position_risk_pct,
                     today=today,
                 )

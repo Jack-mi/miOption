@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 
-from ..config import REPO_ROOT, NormTicker, RUNTIME_VENV_PY, Settings
+from ..config import REPO_ROOT, NormTicker, require_runtime_python, Settings
 from ..schema import ChainSnapshot
 from .yfinance_chain import fetch_chain_yfinance
 
@@ -15,7 +15,7 @@ _BRIDGE_TIMEOUT = 120
 def _fetch_chain_futu(t: NormTicker, settings: Settings) -> ChainSnapshot:
     cfg = settings.chain
     cmd = [
-        str(RUNTIME_VENV_PY), "-m", "signal_chain.options.futu_bridge",
+        str(require_runtime_python()), "-m", "signal_chain.options.futu_bridge",
         t.futu_format, str(cfg["expiry_window_days"]),
         str(cfg["futu_opend_host"]), str(cfg["futu_opend_port"]),
     ]

@@ -143,7 +143,7 @@ async def process_ticker(
         ensemble = ensemble.model_copy(update={
             "catalysts": [*ensemble.catalysts, earnings]})
 
-    # 6. [CODEX] 合成说明
+    # 6. 合成说明（Claude Agent SDK）
     if runner is not None:
         ensemble, meta = await synthesize_notes(runner, ensemble, models["synthesis"])
         if meta:
@@ -165,6 +165,7 @@ async def process_ticker(
         holds_shares=shares >= 100,
         account_equity=account["value"] if account else None,
         equity_currency=account["currency"] if account else None,
+        equity_note=account.get("note") if account else None,
         earnings_blackout_days=risk_cfg["earnings_blackout_days"],
         min_open_interest=risk_cfg["min_open_interest"],
         max_spread_pct=risk_cfg["max_spread_pct"],

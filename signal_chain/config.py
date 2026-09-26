@@ -6,8 +6,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-import sys
-
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -17,7 +15,16 @@ SIGNALS_DIR = REPO_ROOT / "signals"
 CHAINS_DIR = REPO_ROOT / "chains"
 REPORTS_DIR = REPO_ROOT / "reports"
 RUNS_DIR = REPO_ROOT / "runs"
-RUNTIME_VENV_PY = Path(sys.executable)
+# futu-api 只装在这个解释器里。缺失就报这条路径，不用当前进程的 Python 顶上。
+RUNTIME_VENV_PY = REPO_ROOT / "runtime" / ".venv" / "bin" / "python"
+
+
+def require_runtime_python() -> Path:
+    if not RUNTIME_VENV_PY.is_file():
+        raise FileNotFoundError(
+            f"富途桥需要 {RUNTIME_VENV_PY}，不会改用当前解释器"
+        )
+    return RUNTIME_VENV_PY
 
 
 def _load_yaml() -> dict[str, Any]:
@@ -71,19 +78,12 @@ class NormTicker:
 
     @property
     def ta_format(self) -> str:
-        """TradingAgents/Yahoo 格式：AAPL / 0700.HK / 600519.SS。"""
+        """Yahoo Finance 格式：AAPL / 0700.HK / 600519.SS。"""
         if self.market == "HK":
             return f"{str(int(self.code)).zfill(4)}.HK"  # Yahoo 用 4 位港股代码
         if self.market == "CN":
             suffix = ".SS" if self.code.startswith("6") else ".SZ"
             return f"{self.code}{suffix}"
-        return self.code
-
-    @property
-    def dsa_format(self) -> str:
-        """DSA 格式：AAPL / hk00700 / 600519。"""
-        if self.market == "HK":
-            return f"hk{self.code}"
         return self.code
 
     @property

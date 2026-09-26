@@ -85,6 +85,14 @@ def test_equity_exposure():
     assert any("上限" in v for v in d.vetoes)  # 450 > 250
 
 
+def test_equity_note_names_usd_cash_only():
+    d = check_proposal(_spread(), _ensemble(), _chain(),
+                       account_equity=5000.0, equity_currency="USD",
+                       equity_note="仅美元现金，未计入其他币种",
+                       max_position_risk_pct=0.05)
+    assert any("仅美元现金，未计入其他币种" in v for v in d.vetoes)
+
+
 def test_clean_pass():
     d = check_proposal(_spread(), _ensemble(), _chain(),
                        account_equity=100000.0, equity_currency="USD")

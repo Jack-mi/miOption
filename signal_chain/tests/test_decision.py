@@ -76,11 +76,11 @@ async def _one(name, market):
     return next(s for s in signals if s.engine == name)
 
 
-def test_research_and_value_abstain_without_codex():
+def test_research_and_value_abstain_without_model():
     signals = asyncio.run(build_signals(_market(), None, None))
     by = {b.engine: b for b in signals}
     assert by["research"].data_status == "insufficient_data"
-    assert "没有 Codex" in by["research"].data_gaps[0]
+    assert "未调用模型" in by["research"].data_gaps[0]
     assert by["value"].data_status == "insufficient_data"
     assert "财务未标可用" in by["value"].texts["analysis"]
 
@@ -121,4 +121,4 @@ def test_render_keeps_each_signal():
     assert "### trend" in text
     assert "### research" in text
     assert "### value" in text
-    assert "没有 Codex" in text
+    assert "未调用模型" in text

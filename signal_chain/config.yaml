@@ -18,7 +18,7 @@ risk:
   earnings_blackout_days: 10          # 财报窗口内禁止 short-vol 结构
   min_open_interest: 100              # 单腿最低持仓量
   max_spread_pct: 0.10                # 单腿 (ask-bid)/mid 上限
-  auto_account_equity: true           # 从 Futu REAL 账户只读查询；US=usd_assets，HK=hkd_assets
+  auto_account_equity: true           # 美股用总资产折美元；没有汇率时用 usd_assets 并注明
   max_position_risk_pct: 0.05         # 单标的新结构最大亏损占权益比
 
 chain:

@@ -4,7 +4,7 @@ import asyncio
 import json
 from datetime import date, datetime, timezone
 
-from signal_chain.data.models import Fact, MarketData
+from signal_chain.data.models import Fact, FilingExcerpt, MarketData
 from signal_chain.decision.signals import build_signals
 from signal_chain.options.underlying_fetch import build_snapshot
 from signal_chain.schema.underlying import FieldMeta
@@ -54,10 +54,10 @@ def test_missing_fundamentals_do_not_call_the_model():
     assert runner.agents == ["research"]
 
 
-def test_no_codex_keeps_gap_packets():
+def test_no_model_keeps_gap_packets():
     signals = asyncio.run(build_signals(_market(), None, None))
     value = next(s for s in signals if s.engine == "value")
-    assert "没有 Codex" in value.texts["analysis"]
+    assert "未调用模型" in value.texts["analysis"]
     assert "竞争：缺失" in value.texts["analysis"]
     assert "风险：缺失" in value.texts["analysis"]
     assert value.meta == {}
@@ -88,3 +88,23 @@ def test_verifier_drops_numbers_absent_from_the_slice(tmp_path):
     assert {p["id"] for p in trace["packets"]} == {"business", "competition", "risk", "finance"}
     assert "营收 999.0" in trace["rejected_claims"]
     assert all(p["status"] == "gap" for p in trace["packets"] if p["id"] != "finance")
+
+
+def test_governance_toc_stays_out_and_role_lines_are_clipped():
+    from signal_chain.research.workflow import role_memo, role_packets
+
+    toc = (
+        "13 Our Corporate Governance Framework 14 Role of the Board "
+        "15 Board Independence 17 Board Meetings 20 Annual Board"
+    )
+    market = _market()
+    market.excerpts = [
+        FilingExcerpt("competition", "markets " * 80, "edgar"),
+        FilingExcerpt("governance", toc, "edgar"),
+    ]
+    packets = {packet.id: packet for packet in role_packets(market)}
+    assert packets["risk"].status == "gap"
+    memo = role_memo(market)
+    assert "13 Our" not in memo
+    assert "竞争：" in memo and "…" in memo
+    assert len(memo.split("风险：")[0]) < 220

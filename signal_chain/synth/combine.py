@@ -113,7 +113,7 @@ def combine(
     single_source_discount: float = 0.7,
     max_asof_gap_days: int = 1,
 ) -> EnsembleSignal:
-    """把全部可投票的 EngineSignal 合成。notes/dissent 由 Codex 后补。"""
+    """把全部可投票的 EngineSignal 合成。notes/dissent 由 Claude Agent SDK 后补。"""
     if not signals:
         raise ValueError("combine() 需要至少一条信号")
 

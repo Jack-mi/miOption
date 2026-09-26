@@ -2,9 +2,32 @@
 
 from __future__ import annotations
 
+import threading
 from datetime import date, datetime, timedelta, timezone
 
 from ..schema import ChainSnapshot, OptionRow
+
+YAHOO_TIMEOUT_S = 15
+
+
+def run_yahoo(fn, *, label: str):
+    """在守护线程里打 Yahoo，超时就返回，不把进程挂住。"""
+    box: dict = {}
+
+    def target() -> None:
+        try:
+            box["value"] = fn()
+        except Exception as exc:
+            box["error"] = exc
+
+    thread = threading.Thread(target=target, daemon=True)
+    thread.start()
+    thread.join(YAHOO_TIMEOUT_S)
+    if thread.is_alive():
+        raise TimeoutError(f"yfinance 超时（{YAHOO_TIMEOUT_S}s）: {label}")
+    if "error" in box:
+        raise box["error"]
+    return box["value"]
 
 
 def _f(v):
@@ -22,6 +45,17 @@ def _i(v):
 
 def fetch_chain_yfinance(ta_ticker: str, market: str, canonical: str,
                          window_days: int = 60) -> ChainSnapshot:
+    try:
+        return run_yahoo(
+            lambda: _fetch_chain_yfinance(ta_ticker, market, canonical, window_days),
+            label=ta_ticker,
+        )
+    except TimeoutError as exc:
+        raise RuntimeError(str(exc)) from exc
+
+
+def _fetch_chain_yfinance(ta_ticker: str, market: str, canonical: str,
+                          window_days: int) -> ChainSnapshot:
     import yfinance as yf
 
     t = yf.Ticker(ta_ticker)
