@@ -22,7 +22,7 @@ from .pipeline.steps import synthesize_notes
 from .risk.limits import check_signal
 from .risk.account_equity import read_account_equity
 from .research.berkshire import earnings_catalyst
-from .schema import Direction, EngineSignal, EnsembleSignal, make_signal_id
+from .schema import EngineSignal, EnsembleSignal
 from .storage import RunLedger, append_signal, write_chain, write_coverage, write_report
 from .synth.combine import combine
 

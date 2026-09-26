@@ -6,7 +6,6 @@ import contextlib
 import io
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timezone
-from pathlib import Path
 
 from ..config import NormTicker, Settings
 from ..options.chain_fetch import fetch_chain

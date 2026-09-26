@@ -12,7 +12,6 @@ import contextlib
 import importlib.util
 import io
 from datetime import date, datetime
-from pathlib import Path
 
 from ..config import REPO_ROOT
 from ..schema import Catalyst

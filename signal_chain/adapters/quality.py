@@ -26,9 +26,6 @@ def report_data_gaps(text: str) -> list[str]:
     return [f"报告标明关键数据缺失: {', '.join(hits)}"]
 
 
-OPINION_NOTE = "自身未取到行情，观点保留，价格以富途快照为准"
-
-
 def apply_data_gate(
     bundle: RawBundle,
     text: str,
