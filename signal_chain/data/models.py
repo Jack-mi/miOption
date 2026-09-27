@@ -42,6 +42,7 @@ class Fact:
     metric: str
     period: str
     value: float
+    filed: str = ""
 
 
 @dataclass

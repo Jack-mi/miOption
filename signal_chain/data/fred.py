@@ -8,6 +8,7 @@ SERIES = (
     ("FEDERAL_FUNDS_RATE", "DFF"),
     ("CPI", "CPIAUCSL"),
     ("UNEMPLOYMENT", "UNRATE"),
+    ("DGS10", "DGS10"),
 )
 
 

@@ -202,6 +202,8 @@ def test_macro_reads_latest_fred_observation():
             return {"observations": [{"date": "2026-08-01", "value": "326.8"}]}
         if "series_id=UNRATE" in url:
             return {"observations": [{"date": "2026-08-01", "value": "4.3"}]}
+        if "series_id=DGS10" in url:
+            return {"observations": [{"date": "2026-09-25", "value": "4.16"}]}
         if "sec.gov" in url or "stocktwits" in url:
             return _edgar_get(url, headers)
         raise AssertionError(url)
@@ -213,6 +215,8 @@ def test_macro_reads_latest_fred_observation():
     assert by_series["FEDERAL_FUNDS_RATE"].source == "fred"
     assert by_series["CPI"].value == 326.8
     assert by_series["UNEMPLOYMENT"].value == 4.3
+    assert by_series["DGS10"].as_of == date(2026, 9, 25)
+    assert by_series["DGS10"].value == 4.16
     assert ("fred", "used") in _states(market, "macro")
     assert ("fmp", "used") not in _states(market, "macro")
     assert ("nyfed", "used") not in _states(market, "macro")
@@ -293,6 +297,29 @@ def test_social_stays_missing_without_reddit_credentials():
     assert market.social == []
     assert ("reddit", "missing") in _states(market, "social")
     assert all(row.id != "stocktwits" for row in market.sources)
+
+
+def test_annual_history_keeps_ten_years_and_filing_date():
+    def year(end, val, filed):
+        return {"form": "10-K", "val": val, "end": end, "start": f"{int(end[:4]) - 1}-09-28", "filed": filed, "fp": "FY"}
+
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"USD": [year("2024-09-28", 100, "2024-11-01"), year("2025-09-27", 200, "2025-10-31")]}},
+        "NetCashProvidedByUsedInOperatingActivities": {"units": {"USD": [year("2025-09-27", 80, "2025-10-31")]}},
+        "PaymentsToAcquirePropertyPlantAndEquipment": {"units": {"USD": [year("2025-09-27", 30, "2025-10-31")]}},
+        "CashAndCashEquivalentsAtCarryingValue": {"units": {"USD": [
+            {"form": "10-K", "val": 50, "end": "2025-09-27", "filed": "2025-10-31"},
+        ]}},
+    }, "dei": {"EntityCommonStockSharesOutstanding": {"units": {"shares": [
+        {"form": "10-K", "val": 15, "end": "2025-09-27", "filed": "2025-10-31"},
+    ]}}}}}
+    rows = edgar.annual_history(facts)
+    revenue = [row for row in rows if row[0] == "revenue"]
+    assert [row[1] for row in revenue] == ["FY2025", "FY2024"]
+    assert revenue[0][3] == "2025-10-31"
+    fcf = next(row for row in rows if row[0] == "free_cash_flow" and row[1] == "FY2025")
+    assert fcf[2] == 50
+    assert any(row[0] == "shares_outstanding" and row[2] == 15 for row in rows)
 
 
 def test_risk_compression_context_is_only_the_filing():

@@ -111,6 +111,104 @@ def _annual_usd(facts: dict, names: tuple[str, ...]) -> tuple[float, str] | None
     return None
 
 
+_FLOW_SERIES = {
+    "net_income": ("NetIncomeLoss",),
+    "operating_cash_flow": ("NetCashProvidedByUsedInOperatingActivities",),
+    "capex": ("PaymentsToAcquirePropertyPlantAndEquipment",),
+    "buybacks": ("PaymentsForRepurchaseOfCommonStock",),
+}
+_STOCK_SERIES = {
+    "cash": ("CashAndCashEquivalentsAtCarryingValue",),
+    "long_term_debt": ("LongTermDebtNoncurrent", "LongTermDebt"),
+}
+_HISTORY_YEARS = 10
+
+
+def _units(facts: dict, namespace: str, name: str, unit: str) -> list:
+    return (
+        (((facts.get("facts") or {}).get(namespace) or {}).get(name) or {})
+        .get("units", {})
+        .get(unit)
+        or []
+    )
+
+
+def _instant_annual(units: list) -> list:
+    rows = []
+    for row in units:
+        if not isinstance(row, dict):
+            continue
+        if row.get("form") not in {"10-K", "20-F"} or row.get("val") is None or not row.get("end"):
+            continue
+        if row.get("start"):
+            continue
+        rows.append(row)
+    return rows
+
+
+def _by_year(rows: list, limit: int = _HISTORY_YEARS) -> list[dict]:
+    chosen: dict[str, dict] = {}
+    for row in rows:
+        end = str(row.get("end") or "")[:10]
+        if len(end) < 10:
+            continue
+        year = end[:4]
+        prev = chosen.get(year)
+        if prev is None or end > str(prev.get("end")):
+            chosen[year] = row
+    years = sorted(chosen, reverse=True)[:limit]
+    return [chosen[year] for year in years]
+
+
+def _tagged_years(facts: dict, names: tuple[str, ...], *, flow: bool) -> list[dict]:
+    found: dict[str, dict] = {}
+    for name in names:
+        units = _units(facts, "us-gaap", name, "USD")
+        rows = _full_year_usd(units) if flow else _instant_annual(units) or _full_year_usd(units)
+        for row in _by_year(rows, limit=40):
+            year = str(row["end"])[:4]
+            if year not in found:
+                found[year] = row
+    return _by_year(list(found.values()))
+
+
+def _fact_row(metric: str, row: dict) -> tuple[str, str, float, str]:
+    end = str(row["end"])[:10]
+    filed = str(row.get("filed") or "")[:10]
+    return metric, f"FY{end[:4]}", float(row["val"]), filed
+
+
+def annual_history(facts: dict) -> list[tuple[str, str, float, str]]:
+    """近十年年报。每项是科目、FY、数值、申报日。同一财年只留一行。"""
+    out: list[tuple[str, str, float, str]] = []
+    revenue_years: dict[str, dict] = {}
+    for name in _REVENUE_TAGS:
+        for row in _by_year(_full_year_usd(_units(facts, "us-gaap", name, "USD")), limit=40):
+            year = str(row["end"])[:4]
+            if year not in revenue_years:
+                revenue_years[year] = row
+    for row in _by_year(list(revenue_years.values())):
+        out.append(_fact_row("revenue", row))
+    flows: dict[str, dict[str, float]] = {}
+    for metric, names in _FLOW_SERIES.items():
+        rows = _tagged_years(facts, names, flow=True)
+        flows[metric] = {str(row["end"])[:4]: float(row["val"]) for row in rows}
+        out.extend(_fact_row(metric, row) for row in rows)
+    for metric, names in _STOCK_SERIES.items():
+        out.extend(_fact_row(metric, row) for row in _tagged_years(facts, names, flow=False))
+    for row in _by_year(_instant_annual(_units(facts, "dei", "EntityCommonStockSharesOutstanding", "shares"))):
+        out.append(_fact_row("shares_outstanding", row))
+    for row in _by_year(_full_year_usd(_units(
+        facts, "us-gaap", "CommonStockDividendsPerShareDeclared", "USD/shares",
+    ))):
+        out.append(_fact_row("dividends_per_share", row))
+    income = flows.get("operating_cash_flow") or {}
+    capex = flows.get("capex") or {}
+    for year in sorted(set(income) & set(capex), reverse=True)[:_HISTORY_YEARS]:
+        out.append(("free_cash_flow", f"FY{year}", income[year] - abs(capex[year]), ""))
+    return out
+
+
 def derived_ratios(facts: dict) -> dict[str, tuple[float, str]]:
     """从年报 XBRL 算出 ROE、自由现金流、利息覆盖。缺组成项就不算。"""
     income = _annual_usd(facts, ("NetIncomeLoss",))

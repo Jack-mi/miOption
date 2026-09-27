@@ -463,6 +463,18 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
         if quarter is not None:
             keep(quarter_values, quarter_periods, quarter_ends, "edgar", quarter[0], quarter[1], "revenue",
                  _period_end(quarter[1]), quarter[1])
+        if facts_payload:
+            seen = {(item.source, item.metric, item.period) for item in facts}
+            added = 0
+            for metric, period, value, filed in edgar.annual_history(facts_payload):
+                key = ("edgar", metric, period)
+                if key in seen:
+                    continue
+                seen.add(key)
+                facts.append(Fact("edgar", metric, period, value, filed))
+                added += 1
+            if added:
+                rows.append(_row("edgar", "fundamentals", "used", f"十年序列 {added}"))
         if not keys.get("FMP_API_KEY"):
             rows.append(_row("fmp", "fundamentals", "skipped", "没有 FMP_API_KEY"))
         elif not quota():
@@ -491,7 +503,8 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
         rows.append(_row("fmp", "fundamentals", "unsupported", "只覆盖美股"))
     ratio_rows, ratio_facts, ratios = _accept_ratios(_ratio_candidates(t, facts_payload))
     rows.extend(ratio_rows)
-    facts.extend(ratio_facts)
+    have = {(item.metric, item.period) for item in facts}
+    facts.extend(fact for fact in ratio_facts if (fact.metric, fact.period) not in have)
     annual_end = max(annual_ends, default=None)
     quarter_end = max(quarter_ends, default=None)
     if quarter_values and quarter_end and (annual_end is None or quarter_end > annual_end):

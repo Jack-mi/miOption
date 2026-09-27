@@ -95,7 +95,8 @@ def _fundamentals(market: MarketData) -> str:
         return f"财报缺失: {fund.error or fund.status}"
     lines = [f"财报: available，出处 {fund.source or '无出处'}，期间 {fund.period or '无期间'}"]
     for fact in market.facts:
-        lines.append(f"- {fact.metric}: {fact.value}，出处 {fact.source}，期间 {fact.period}")
+        filed = f"，申报 {fact.filed}" if fact.filed else ""
+        lines.append(f"- {fact.metric}: {fact.value}，出处 {fact.source}，期间 {fact.period}{filed}")
     for ratio in market.ratios:
         lines.append(f"- {ratio.metric}: {ratio.value}，出处 {ratio.source}，期间 {ratio.period}")
     return "\n".join(lines)
