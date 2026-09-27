@@ -40,11 +40,11 @@ def _market(*, flow_net=12.0, fundamentals=False):
         )})
     if fundamentals:
         snap = snap.model_copy(update={"fundamentals": FieldMeta(
-            status="available", source="edgar,yfinance", as_of=D0,
+            status="available", source="edgar,fmp", as_of=D0,
             fetched_at=NOW, period="FY2026",
         )})
     snap = snap.model_copy(update={"news": FieldMeta(
-        status="available", source="yfinance", as_of=D0, fetched_at=NOW,
+        status="available", source="fmp", as_of=D0, fetched_at=NOW,
     )})
     return MarketData(snapshot=snap, flow_net=flow_net, news_text="一条标题")
 
@@ -57,7 +57,7 @@ def test_pack_keeps_flow_and_news_and_marks_missing_roles():
     assert "竞争缺失" in text
     assert "风险缺失" in text
     assert "宏观缺失" in text
-    assert "财务缺失" in text
+    assert "财报缺失" in text
 
 
 def test_trend_scores_only_available_faces():

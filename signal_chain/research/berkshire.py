@@ -40,9 +40,10 @@ def attach_fundamentals(
     values: dict[str, float],
     as_of: date,
     fetched_at: datetime,
+    require_pair: bool = True,
 ) -> UnderlyingSnapshot:
-    """两源以上且偏差 ≤1% 才标 available。不把共识数值写进快照。"""
-    if len(values) < 2:
+    """EDGAR 单源可以可用。两源都在时，偏差超过 1% 不标 available。不把数值写进快照。"""
+    if len(values) < 2 and require_pair:
         meta = FieldMeta(
             status="missing",
             source="financial-data",
@@ -50,6 +51,19 @@ def attach_fundamentals(
             fetched_at=fetched_at,
             period=period,
             error=f"{metric} 缺少第二个独立来源",
+        )
+        return snapshot.model_copy(update={"fundamentals": meta})
+    if len(values) == 1:
+        source = next(iter(values))
+        meta = FieldMeta(
+            status="available", source=source, as_of=as_of, fetched_at=fetched_at,
+            period=period, error=None,
+        )
+        return snapshot.model_copy(update={"fundamentals": meta})
+    if not values:
+        meta = FieldMeta(
+            status="missing", source=None, as_of=as_of, fetched_at=fetched_at,
+            period=period, error=f"{metric} 没有来源",
         )
         return snapshot.model_copy(update={"fundamentals": meta})
     result = _cross_validate(metric, values)

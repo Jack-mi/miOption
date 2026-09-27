@@ -78,9 +78,9 @@ class NormTicker:
 
     @property
     def ta_format(self) -> str:
-        """Yahoo Finance 格式：AAPL / 0700.HK / 600519.SS。"""
+        """代码形态：AAPL / 0700.HK / 600519.SS。"""
         if self.market == "HK":
-            return f"{str(int(self.code)).zfill(4)}.HK"  # Yahoo 用 4 位港股代码
+            return f"{str(int(self.code)).zfill(4)}.HK"
         if self.market == "CN":
             suffix = ".SS" if self.code.startswith("6") else ".SZ"
             return f"{self.code}{suffix}"

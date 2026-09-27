@@ -5,18 +5,18 @@ from __future__ import annotations
 import contextlib
 import io
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from ..config import NormTicker, Settings
 from ..options.chain_fetch import fetch_chain
 from ..options.underlying_fetch import (
     build_snapshot,
     probe_futu,
-    probe_yahoo,
 )
 from ..research.berkshire import _cross_validate, attach_fundamentals, note_earnings
 from ..schema.underlying import FieldMeta
-from . import alphavantage, eastmoney, edgar, polymarket, reddit, stocktwits, yahoo
+from . import earnings_calendar, edgar, finnhub, fmp, fred, polymarket, reddit
+from ..sessions import session_for
 from .http import get_json, get_text
 from .keys import load_keys
 from .models import (
@@ -24,9 +24,6 @@ from .models import (
 )
 
 _MACRO: dict[str, tuple[list[MacroPoint], list[SourceRow]]] = {}
-_MACRO_FUNCTIONS = ("FEDERAL_FUNDS_RATE", "CPI", "UNEMPLOYMENT")
-_EFFR_URL = "https://markets.newyorkfed.org/api/rates/unsecured/effr/last/1.json"
-_REVENUE_PREFER = ("edgar", "alphavantage", "yfinance", "eastmoney")
 
 
 def _row(source: str, field: str, state: str, note: str = "") -> SourceRow:
@@ -69,7 +66,7 @@ def _price_rows(snap, tried: dict[str, str]) -> list[SourceRow]:
     rows = []
     for field, meta in (("quote", snap.quote.meta), ("kline", snap.kline.meta)):
         winner = meta.source
-        for source in ("futu", "yfinance", "alphavantage"):
+        for source in ("futu", "fmp"):
             if source not in tried and source != "futu":
                 continue
             if winner == source and meta.status == "available":
@@ -99,136 +96,76 @@ def _news_meta(text: str | None, source: str, as_of: date, fetched_at: datetime,
     return _meta("missing", source, None, fetched_at, error or "无标题")
 
 
-def _effr(payload: dict) -> tuple[date, float] | None:
-    rows = payload.get("refRates") if isinstance(payload, dict) else None
-    if not rows:
-        return None
-    row = rows[0]
-    day = str(row.get("effectiveDate") or "")[:10]
-    try:
-        return date.fromisoformat(day), float(row["percentRate"])
-    except (TypeError, ValueError):
-        return None
-
-
 def load_macro(keys: dict[str, str], today: date, get=get_json, quota=None) -> tuple[list[MacroPoint], list[SourceRow]]:
     cached = _MACRO.get(today.isoformat())
     if cached is not None:
         return cached
-    if not keys.get("ALPHAVANTAGE_API_KEY"):
-        result = ([], [_row("alphavantage", "macro", "skipped", "没有 ALPHAVANTAGE_API_KEY")])
+    if not keys.get("FRED_API_KEY"):
+        result = ([], [_row("fred", "macro", "skipped", "没有 FRED_API_KEY")])
         _MACRO[today.isoformat()] = result
         return result
-    quota = quota or (lambda: alphavantage.take_quota(today))
     points: list[MacroPoint] = []
     errors: list[str] = []
-    rate: MacroPoint | None = None
-    for function in _MACRO_FUNCTIONS:
-        if not quota():
-            errors.append(f"{function}: 当日额度用尽")
-            continue
-        url = (
-            "https://www.alphavantage.co/query"
-            f"?function={function}&interval=monthly&apikey={keys['ALPHAVANTAGE_API_KEY']}"
-        )
+    for series, series_id in fred.SERIES:
         try:
-            obs = alphavantage.latest_indicator(get(url))
+            payload = get(fred.observations_url(series_id, keys["FRED_API_KEY"]))
+            obs = fred.latest(payload)
         except Exception as exc:
-            errors.append(f"{function}: {str(exc)[:80]}")
+            errors.append(f"{series}: {fred.public_error(exc)}")
             continue
         if obs is None:
-            errors.append(f"{function}: 无观测")
+            errors.append(f"{series}: 无观测")
             continue
-        point = MacroPoint(function, obs[0], obs[1])
-        points.append(point)
-        if function == "FEDERAL_FUNDS_RATE":
-            rate = point
-    rows: list[SourceRow] = []
-    if any(point.source == "alphavantage" for point in points):
-        rows.append(_row("alphavantage", "macro", "used"))
+        points.append(MacroPoint(series, obs[0], obs[1], "fred"))
+    if points:
+        rows = [_row("fred", "macro", "used", "；".join(f"{point.series} {point.as_of.isoformat()}" for point in points))]
     else:
-        rows.append(_row("alphavantage", "macro", "missing", "；".join(errors) or "无观测"))
-    if rate is None:
-        try:
-            obs = _effr(get(_EFFR_URL))
-        except Exception as exc:
-            obs = None
-            errors.append(f"EFFR: {str(exc)[:80]}")
-        if obs is None:
-            rows.append(_row("nyfed", "macro", "missing", next((item for item in errors if item.startswith("EFFR")), "无观测")))
-        else:
-            points.append(MacroPoint("FEDERAL_FUNDS_RATE", obs[0], obs[1], "nyfed"))
-            rows.append(_row("nyfed", "macro", "used"))
+        rows = [_row("fred", "macro", "missing", "；".join(errors) or "无观测")]
     result = (points, rows)
     _MACRO[today.isoformat()] = result
     return result
 
 
-def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_probe, yahoo_probe):
-    """报价和日线按富途、Yahoo、Alpha Vantage 级联。资金流用这次富途探测。"""
+def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_probe):
+    """报价和日线按富途、FMP 级联。资金流只用这次富途探测。"""
     tried: dict[str, str] = {}
     futu, futu_error = futu_probe(t, trade_date, settings)
     tried["futu"] = futu_error or "ok"
-    yahoo, yahoo_error = None, None
     from ..options.underlying_fetch import _futu_field_fresh
-    fresh = _futu_field_fresh(futu, trade_date, "quote") and _futu_field_fresh(futu, trade_date, "kline")
-    if fresh:
-        tried["yfinance"] = "skipped"
-        tried["alphavantage"] = "skipped"
-    else:
-        yahoo, yahoo_error = yahoo_probe(t, trade_date)
-        tried["yfinance"] = yahoo_error or "ok"
+    session = session_for(t.market, trade_date)
+    fresh = _futu_field_fresh(futu, session, "quote") and _futu_field_fresh(futu, session, "kline")
     snap = build_snapshot(
         ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
-        futu=futu, futu_error=futu_error, yahoo=yahoo, yahoo_error=yahoo_error,
+        futu=futu, futu_error=futu_error,
     )
-    if (snap.quote.meta.status != "available" or snap.kline.meta.status != "available") and keys.get("ALPHAVANTAGE_API_KEY"):
-        if quota():
-            tried["alphavantage"] = "ok"
-            url = (
-                "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY"
-                f"&symbol={t.ta_format}&apikey={keys['ALPHAVANTAGE_API_KEY']}"
-            )
-            try:
-                payload = get(url)
-                limited = alphavantage.note(payload) if isinstance(payload, dict) else None
-                probe = None if limited else alphavantage.daily_probe(payload)
-                if probe is None:
-                    tried["alphavantage"] = limited or "无日线"
-                else:
-                    snap = build_snapshot(
-                        ticker=t.canonical, market=t.market, trade_date=trade_date,
-                        fetched_at=fetched_at,
-                        futu=_probe_from_snapshot(snap),
-                        yahoo=probe,
-                        futu_error=snap.quote.meta.error,
-                        yahoo_error=None,
-                    )
-                    if snap.quote.meta.source == "yfinance":
-                        snap = snap.model_copy(update={
-                            "quote": snap.quote.model_copy(update={
-                                "meta": snap.quote.meta.model_copy(update={"source": "alphavantage"})
-                            })
-                        })
-                    if snap.kline.meta.source == "yfinance":
-                        snap = snap.model_copy(update={
-                            "kline": snap.kline.model_copy(update={
-                                "meta": snap.kline.meta.model_copy(update={"source": "alphavantage"})
-                            }),
-                            "technical": snap.technical.model_copy(update={
-                                "meta": snap.technical.meta.model_copy(update={
-                                    "source": "alphavantage" if snap.technical.meta.source == "yfinance" else snap.technical.meta.source
-                                })
-                            }),
-                        })
-            except Exception as exc:
-                tried["alphavantage"] = str(exc)[:160]
-        else:
-            tried["alphavantage"] = "当日额度用尽"
-    elif "alphavantage" not in tried:
-        tried["alphavantage"] = "skipped"
+    if fresh:
+        tried["fmp"] = "skipped"
+    elif not keys.get("FMP_API_KEY"):
+        tried["fmp"] = "skipped"
+    elif not quota():
+        tried["fmp"] = "当日额度用尽"
+    else:
+        tried["fmp"] = "ok"
+        url = fmp.endpoint("historical-price-eod/full", keys["FMP_API_KEY"], symbol=t.code)
+        try:
+            payload = get(url)
+            limited = fmp.note(payload)
+            probe = None if limited else fmp.daily_probe(payload)
+            if probe is None:
+                tried["fmp"] = limited or "无日线"
+            else:
+                snap = build_snapshot(
+                    ticker=t.canonical, market=t.market, trade_date=trade_date,
+                    fetched_at=fetched_at,
+                    futu=_probe_from_snapshot(snap),
+                    fallback=probe,
+                    futu_error=snap.quote.meta.error,
+                    fallback_source="fmp",
+                )
+        except Exception as exc:
+            tried["fmp"] = fmp.public_error(exc)
     rows = _price_rows(snap, tried)
-    snap, flow_rows, flow_net = _capital_flow(t, snap, futu, trade_date, fetched_at, get)
+    snap, flow_rows, flow_net = _capital_flow(snap, futu, fetched_at)
     rows.extend(flow_rows)
     return snap, rows, flow_net
 
@@ -239,18 +176,9 @@ def _option_chain(t, settings, chain_fetch):
         chain = chain_fetch(t, settings)
     except Exception as exc:
         chain_error = str(exc)[:300]
-        rows.append(_row("futu", "chain", "missing", chain_error))
-        if t.market != "US":
-            rows.append(_row("yfinance", "chain", "unsupported", "只兜美股"))
-        else:
-            rows.append(_row("yfinance", "chain", "missing", chain_error))
+        rows.append(_row("futu", "chain", "missing", chain_error or "富途不可用"))
         return None, chain_error, rows
-    if chain.source == "futu":
-        rows.append(_row("futu", "chain", "used"))
-        rows.append(_row("yfinance", "chain", "skipped", "上一级已可用"))
-    else:
-        rows.append(_row("futu", "chain", "missing", chain.notes or "已降级"))
-        rows.append(_row("yfinance", "chain", "used"))
+    rows.append(_row("futu", "chain", "used"))
     return chain, None, rows
 
 
@@ -264,15 +192,23 @@ def load(
     get=get_json,
     quota=None,
     futu_probe=probe_futu,
-    yahoo_probe=probe_yahoo,
     chain_fetch=fetch_chain,
-    yahoo_info=None,
-    yahoo_news=None,
     get_text=get_text,
 ) -> MarketData:
     keys = keys if keys is not None else load_keys()
     fetched_at = datetime.now(timezone.utc)
-    quota = quota or (lambda: alphavantage.take_quota(trade_date))
+    if t.market != "US":
+        if t.market != "HK":
+            raise ValueError("只覆盖美股")
+        skeleton = build_snapshot(
+            ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
+        )
+        return MarketData(
+            skeleton, None, "只覆盖美股", [], [], [], [],
+            [_row("loader", "market", "unsupported", "只覆盖美股")],
+            None, None, [], [],
+        )
+    quota = quota or (lambda: fmp.take_quota(trade_date))
     skeleton = build_snapshot(
         ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
     )
@@ -285,20 +221,20 @@ def load(
     with ThreadPoolExecutor(max_workers=8) as pool:
         price_f = pool.submit(
             _price_and_flow, t, trade_date, settings, fetched_at, keys, get, quota,
-            futu_probe, yahoo_probe,
+            futu_probe,
         )
         fund_f = pool.submit(
-            _fundamentals, t, skeleton, trade_date, fetched_at, keys, get, quota, yahoo_info,
+            _fundamentals, t, skeleton, trade_date, fetched_at, keys, get, quota,
         )
         earn_f = pool.submit(
-            _earnings, t, skeleton, trade_date, fetched_at, keys, get, yahoo_info, get_text,
+            _earnings, t, skeleton, trade_date, fetched_at, keys, get, get_text,
         )
         news_f = pool.submit(
-            _news, t, skeleton, trade_date, fetched_at, keys, get, quota, yahoo_news,
+            _news, t, session_for(t.market, trade_date), skeleton, trade_date, fetched_at, keys, get,
         )
         social_f = pool.submit(_social, t, keys, get, trade_date)
         events_f = pool.submit(_events, t, get)
-        macro_f = pool.submit(load_macro, keys, trade_date, get, quota)
+        macro_f = pool.submit(load_macro, keys, trade_date, get)
         chain_f = pool.submit(chain_job)
         snap, price_rows, flow_net = price_f.result()
         fund_snap, fact_rows, facts, ratios = fund_f.result()
@@ -328,41 +264,18 @@ def load(
     )
 
 
-def _capital_flow(t, snap, futu, trade_date, fetched_at, get):
+def _capital_flow(snap, futu, fetched_at):
     raw = (futu or {}).get("capital_flow") if futu else None
     meta = _flow_meta(raw, "futu", fetched_at)
-    rows = []
     if meta.status == "available":
-        rows.append(_row("futu", "capital_flow", "used"))
-        rows.append(_row("eastmoney", "capital_flow", "skipped", "上一级已可用"))
-        return snap.model_copy(update={"capital_flow": meta}), rows, float(raw["net"])
-    if t.market != "HK":
-        rows.append(_row("futu", "capital_flow", "missing", meta.error or ""))
-        rows.append(_row("eastmoney", "capital_flow", "unsupported", "只兜港股"))
-        return snap.model_copy(update={"capital_flow": _meta(
-            "unsupported", None, None, fetched_at, "美股资金流没有兜底")}), rows, None
-    url = (
-        "https://push2.eastmoney.com/api/qt/stock/fflow/kline/get"
-        f"?lmt=1&klt=101&secid={eastmoney.hk_secid(t.code)}"
-        "&fields1=f1,f2,f3,f7&fields2=f51,f52"
+        return snap.model_copy(update={"capital_flow": meta}), [_row("futu", "capital_flow", "used")], float(raw["net"])
+    err = meta.error or "富途不可用"
+    meta = meta.model_copy(update={"error": err})
+    return (
+        snap.model_copy(update={"capital_flow": meta}),
+        [_row("futu", "capital_flow", "missing", err)],
+        None,
     )
-    try:
-        parsed = eastmoney.net_inflow(get(url))
-    except Exception as exc:
-        parsed = None
-        err = str(exc)[:160]
-    else:
-        err = None
-    if parsed is None:
-        rows.append(_row("futu", "capital_flow", "missing", meta.error or ""))
-        rows.append(_row("eastmoney", "capital_flow", "missing", err or "无法确认净流入"))
-        return snap.model_copy(update={"capital_flow": _meta(
-            "missing", "eastmoney", None, fetched_at, err or "无法确认净流入")}), rows, None
-    day, value = parsed
-    rows.append(_row("futu", "capital_flow", "missing", meta.error or ""))
-    rows.append(_row("eastmoney", "capital_flow", "used"))
-    return snap.model_copy(update={"capital_flow": _meta(
-        "available", "eastmoney", date.fromisoformat(day), fetched_at)}), rows, value
 
 
 def _consistent(metric: str, values: dict[str, float]) -> bool:
@@ -373,18 +286,24 @@ def _consistent(metric: str, values: dict[str, float]) -> bool:
         return False
 
 
-def _matching_revenue_pair(values: dict[str, float]) -> dict[str, float] | None:
-    """按来源顺序留下第一对相差在 1% 以内的营收。没有这样的一对就返回空。"""
-    ordered = [name for name in _REVENUE_PREFER if name in values]
-    for index, left in enumerate(ordered):
-        for right in ordered[index + 1:]:
-            pair = {left: values[left], right: values[right]}
-            if _consistent("revenue", pair):
-                return pair
-    return None
+def _choose_revenue(values: dict[str, float], rows: list[SourceRow]) -> tuple[dict[str, float], bool]:
+    """EDGAR 有数就用 EDGAR。FMP 只在缺 EDGAR 时补上；对不上只告警。"""
+    edgar_value = values.get("edgar")
+    fmp_value = values.get("fmp")
+    if edgar_value is not None and fmp_value is not None:
+        pair = {"edgar": edgar_value, "fmp": fmp_value}
+        if _consistent("revenue", pair):
+            return pair, False
+        rows.append(_row("fmp", "fundamentals", "missing", "与 EDGAR 相差超过 1%"))
+        return {"edgar": edgar_value}, True
+    if edgar_value is not None:
+        return {"edgar": edgar_value}, True
+    if fmp_value is not None:
+        return {"fmp": fmp_value}, True
+    return {}, False
 
 
-def _ratio_candidates(t, facts_payload, info: dict) -> dict[str, dict[str, tuple[float, str]]]:
+def _ratio_candidates(t, facts_payload) -> dict[str, dict[str, tuple[float, str]]]:
     found: dict[str, dict[str, tuple[float, str]]] = {}
 
     def put(metric: str, source: str, value: float | None, period: str) -> None:
@@ -395,14 +314,11 @@ def _ratio_candidates(t, facts_payload, info: dict) -> dict[str, dict[str, tuple
     if t.market == "US" and facts_payload:
         for metric, (value, period) in edgar.derived_ratios(facts_payload).items():
             put(metric, "edgar", value, period)
-    put("roe", "yfinance", yahoo.named_float(info, "returnOnEquity"), "TTM")
-    put("free_cash_flow", "yfinance", yahoo.named_float(info, "freeCashflow"), "TTM")
-    put("interest_coverage", "yfinance", yahoo.named_float(info, "interestCoverage"), "TTM")
     return found
 
 
 def _accept_ratios(candidates: dict[str, dict[str, tuple[float, str]]]):
-    prefer = ("edgar", "yfinance", "eastmoney", "alphavantage")
+    prefer = ("edgar",)
     ratios: list[Ratio] = []
     rows: list[SourceRow] = []
     extra: list[Fact] = []
@@ -420,6 +336,55 @@ def _accept_ratios(candidates: dict[str, dict[str, tuple[float, str]]]):
     return rows, extra, ratios
 
 
+def risk_compression_messages(text: str) -> list[dict[str, str]]:
+    """压缩环节的全部上下文：系统指令加上 Item 1A 原文。没有行情、财报数字或上一轮对话。"""
+    return [
+        {
+            "role": "system",
+            "content": (
+                "你是数据链上单独的压缩环节。这次上下文只有下面那份 10-K Item 1A，没有别的材料。"
+                "不要编造原文没有的风险。"
+                "输出不超过 12 条。每条先写一句判断，换行后写「说明：」，用 200 到 400 字写这一条在原文里的具体情况。"
+                "相近的可以合并，但法律、税务、平台和监管也要覆盖到。"
+                "不要前言，不要结尾。"
+            ),
+        },
+        {"role": "user", "content": text},
+    ]
+
+
+def _summarize_risk(text: str) -> tuple[str, str]:
+    """风险因素全文交给单独一次模型调用。没有钥匙或调用失败时，仍只留前 2 万字，并记下全长。"""
+    from ..agents.llm import load_deepseek_key
+
+    key = load_deepseek_key()
+    if not key or len(text) <= 4000:
+        return edgar.risk_excerpt(text)
+    try:
+        summary = _risk_summary(text, key)
+    except Exception:
+        return edgar.risk_excerpt(text)
+    return edgar.risk_excerpt(text, summary)
+
+
+def _risk_summary(text: str, api_key: str) -> str:
+    import httpx
+
+    response = httpx.post(
+        "https://api.deepseek.com/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}"},
+        json={
+            "model": "deepseek-chat",
+            "temperature": 0,
+            "max_tokens": 8192,
+            "messages": risk_compression_messages(text),
+        },
+        timeout=180,
+    )
+    response.raise_for_status()
+    return str(response.json()["choices"][0]["message"]["content"]).strip()
+
+
 def _filing_excerpts(cik: str, submissions: dict, read_text, contact: str) -> list[FilingExcerpt]:
     out: list[FilingExcerpt] = []
     headers = edgar.user_agent(contact)
@@ -428,8 +393,10 @@ def _filing_excerpts(cik: str, submissions: dict, read_text, contact: str) -> li
         try:
             html = read_text(edgar.archive_url(cik, annual["accession"], annual["document"]), headers)
             filed = date.fromisoformat(annual["filed"])
-            for section, text in edgar.excerpts_from_10k(html).items():
-                out.append(FilingExcerpt(section, text, "edgar", filed))
+            for section, (text, quality) in edgar.excerpts_from_10k(html).items():
+                if section == "risk_factors" and not quality.startswith("summary"):
+                    text, quality = _summarize_risk(text)
+                out.append(FilingExcerpt(section, text, "edgar", filed, quality))
         except Exception:
             pass
     proxy = edgar.latest_primary(submissions, {"DEF 14A"})
@@ -444,27 +411,35 @@ def _filing_excerpts(cik: str, submissions: dict, read_text, contact: str) -> li
     return out
 
 
-def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota, yahoo_info):
+def _period_end(label: str) -> date | None:
+    text = label[1:] if label.startswith(("Q", "FY")) and len(label) > 10 else label
+    try:
+        return date.fromisoformat(text[:10])
+    except ValueError:
+        return None
+
+
+def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
     facts: list[Fact] = []
-    values: dict[str, float] = {}
-    periods: dict[str, str] = {}
+    annual_values: dict[str, float] = {}
+    annual_periods: dict[str, str] = {}
+    annual_ends: list[date] = []
+    quarter_values: dict[str, float] = {}
+    quarter_periods: dict[str, str] = {}
+    quarter_ends: list[date] = []
     period = f"FY{trade_date.year}"
     rows: list[SourceRow] = []
     contact = keys.get("EDGAR_CONTACT", "")
     facts_payload = None
-    info_box: dict = {}
 
-    def info_for() -> dict:
-        if "value" not in info_box:
-            raw = yahoo_info(t) if yahoo_info else _live_yahoo_info(t)
-            info_box["value"] = raw or {}
-        return info_box["value"]
-
-    def keep(source: str, value: float, source_period: str, note: str = "") -> None:
-        values[source] = value
+    def keep(bucket: dict[str, float], periods: dict[str, str], ends: list[date], source: str,
+             value: float, source_period: str, metric: str, end: date | None, note: str = "") -> None:
+        bucket[source] = value
         periods[source] = source_period
-        facts.append(Fact(source, "revenue", source_period, value))
-        rows.append(_row(source, "fundamentals", "used", note))
+        if end is not None:
+            ends.append(end)
+        facts.append(Fact(source, metric, source_period, value))
+        rows.append(_row(source, "fundamentals", "used", note or source_period))
 
     if t.market == "US":
         symbol = t.code
@@ -482,61 +457,54 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota, yahoo_info)
             found = None
             rows.append(_row("edgar", "fundamentals", "missing", str(exc)[:160]))
         if found:
-            value, period, end = found
-            keep("edgar", value, period, end)
-        if not keys.get("ALPHAVANTAGE_API_KEY"):
-            rows.append(_row("alphavantage", "fundamentals", "skipped", "没有 ALPHAVANTAGE_API_KEY"))
+            keep(annual_values, annual_periods, annual_ends, "edgar", found[0], found[1], "revenue",
+                 date.fromisoformat(found[2]), found[2])
+        quarter = edgar.latest_quarter_revenue(facts_payload) if facts_payload else None
+        if quarter is not None:
+            keep(quarter_values, quarter_periods, quarter_ends, "edgar", quarter[0], quarter[1], "revenue",
+                 _period_end(quarter[1]), quarter[1])
+        if not keys.get("FMP_API_KEY"):
+            rows.append(_row("fmp", "fundamentals", "skipped", "没有 FMP_API_KEY"))
         elif not quota():
-            rows.append(_row("alphavantage", "fundamentals", "missing", "当日额度用尽"))
+            rows.append(_row("fmp", "fundamentals", "missing", "当日额度用尽"))
         else:
             try:
-                overview = get(
-                    "https://www.alphavantage.co/query?function=OVERVIEW"
-                    f"&symbol={symbol}&apikey={keys['ALPHAVANTAGE_API_KEY']}"
-                )
-                revenue = alphavantage.revenue_ttm(overview)
-                if revenue is None:
-                    raise ValueError(alphavantage.note(overview) or "无 RevenueTTM")
-                keep("alphavantage", revenue, period)
+                payload = get(fmp.endpoint(
+                    "income-statement", keys["FMP_API_KEY"], symbol=symbol, period="annual", limit="1",
+                ))
+                limited = fmp.note(payload)
+                parsed = None if limited else fmp.annual_revenue(payload)
+                if parsed is None:
+                    raise ValueError(limited or "无 revenue")
+                keep(annual_values, annual_periods, annual_ends, "fmp", parsed[0], parsed[1], "revenue",
+                     date.fromisoformat(parsed[2]), parsed[2])
+                quarter = fmp.quarter_revenue(get(fmp.endpoint(
+                    "income-statement", keys["FMP_API_KEY"], symbol=symbol, period="quarter", limit="1",
+                )))
+                if quarter is not None:
+                    keep(quarter_values, quarter_periods, quarter_ends, "fmp", quarter[0], quarter[1], "revenue",
+                         _period_end(quarter[1]), quarter[1])
             except Exception as exc:
-                rows.append(_row("alphavantage", "fundamentals", "missing", str(exc)[:160]))
-        revenue = yahoo.revenue_from_info(info_for())
-        if revenue is None:
-            rows.append(_row("yfinance", "fundamentals", "missing", "无 totalRevenue"))
-        else:
-            keep("yfinance", revenue, period)
-        rows.append(_row("eastmoney", "fundamentals", "unsupported", "美股不走东财"))
+                rows.append(_row("fmp", "fundamentals", "missing", fmp.public_error(exc)))
     else:
         rows.append(_row("edgar", "fundamentals", "unsupported", "只覆盖美股"))
-        revenue = yahoo.revenue_from_info(info_for())
-        if revenue is None:
-            rows.append(_row("yfinance", "fundamentals", "missing", "无 totalRevenue"))
-        else:
-            keep("yfinance", revenue, period)
-        url = (
-            "https://datacenter.eastmoney.com/securities/api/data/v1/get"
-            "?reportName=RPT_HKF10_FN_MAININDICATOR&columns=OPERATE_INCOME,REPORT_DATE"
-            f"&filter=(SECUCODE=%22{t.code.zfill(5)}.HK%22)&pageSize=1"
-        )
-        try:
-            parsed = eastmoney.revenue(get(url))
-        except Exception as exc:
-            parsed = None
-            rows.append(_row("eastmoney", "fundamentals", "missing", str(exc)[:160]))
-        if parsed:
-            value, em_period = parsed
-            keep("eastmoney", value, em_period)
-    ratio_rows, ratio_facts, ratios = _accept_ratios(_ratio_candidates(t, facts_payload, info_for()))
+        rows.append(_row("fmp", "fundamentals", "unsupported", "只覆盖美股"))
+    ratio_rows, ratio_facts, ratios = _accept_ratios(_ratio_candidates(t, facts_payload))
     rows.extend(ratio_rows)
     facts.extend(ratio_facts)
-    pair = _matching_revenue_pair(values)
-    chosen = pair if pair is not None else values
+    annual_end = max(annual_ends, default=None)
+    quarter_end = max(quarter_ends, default=None)
+    if quarter_values and quarter_end and (annual_end is None or quarter_end > annual_end):
+        values, periods = quarter_values, quarter_periods
+    else:
+        values, periods = annual_values, annual_periods
+    chosen, alone = _choose_revenue(values, rows)
     if chosen:
         period = periods[next(iter(chosen))]
     try:
         snap = attach_fundamentals(
             snap, metric="revenue", period=period, values=chosen,
-            as_of=trade_date, fetched_at=fetched_at,
+            as_of=trade_date, fetched_at=fetched_at, require_pair=not alone,
         )
     except Exception as exc:
         snap = snap.model_copy(update={"fundamentals": _meta(
@@ -544,23 +512,7 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota, yahoo_info)
     return snap, rows, facts, ratios
 
 
-def _live_yahoo_info(t: NormTicker) -> dict:
-    try:
-        import yfinance as yf
-        return dict(yf.Ticker(t.ta_format).info or {})
-    except Exception:
-        return {}
-
-
-def _yahoo_earnings_date(info: dict) -> date | None:
-    raw = str((info or {}).get("earningsDate") or "")[:10]
-    try:
-        return date.fromisoformat(raw)
-    except ValueError:
-        return None
-
-
-def _earnings(t, snap, trade_date, fetched_at, keys, get, yahoo_info, read_text):
+def _earnings(t, snap, trade_date, fetched_at, keys, get, read_text):
     rows = []
     excerpts: list[FilingExcerpt] = []
     contact = keys.get("EDGAR_CONTACT", "")
@@ -583,121 +535,133 @@ def _earnings(t, snap, trade_date, fetched_at, keys, get, yahoo_info, read_text)
             else:
                 rows.append(_row("edgar", "earnings", "used", f"申报日 {filed.isoformat()}"))
             excerpts = _filing_excerpts(cik, submissions, read_text, contact)
+            for item in excerpts:
+                if item.section == "risk_factors" and item.quality.startswith("summary"):
+                    rows.append(_row("deepseek", "risk_factors", "used", item.quality))
+                elif item.section == "risk_factors" and item.quality.startswith("full="):
+                    rows.append(_row("deepseek", "risk_factors", "missing", item.quality))
     else:
         rows.append(_row("edgar", "earnings", "unsupported", "港股财报日不走 EDGAR"))
-    info = yahoo_info(t) if yahoo_info else _live_yahoo_info(t)
-    found = _yahoo_earnings_date(info)
+    found, note = _next_earnings(t.code, trade_date, keys, get)
     if found is None:
-        return snap, rows + [_row("yfinance", "earnings", "missing", "无带出处的披露日")], excerpts
-    snap = note_earnings(snap, found, source="yfinance")
-    return snap, rows + [_row("yfinance", "earnings", "used", found.isoformat())], excerpts
+        rows.append(_row("nasdaq", "earnings", "missing", note or "日历没有下次财报日"))
+        return snap, rows, excerpts
+    snap = note_earnings(snap, found[0], source=found[1])
+    return snap, rows + [_row(found[1], "earnings", "used", note or found[0].isoformat())], excerpts
 
 
-def _news(t, snap, trade_date, fetched_at, keys, get, quota, yahoo_news):
-    text = None
-    rows = []
-    if keys.get("ALPHAVANTAGE_API_KEY") and quota():
+_NASDAQ_HEADERS = {"User-Agent": "mioption data", "Accept": "application/json"}
+
+
+def _next_earnings(symbol: str, day: date, keys: dict, get) -> tuple[tuple[date, str] | None, str]:
+    """Nasdaq 当天名单为主。Finnhub 给出近月日期和预期，用来对准 Nasdaq 的日期。"""
+    hint = None
+    hint_note = ""
+    if keys.get("FINNHUB_API_KEY"):
         try:
-            payload = get(
-                "https://www.alphavantage.co/query?function=NEWS_SENTIMENT"
-                f"&tickers={t.ta_format}&apikey={keys['ALPHAVANTAGE_API_KEY']}&limit=3"
-            )
-            limited = alphavantage.note(payload) if isinstance(payload, dict) else None
-            text = None if limited else alphavantage.headlines(payload)
-            if text:
-                rows.append(_row("alphavantage", "news", "used"))
-                rows.append(_row("yfinance", "news", "skipped", "上一级已可用"))
-                return snap.model_copy(update={"news": _news_meta(text, "alphavantage", trade_date, fetched_at, None)}), rows, text
-            rows.append(_row("alphavantage", "news", "missing", limited or "无标题"))
+            payload = get(earnings_calendar.finnhub_url(
+                symbol, day, day + timedelta(days=31), keys["FINNHUB_API_KEY"],
+            ))
+            hint = earnings_calendar.finnhub_next(payload, symbol)
+            hint_note = earnings_calendar.estimate_note(hint)
         except Exception as exc:
-            rows.append(_row("alphavantage", "news", "missing", str(exc)[:160]))
+            hint_note = finnhub.public_error(exc)
+    days = []
+    if hint and hint.get("date"):
+        hinted = date.fromisoformat(str(hint["date"])[:10])
+        days = [hinted, hinted + timedelta(days=1)]
     else:
-        why = "没有 ALPHAVANTAGE_API_KEY" if not keys.get("ALPHAVANTAGE_API_KEY") else "当日额度用尽"
-        rows.append(_row("alphavantage", "news", "skipped", why))
-    items = yahoo_news(t) if yahoo_news else _live_yahoo_news(t)
-    text = yahoo.headlines(items or [])
-    rows.append(_row("yfinance", "news", "used" if text else "missing", "" if text else "无标题"))
+        days = earnings_calendar.upcoming_days(day + timedelta(days=1), 24)
+    for probe in days:
+        try:
+            payload = get(earnings_calendar.nasdaq_url(probe), _NASDAQ_HEADERS)
+        except TypeError:
+            payload = get(earnings_calendar.nasdaq_url(probe))
+        except Exception:
+            continue
+        if earnings_calendar.nasdaq_hit(payload, symbol):
+            note = f"Nasdaq {probe.isoformat()}"
+            if hint_note:
+                note = f"{note}；{hint_note}"
+            return (probe, "nasdaq"), note
+    if hint and hint.get("date"):
+        found = date.fromisoformat(str(hint["date"])[:10])
+        return (found, "finnhub"), hint_note or found.isoformat()
+    return None, hint_note
+
+
+def _news(t, session: date, snap, trade_date, fetched_at, keys, get):
+    rows = []
+    if not keys.get("FINNHUB_API_KEY"):
+        rows.append(_row("finnhub", "news", "missing", "没有 FINNHUB_API_KEY"))
+    else:
+        try:
+            payload = get(finnhub.news_url(t.code, session, keys["FINNHUB_API_KEY"]))
+            text = finnhub.headlines(payload)
+            if text:
+                rows.append(_row("finnhub", "news", "used"))
+                return snap.model_copy(update={"news": _news_meta(text, "finnhub", session, fetched_at, None)}), rows, text
+            rows.append(_row("finnhub", "news", "missing", "无标题"))
+        except Exception as exc:
+            rows.append(_row("finnhub", "news", "missing", finnhub.public_error(exc)))
+    err = next((row.note for row in reversed(rows) if row.note), "无标题")
     return snap.model_copy(update={"news": _news_meta(
-        text, "yfinance", trade_date, fetched_at, None if text else "无标题")}), rows, text
+        None, "finnhub", trade_date, fetched_at, err)}), rows, None
 
 
-def _live_yahoo_news(t: NormTicker) -> list:
-    try:
-        import yfinance as yf
-        return list(yf.Ticker(t.ta_format).news or [])
-    except Exception:
-        return []
+_REDDIT_TOKEN = {"value": "", "until": 0.0}
+_REDDIT_SUBS = ("stocks", "wallstreetbets")
 
 
 def _social(t, keys, get, trade_date: date):
     items: list[SocialItem] = []
-    rows = []
-    symbol = t.code
     if t.market != "US":
-        return items, [
-            _row("reddit", "social", "unsupported", "只覆盖美股代码"),
-            _row("stocktwits", "social", "unsupported", "只覆盖美股代码"),
-        ]
-    if keys.get("REDDIT_CLIENT_ID") and keys.get("REDDIT_CLIENT_SECRET"):
-        try:
-            token = _reddit_token(keys, get)
-            payload = get(
-                f"https://oauth.reddit.com/search?q={symbol}&limit=3&sort=new&restrict_sr=0",
-                {"Authorization": f"bearer {token}", "User-Agent": "mioption-data"},
-            )
-            found = reddit.titles(payload)
-        except Exception as exc:
-            found = []
-            rows.append(_row("reddit", "social", "missing", str(exc)[:160]))
-        else:
-            if found:
-                items.extend(SocialItem("reddit", title) for title in found)
-                rows.append(_row("reddit", "social", "used"))
-            else:
-                rows.append(_row("reddit", "social", "missing", "无帖子"))
-    else:
-        rows.append(_row("reddit", "social", "skipped", "没有 Reddit 应用凭据"))
-        try:
-            payload = get(
-                "https://arctic-shift.photon-reddit.com/api/posts/search"
-                f"?subreddit=stocks&query={symbol}&limit=3&sort=desc"
-            )
-            titles, state = reddit.archive_posts(payload, trade_date)
-        except Exception as exc:
-            rows.append(_row("arctic-shift", "social", "missing", str(exc)[:160]))
-        else:
-            if state == "used":
-                items.extend(SocialItem("arctic-shift", title) for title in titles)
-                rows.append(_row("arctic-shift", "social", "used"))
-            elif state == "stale":
-                rows.append(_row("arctic-shift", "social", "stale", "帖子超过 14 天"))
-            else:
-                rows.append(_row("arctic-shift", "social", "missing", "无帖子"))
+        return items, [_row("reddit", "social", "unsupported", "只覆盖美股代码")]
+    if not (keys.get("REDDIT_CLIENT_ID") and keys.get("REDDIT_CLIENT_SECRET") and keys.get("REDDIT_USERNAME")):
+        return items, [_row("reddit", "social", "missing", "没有 Reddit 应用凭据")]
     try:
-        stocktwits.wait_turn()
-        found = stocktwits.titles(get(f"https://api.stocktwits.com/api/2/streams/symbol/{symbol}.json"))
+        token = _reddit_token(keys)
+        headers = {
+            "Authorization": f"bearer {token}",
+            "User-Agent": reddit.user_agent(keys["REDDIT_USERNAME"]),
+        }
+        now = datetime.now(timezone.utc)
+        found: list[str] = []
+        for index, name in enumerate(_REDDIT_SUBS):
+            if index:
+                import time
+                time.sleep(1.5)
+            payload = get(reddit.subreddit_search(name, t.code), headers)
+            found.extend(reddit.recent_titles(payload, now))
     except Exception as exc:
-        return items, rows + [_row("stocktwits", "social", "missing", str(exc)[:160])]
+        return items, [_row("reddit", "social", "missing", str(exc)[:160])]
     if not found:
-        return items, rows + [_row("stocktwits", "social", "missing", "无讨论")]
-    items.extend(SocialItem("stocktwits", title) for title in found)
-    return items, rows + [_row("stocktwits", "social", "used")]
+        return items, [_row("reddit", "social", "missing", "24 小时内这两个版没有提到这只股票")]
+    items.extend(SocialItem("reddit", title) for title in found[:5])
+    return items, [_row("reddit", "social", "used")]
 
 
-def _reddit_token(keys: dict, get) -> str:
+def _reddit_token(keys: dict) -> str:
+    import time
     import httpx
 
+    now = time.time()
+    if _REDDIT_TOKEN["value"] and now < _REDDIT_TOKEN["until"]:
+        return _REDDIT_TOKEN["value"]
     response = httpx.post(
         "https://www.reddit.com/api/v1/access_token",
         auth=(keys["REDDIT_CLIENT_ID"], keys["REDDIT_CLIENT_SECRET"]),
         data={"grant_type": "client_credentials"},
-        headers={"User-Agent": "mioption-data"},
+        headers={"User-Agent": reddit.user_agent(keys["REDDIT_USERNAME"])},
         timeout=20,
     )
     response.raise_for_status()
-    token = response.json().get("access_token")
+    payload = response.json()
+    token = payload.get("access_token")
     if not token:
         raise ValueError("Reddit 无 access_token")
+    _REDDIT_TOKEN["value"] = token
+    _REDDIT_TOKEN["until"] = now + int(payload.get("expires_in") or 86400) - 60
     return token
 
 

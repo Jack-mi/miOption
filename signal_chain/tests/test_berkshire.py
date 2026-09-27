@@ -14,7 +14,7 @@ NOW = datetime(2026, 9, 23, 12, 0, tzinfo=timezone.utc)
 def _snap():
     return build_snapshot(
         ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW,
-        futu_error="未探测", yahoo_error="未探测",
+        futu_error="未探测",
     )
 
 

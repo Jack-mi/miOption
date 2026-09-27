@@ -1,4 +1,4 @@
-"""取链编排：Futu OpenD 主源（港美），美股失败时降级 yfinance。确定性代码。"""
+"""取链编排：Futu OpenD 主源。确定性代码。"""
 
 from __future__ import annotations
 
@@ -7,8 +7,6 @@ import subprocess
 
 from ..config import REPO_ROOT, NormTicker, require_runtime_python, Settings
 from ..schema import ChainSnapshot
-from .yfinance_chain import fetch_chain_yfinance
-
 _BRIDGE_TIMEOUT = 120
 
 
@@ -38,15 +36,5 @@ def _fetch_chain_futu(t: NormTicker, settings: Settings) -> ChainSnapshot:
 
 
 def fetch_chain(t: NormTicker, settings: Settings) -> ChainSnapshot:
-    """主源 Futu；美股 Futu 失败时降级 yfinance（降级结果 degraded=True）。"""
-    try:
-        return _fetch_chain_futu(t, settings)
-    except Exception as exc:
-        if t.market != "US":
-            raise
-        snap = fetch_chain_yfinance(
-            t.ta_format, t.market, t.canonical, settings.chain["expiry_window_days"]
-        )
-        snap.degraded = True
-        snap.notes = f"Futu 主源失败（{exc}），已降级 yfinance；数据有延迟"
-        return snap
+    """只走 Futu。失败就把异常抛给数据层记缺失。"""
+    return _fetch_chain_futu(t, settings)

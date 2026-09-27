@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from signal_chain.config import NormTicker
-from signal_chain.data import eastmoney, edgar, stocktwits
+from signal_chain.data import earnings_calendar, edgar, fmp
 from signal_chain.data.layer import clear_macro_cache, load
 from signal_chain.options.underlying_fetch import build_snapshot
 from signal_chain.schema.underlying import UnderlyingSnapshot
@@ -16,9 +16,8 @@ NOW = datetime(2026, 9, 23, 20, 0, tzinfo=timezone.utc)
 
 
 @pytest.fixture(autouse=True)
-def _quiet(monkeypatch):
+def _quiet():
     clear_macro_cache()
-    monkeypatch.setattr(stocktwits, "wait_turn", lambda: None)
 
 
 def _bars():
@@ -48,17 +47,11 @@ def _states(market, field):
 
 
 def _load(*, market="US", code="AAPL", futu=None, futu_error=None,
-          yahoo=None, yahoo_error=None, keys=None, get=None, info=None, news=None,
-          allow_yahoo=False, quota=None, get_text=None):
+          keys=None, get=None, quota=None, get_text=None):
     ticker = NormTicker(market, code)
 
     def futu_probe(*_a, **_k):
         return futu, futu_error
-
-    def yahoo_probe(*_a, **_k):
-        if not allow_yahoo:
-            raise AssertionError("yahoo 不该被调用")
-        return yahoo, yahoo_error
 
     def getter(url, headers=None):
         if get:
@@ -71,9 +64,6 @@ def _load(*, market="US", code="AAPL", futu=None, futu_error=None,
         get=getter,
         quota=quota or (lambda: False),
         futu_probe=futu_probe,
-        yahoo_probe=yahoo_probe,
-        yahoo_info=lambda _t: info or {},
-        yahoo_news=lambda _t: news or [],
         **({} if get_text is None else {"get_text": get_text}),
     )
 
@@ -92,26 +82,29 @@ def _edgar_get(url, headers=None):
     raise AssertionError(url)
 
 
-def test_fresh_futu_skips_yahoo_and_alpha():
+def test_fresh_futu_skips_fmp_price():
     market = _load(futu=_futu(), get=_edgar_get)
     assert market.snapshot.quote.meta.source == "futu"
     assert market.snapshot.kline.meta.source == "futu"
-    assert ("yfinance", "skipped") in _states(market, "quote")
-    assert ("alphavantage", "skipped") in _states(market, "quote")
+    assert ("fmp", "skipped") in _states(market, "quote")
+    assert all(row.id != "yfinance" for row in market.sources)
     assert ("futu", "used") in _states(market, "capital_flow")
-    assert ("eastmoney", "skipped") in _states(market, "capital_flow")
-    assert market.snapshot.fundamentals.status == "missing"
+    assert ("eastmoney", "skipped") not in _states(market, "capital_flow")
+    assert market.snapshot.fundamentals.status == "available"
+    assert market.snapshot.fundamentals.source == "edgar"
     assert market.facts and market.facts[0].source == "edgar"
     assert market.snapshot.earnings_date is None
+    assert market.snapshot.earnings_source is None
     assert any(row.id == "edgar" and row.state == "used" and "申报日 2026-08-01" in row.note
                for row in market.sources if row.field == "earnings")
-    assert ("alphavantage", "skipped") in _states(market, "macro")
-    assert ("nyfed", "skipped") not in _states(market, "macro")
+    assert ("fred", "skipped") in _states(market, "macro")
     assert ("polymarket", "skipped") in _states(market, "events")
 
 
-def test_yahoo_fills_when_futu_misses():
+def test_fmp_fills_quote_when_futu_misses():
     def get(url, headers=None):
+        if "historical-price-eod" in url:
+            return [{"date": D0.isoformat(), "open": 90, "high": 91, "low": 89, "close": 90, "volume": 1}]
         if "stocktwits" in url:
             return {"messages": [{"body": "看多"}]}
         if "sec.gov" in url:
@@ -120,35 +113,25 @@ def test_yahoo_fills_when_futu_misses():
 
     market = _load(
         futu=None, futu_error="opend 未连接",
-        yahoo=_futu(90, flow=False), allow_yahoo=True, get=get,
-        news=[{"title": "Yahoo 标题"}],
+        keys={"FMP_API_KEY": "k"}, get=get, quota=lambda: True,
     )
-    assert market.snapshot.quote.meta.source == "yfinance"
+    assert market.snapshot.quote.meta.source == "fmp"
+    assert market.snapshot.quote.last == 90
     assert "opend 未连接" in (market.snapshot.quote.meta.error or "")
-    assert ("alphavantage", "skipped") in _states(market, "quote")
-    assert market.snapshot.news.source == "yfinance"
-    assert market.snapshot.news.status == "available"
-    assert market.news_text == "Yahoo 标题"
-    assert any(item.source == "stocktwits" for item in market.social)
+    assert ("reddit", "missing") in _states(market, "social")
 
 
-def test_alpha_vantage_price_when_both_fail():
+def test_fmp_price_when_both_fail():
     def get(url, headers=None):
-        if "TIME_SERIES_DAILY" in url:
-            return {"Time Series (Daily)": {
-                "2026-09-19": {
-                    "1. open": "10", "2. high": "11", "3. low": "9",
-                    "4. close": "10", "5. volume": "1",
-                },
-                D0.isoformat(): {
-                    "1. open": "10", "2. high": "12", "3. low": "9",
-                    "4. close": "11", "5. volume": "2",
-                },
-            }}
-        if "OVERVIEW" in url:
-            return {"RevenueTTM": "100"}
-        if "NEWS_SENTIMENT" in url:
-            return {"feed": [{"title": "AV 新闻"}]}
+        if "historical-price-eod" in url:
+            return [
+                {"date": "2026-09-19", "open": 10, "high": 11, "low": 9, "close": 10, "volume": 1},
+                {"date": D0.isoformat(), "open": 10, "high": 12, "low": 9, "close": 11, "volume": 2},
+            ]
+        if "income-statement?symbol" in url:
+            return [{"revenue": 100, "date": "2025-09-27"}]
+        if "company-news" in url:
+            return [{"headline": "Finnhub 新闻"}]
         if "company_tickers" in url:
             return {"0": {"ticker": "AAPL", "cik_str": 320193}}
         if "companyfacts" in url:
@@ -163,33 +146,33 @@ def test_alpha_vantage_price_when_both_fail():
 
     market = _load(
         futu=None, futu_error="opend 未连接",
-        yahoo=None, yahoo_error="429", allow_yahoo=True,
-        keys={"ALPHAVANTAGE_API_KEY": "k"}, get=get, quota=lambda: True,
+        keys={"FMP_API_KEY": "k", "FINNHUB_API_KEY": "h"}, get=get, quota=lambda: True,
     )
-    assert market.snapshot.quote.meta.source == "alphavantage"
+    assert market.snapshot.quote.meta.source == "fmp"
     assert market.snapshot.quote.last == 11.0
-    assert market.snapshot.news.source == "alphavantage"
+    assert market.snapshot.news.source == "finnhub"
+    assert market.news_text == "Finnhub 新闻"
     assert market.snapshot.fundamentals.status == "available"
-    assert {item.source for item in market.social} == {"stocktwits"}
+    assert market.social == []
 
 
-def test_hk_capital_flow_falls_back_to_eastmoney():
-    def get(url, headers=None):
-        if "fflow" in url:
-            return {"data": {"klines": ["2026-09-23,88.5,1"]}}
-        if "RPT_HKF10_FN_MAININDICATOR" in url:
-            return {"result": {"data": [{"OPERATE_INCOME": "50", "REPORT_DATE": "2025-12-31"}]}}
-        raise AssertionError(url)
+def test_non_us_load_does_not_fetch():
+    def refuse(*_a, **_k):
+        raise AssertionError("不该取数")
 
-    market = _load(
-        market="HK", code="00700", futu=_futu(flow=False), get=get,
-        info={"totalRevenue": 50, "earningsDate": "2026-11-12"},
+    result = load(
+        NormTicker("HK", "00700"), D0, object(), include_chain=False,
+        keys={"FMP_API_KEY": "k"},
+        get=refuse, quota=lambda: True,
+        futu_probe=refuse, chain_fetch=refuse,
     )
-    assert market.snapshot.capital_flow.status == "available"
-    assert market.snapshot.capital_flow.source == "eastmoney"
-    assert market.flow_net == 88.5
-    assert ("eastmoney", "used") in _states(market, "capital_flow")
-    assert market.snapshot.earnings_source == "yfinance"
+    assert result.chain_error == "只覆盖美股"
+    assert ("loader", "unsupported") in _states(result, "market")
+    with pytest.raises(ValueError, match="只覆盖美股"):
+        load(
+            NormTicker("CN", "600519"), D0, object(), include_chain=False,
+            get=refuse, futu_probe=refuse, chain_fetch=refuse,
+        )
 
 
 def test_capital_flow_available_requires_source():
@@ -208,62 +191,43 @@ def test_capital_flow_available_requires_source():
     assert ok.capital_flow.status == "available"
 
 
-def test_macro_falls_back_to_nyfed_when_rate_missing():
+def test_macro_reads_latest_fred_observation():
     def get(url, headers=None):
-        if "FEDERAL_FUNDS_RATE" in url:
-            return {"Note": "no rate"}
-        if "function=CPI" in url:
-            return {"data": [{"date": "2026-08-01", "value": "2.7"}, {"date": "2026-07-01", "value": "."}]}
-        if "function=UNEMPLOYMENT" in url:
-            return {"data": [{"date": "2026-08-01", "value": "4.2"}]}
-        if "newyorkfed.org" in url:
-            return {"refRates": [{"effectiveDate": "2026-09-22", "percentRate": 3.88}]}
+        if "series_id=DFF" in url:
+            return {"observations": [
+                {"date": "2026-09-25", "value": "."},
+                {"date": "2026-09-24", "value": "4.09"},
+            ]}
+        if "series_id=CPIAUCSL" in url:
+            return {"observations": [{"date": "2026-08-01", "value": "326.8"}]}
+        if "series_id=UNRATE" in url:
+            return {"observations": [{"date": "2026-08-01", "value": "4.3"}]}
         if "sec.gov" in url or "stocktwits" in url:
             return _edgar_get(url, headers)
         raise AssertionError(url)
 
-    market = _load(futu=_futu(), keys={"ALPHAVANTAGE_API_KEY": "k"}, get=get, quota=lambda: True)
+    market = _load(futu=_futu(), keys={"FRED_API_KEY": "k"}, get=get)
     by_series = {point.series: point for point in market.macro}
-    assert by_series["CPI"].as_of == date(2026, 8, 1)
-    assert by_series["CPI"].value == 2.7
-    assert by_series["CPI"].source == "alphavantage"
-    assert by_series["UNEMPLOYMENT"].as_of == date(2026, 8, 1)
-    assert by_series["FEDERAL_FUNDS_RATE"].source == "nyfed"
-    assert by_series["FEDERAL_FUNDS_RATE"].value == 3.88
-    assert ("nyfed", "used") in _states(market, "macro")
+    assert by_series["FEDERAL_FUNDS_RATE"].as_of == date(2026, 9, 24)
+    assert by_series["FEDERAL_FUNDS_RATE"].value == 4.09
+    assert by_series["FEDERAL_FUNDS_RATE"].source == "fred"
+    assert by_series["CPI"].value == 326.8
+    assert by_series["UNEMPLOYMENT"].value == 4.3
+    assert ("fred", "used") in _states(market, "macro")
+    assert ("fmp", "used") not in _states(market, "macro")
+    assert ("nyfed", "used") not in _states(market, "macro")
     from signal_chain.decision.pack import render_pack
-    assert "FEDERAL_FUNDS_RATE" in render_pack(market)
-    assert "3.88" in render_pack(market)
+    text = render_pack(market)
+    assert "FEDERAL_FUNDS_RATE" in text
+    assert "4.09" in text
 
 
-def test_us_earnings_date_comes_from_yahoo():
-    market = _load(
-        futu=_futu(), get=_edgar_get, info={"earningsDate": "2026-10-29"},
-    )
-    assert market.snapshot.earnings_date == date(2026, 10, 29)
-    assert market.snapshot.earnings_source == "yfinance"
+def test_earnings_date_stays_empty_without_a_disclosure_source():
+    market = _load(futu=_futu(), get=_edgar_get)
+    assert market.snapshot.earnings_date is None
+    assert market.snapshot.earnings_source is None
     assert any("申报日 2026-08-01" in row.note for row in market.sources if row.field == "earnings")
-
-
-def test_hk_news_uses_ta_format():
-    seen = []
-
-    def get(url, headers=None):
-        seen.append(url)
-        if "NEWS_SENTIMENT" in url:
-            return {"feed": [{"title": "港股标题"}]}
-        if "function=FEDERAL_FUNDS_RATE" in url or "function=CPI" in url or "function=UNEMPLOYMENT" in url:
-            return {"data": [{"date": "2026-08-01", "value": "1"}]}
-        if "RPT_HKF10_FN_MAININDICATOR" in url:
-            return {"result": {"data": [{"OPERATE_INCOME": "50", "REPORT_DATE": "2025-12-31"}]}}
-        raise AssertionError(url)
-
-    market = _load(
-        market="HK", code="00700", futu=_futu(),
-        keys={"ALPHAVANTAGE_API_KEY": "k"}, get=get, quota=lambda: True,
-    )
-    assert any("tickers=0700.HK" in url for url in seen)
-    assert market.snapshot.news.source == "alphavantage"
+    assert all(row.id != "yfinance" for row in market.sources)
 
 
 def test_agreed_ratios_excerpts_and_fresh_archive():
@@ -292,13 +256,6 @@ def test_agreed_ratios_excerpts_and_fresh_archive():
                 "accessionNumber": ["0000320193-26-000001", "0000320193-26-000002"],
                 "primaryDocument": ["a10k.htm", "proxy.htm"],
             }}}
-        if "arctic-shift" in url:
-            return {"data": [{
-                "title": "AAPL 讨论",
-                "created_utc": int(datetime(2026, 9, 20, tzinfo=timezone.utc).timestamp()),
-            }]}
-        if "stocktwits" in url:
-            return {"messages": []}
         raise AssertionError(url)
 
     def read_text(url, headers=None):
@@ -315,18 +272,11 @@ def test_agreed_ratios_excerpts_and_fresh_archive():
 
     market = _load(
         futu=_futu(), get=get, get_text=read_text,
-        info={
-            "returnOnEquity": 0.1, "freeCashflow": 20, "interestCoverage": 4,
-            "earningsDate": "2026-10-29",
-        },
     )
-    by_metric = {item.metric: item for item in market.ratios}
-    assert by_metric["roe"].value == 0.1
-    assert by_metric["roe"].source == "edgar,yfinance"
-    assert by_metric["free_cash_flow"].value == 20
-    assert by_metric["interest_coverage"].value == 4
+    assert market.ratios == []
+    assert any(fact.source == "edgar" and fact.metric == "roe" for fact in market.facts)
     assert {item.section for item in market.excerpts} == {"business", "risk_factors", "governance"}
-    assert any(item.source == "arctic-shift" for item in market.social)
+    assert ("reddit", "missing") in _states(market, "social")
     from signal_chain.research.workflow import role_gap_labels, role_memo
     assert "sells devices" in role_memo(market)
     assert "商业模式缺失" not in role_gap_labels(market)
@@ -338,33 +288,54 @@ def test_agreed_ratios_excerpts_and_fresh_archive():
     assert "宏观缺失" in text
 
 
-def test_stale_archive_is_not_current_social():
-    def get(url, headers=None):
-        if "arctic-shift" in url:
-            return {"data": [{"title": "旧帖", "created_utc": 1_600_000_000}]}
-        return _edgar_get(url, headers)
-
-    market = _load(futu=_futu(), get=get)
-    assert all(item.source != "arctic-shift" for item in market.social)
-    assert ("arctic-shift", "stale") in _states(market, "social")
+def test_social_stays_missing_without_reddit_credentials():
+    market = _load(futu=_futu(), get=_edgar_get)
+    assert market.social == []
+    assert ("reddit", "missing") in _states(market, "social")
+    assert all(row.id != "stocktwits" for row in market.sources)
 
 
-def test_10k_competition_heading_becomes_excerpt():
-    html = (
+def test_risk_compression_context_is_only_the_filing():
+    from signal_chain.data.layer import risk_compression_messages
+
+    messages = risk_compression_messages("ONLY-FILING")
+    assert [item["role"] for item in messages] == ["system", "user"]
+    assert messages[1]["content"] == "ONLY-FILING"
+    assert "200" in messages[0]["content"]
+    assert "价格" not in messages[0]["content"]
+    assert "财务" not in messages[0]["content"]
+
+
+def test_risk_excerpt_keeps_full_length_and_prefers_summary():
+    short, quality = edgar.risk_excerpt("风险不长")
+    assert short == "风险不长" and quality == ""
+    capped, quality = edgar.risk_excerpt("x" * 25000)
+    assert len(capped) == 20000 and quality == "full=25000"
+    summary, quality = edgar.risk_excerpt("x" * 25000, "供应链中断")
+    assert summary == "供应链中断" and quality == "summary full=25000"
+
+
+def test_10k_uses_the_long_item_not_the_table_of_contents():
+    toc = "Item 1. Business 1 Item 1A. Risk Factors 2 Item 1B. Unresolved Staff Comments 3 "
+    body = (
         "Item 1. Business The company sells devices and services to a global installed base. "
         "Competition The company competes with other smartphone makers across hardware and services worldwide. "
         "Item 1A. Risk Factors Supply concentration can interrupt production for months. "
         "Item 1B. Unresolved Staff Comments None here."
     )
-    sections = edgar.excerpts_from_10k(html)
-    assert "smartphone" in sections["competition"]
-    assert "Item 1A" not in sections["competition"]
+    sections = edgar.excerpts_from_10k(toc + body)
+    text, quality = sections["competition"]
+    assert "smartphone" in text
+    assert "Item 1A" not in text
+    assert quality == "extraction_suspect"
+    assert "sells devices" in sections["business"][0]
+    assert "Supply concentration" in sections["risk_factors"][0]
 
 
 def test_revenue_pair_skips_the_outlier():
     def get(url, headers=None):
-        if "OVERVIEW" in url:
-            return {"RevenueTTM": "200"}
+        if "income-statement?symbol" in url:
+            return [{"revenue": 200, "date": "2025-09-27"}]
         if "companyfacts" in url:
             return {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [
                 {"form": "10-K", "val": 100.0, "end": "2025-09-27"},
@@ -372,21 +343,17 @@ def test_revenue_pair_skips_the_outlier():
         return _edgar_get(url, headers)
 
     market = _load(
-        futu=_futu(), get=get, info={"totalRevenue": 100},
-        keys={"ALPHAVANTAGE_API_KEY": "k"}, quota=lambda: True,
+        futu=_futu(), get=get,         keys={"FMP_API_KEY": "k"}, quota=lambda: True,
     )
     assert market.snapshot.fundamentals.status == "available"
-    assert market.snapshot.fundamentals.source == "edgar,yfinance"
-    assert any(
-        fact.source == "alphavantage" and fact.metric == "revenue" and fact.value == 200
-        for fact in market.facts
-    )
+    assert market.snapshot.fundamentals.source == "edgar"
+    assert any(row.id == "fmp" and "1%" in row.note for row in market.sources)
 
 
 def test_revenue_stays_missing_when_no_pair_agrees():
     def get(url, headers=None):
-        if "OVERVIEW" in url:
-            return {"RevenueTTM": "200"}
+        if "income-statement?symbol" in url:
+            return [{"revenue": 200, "date": "2025-09-27"}]
         if "companyfacts" in url:
             return {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [
                 {"form": "10-K", "val": 100.0, "end": "2025-09-27"},
@@ -394,17 +361,87 @@ def test_revenue_stays_missing_when_no_pair_agrees():
         return _edgar_get(url, headers)
 
     market = _load(
-        futu=_futu(), get=get, info={"totalRevenue": 300},
-        keys={"ALPHAVANTAGE_API_KEY": "k"}, quota=lambda: True,
+        futu=_futu(), get=get,
+        keys={"FMP_API_KEY": "k"}, quota=lambda: True,
     )
-    assert market.snapshot.fundamentals.status == "missing"
-    assert "1%" in (market.snapshot.fundamentals.error or "")
+    assert market.snapshot.fundamentals.status == "available"
+    assert market.snapshot.fundamentals.source == "edgar"
+
+
+def test_fmp_key_alias_from_env_file(tmp_path):
+    from signal_chain.data.keys import load_keys
+
+    src = tmp_path / "env"
+    src.write_text("FMP_KEY=abc\nEDGAR_CONTACT=a@b.c\n", encoding="utf-8")
+    keys = load_keys(src)
+    assert keys["FMP_API_KEY"] == "abc"
+    assert keys["EDGAR_CONTACT"] == "a@b.c"
+
+
+def test_latest_revenue_skips_the_stale_tag():
+    facts = {"facts": {"us-gaap": {
+        "Revenues": {"units": {"USD": [
+            {"form": "10-K", "val": 265.0, "end": "2018-09-29", "start": "2017-10-01", "fp": "FY", "frame": "CY2018"},
+        ]}},
+        "RevenueFromContractWithCustomerExcludingAssessedTax": {"units": {"USD": [
+            {"form": "10-K", "val": 416.0, "end": "2025-09-27", "start": "2024-09-29", "fp": "FY", "frame": "CY2025"},
+            {"form": "10-K", "val": 62.0, "end": "2025-09-27", "start": "2025-06-28", "fp": "FY", "frame": "CY2025Q4"},
+        ]}},
+    }}}
+    assert edgar.latest_revenue(facts) == (416.0, "FY2025", "2025-09-27")
+
+
+def test_newer_quarter_is_the_headline():
+    def get(url, headers=None):
+        if "company_tickers" in url:
+            return {"0": {"ticker": "AAPL", "cik_str": 320193}}
+        if "companyfacts" in url:
+            return {"facts": {"us-gaap": {"Revenues": {"units": {"USD": [
+                {"form": "10-K", "val": 400.0, "end": "2025-09-27", "start": "2024-09-29", "fp": "FY"},
+                {"form": "10-Q", "val": 110.0, "end": "2026-06-27", "start": "2026-03-29", "fp": "Q3"},
+            ]}}}}}
+        if "submissions" in url:
+            return {"filings": {"recent": {"form": ["10-Q"], "filingDate": ["2026-07-31"]}}}
+        raise AssertionError(url)
+
+    market = _load(futu=_futu(), get=get)
+    assert market.snapshot.fundamentals.status == "available"
+    assert market.snapshot.fundamentals.period == "Q2026-06-27"
+    assert market.snapshot.fundamentals.source == "edgar"
+    revenues = [fact for fact in market.facts if fact.metric == "revenue"]
+    assert {fact.period for fact in revenues} == {"FY2025", "Q2026-06-27"}
+
+
+def test_reddit_keeps_posts_from_the_last_day():
+    from datetime import datetime
+
+    from signal_chain.data import reddit
+    now = datetime(2026, 9, 27, 12, 0, tzinfo=timezone.utc)
+    fresh = int(now.timestamp()) - 3600
+    stale = int(now.timestamp()) - 2 * 86400
+    payload = {"data": {"children": [
+        {"data": {"title": "AAPL new", "created_utc": fresh}},
+        {"data": {"title": "AAPL old", "created_utc": stale}},
+    ]}}
+    assert reddit.recent_titles(payload, now) == ["AAPL new"]
+
+
+def test_earnings_calendar_parsers():
+    nasdaq = {"data": {"rows": [
+        {"symbol": "MSFT", "time": "time-pre-market"},
+        {"symbol": "AAPL", "time": "time-not-supplied", "fiscalQuarterEnding": "Sep/2026"},
+    ]}}
+    assert earnings_calendar.nasdaq_hit(nasdaq, "AAPL")["fiscalQuarterEnding"] == "Sep/2026"
+    finn = {"earningsCalendar": [
+        {"symbol": "AAPL", "date": "2026-10-28", "hour": "amc", "epsEstimate": 1.9, "revenueEstimate": 100},
+    ]}
+    row = earnings_calendar.finnhub_next(finn, "AAPL")
+    assert row["date"] == "2026-10-28"
+    assert "EPS预期" in earnings_calendar.estimate_note(row)
 
 
 def test_parsers():
     assert edgar.cik_for({"0": {"ticker": "AAPL", "cik_str": 32}}, "AAPL") == "0000000032"
-    assert eastmoney.net_inflow({"data": {"klines": ["2026-09-23,3.5"]}}) == ("2026-09-23", 3.5)
-    assert eastmoney.net_inflow({"data": {}}) is None
-    assert eastmoney.revenue({"result": {"data": [
-        {"OPERATE_INCOME": "10", "REPORT_DATE": "2025-12-31"},
-    ]}}) == (10.0, "FY2025")
+    assert fmp.revenue_ttm([{"revenue": 10}]) == 10
+    assert fmp.headlines([{"title": "一条"}, {"title": "两条"}]) == "一条；两条"
+    assert fmp.daily_probe([{"date": "2026-09-23", "open": 1, "high": 2, "low": 0.5, "close": 1.5, "volume": 3}])["quote"]["last"] == 1.5

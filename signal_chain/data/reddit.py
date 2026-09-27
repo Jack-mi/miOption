@@ -1,8 +1,41 @@
-"""Reddit 社交。有官方凭据走官方接口；没有则解析 Arctic Shift 档案。"""
+"""Reddit 社交。script 应用用 client_credentials，只留 24 小时内的帖子。"""
 
 from __future__ import annotations
 
 from datetime import date, datetime, timezone
+
+
+def user_agent(username: str) -> str:
+    return f"linux:research-agent-data:v0.1 (by /u_{username})"
+
+
+def subreddit_new(name: str) -> str:
+    return f"https://oauth.reddit.com/r/{name}/new?limit=5"
+
+
+def subreddit_search(name: str, symbol: str) -> str:
+    return (
+        f"https://oauth.reddit.com/r/{name}/search?q={symbol}"
+        "&restrict_sr=1&sort=new&t=day&limit=5"
+    )
+
+
+def recent_titles(payload: dict, now: datetime, *, limit: int = 5, hours: int = 24) -> list[str]:
+    children = ((payload.get("data") or {}).get("children")) or []
+    cutoff = now.timestamp() - hours * 3600
+    out = []
+    for child in children:
+        data = (child.get("data") or {}) if isinstance(child, dict) else {}
+        title = str(data.get("title") or "").strip()
+        try:
+            posted = float(data.get("created_utc"))
+        except (TypeError, ValueError):
+            continue
+        if title and posted >= cutoff:
+            out.append(title)
+        if len(out) >= limit:
+            break
+    return out
 
 _ARCHIVE_DAYS = 14
 

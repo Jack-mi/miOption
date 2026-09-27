@@ -83,7 +83,7 @@ def test_fresh_snapshot_has_quote_kline_and_sma():
     assert snap.news.status == "unsupported"
 
 
-def test_previous_session_kline_stays_available():
+def test_kline_must_end_on_the_session():
     snap = build_snapshot(
         ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW,
         futu={
@@ -92,11 +92,26 @@ def test_previous_session_kline_stays_available():
         },
     )
     assert snap.quote.meta.status == "available"
+    assert snap.kline.meta.status == "stale"
+    assert snap.kline.bars == []
+    assert "这场交易" in (snap.kline.meta.error or "")
+
+
+def test_sunday_quote_uses_friday_session():
+    sunday = date(2026, 9, 27)
+    friday = date(2026, 9, 25)
+    snap = build_snapshot(
+        ticker="US.AAPL", market="US", trade_date=sunday, fetched_at=NOW,
+        futu={
+            "quote": {"last": 341.07, "session_date": friday.isoformat(), "error": None},
+            "kline": {"adjusted": True, "bars": _bars(end=friday), "error": None},
+        },
+    )
+    assert snap.as_of == friday
+    assert snap.quote.meta.status == "available"
+    assert snap.quote.last == 341.07
     assert snap.kline.meta.status == "available"
-    assert snap.kline.meta.as_of == D0 - timedelta(days=1)
-    assert snap.kline.bars
-    assert snap.technical.meta.status == "available"
-    assert snap.critical_gaps() == []
+    assert snap.kline.meta.as_of == friday
 
 
 def test_stale_quote_and_kline_drop_prices():
@@ -107,7 +122,7 @@ def test_stale_quote_and_kline_drop_prices():
             "quote": {"last": 999, "session_date": old, "error": None},
             "kline": {"adjusted": True, "bars": _bars(end=D0 - timedelta(days=10)), "error": None},
         },
-        yahoo_error="yfinance 限流",
+        fallback_error="降级源限流",
     )
     assert snap.quote.meta.status == "stale"
     assert snap.quote.last is None
@@ -117,30 +132,32 @@ def test_stale_quote_and_kline_drop_prices():
     assert snap.critical_gaps()
 
 
-def test_yahoo_fallback_records_futu_failure():
+def test_fallback_records_futu_failure():
     snap = build_snapshot(
         ticker="HK.00700", market="HK", trade_date=D0, fetched_at=NOW,
         futu_error="opend 未连接",
-        yahoo=_fresh_probe(320.0),
+        fallback=_fresh_probe(320.0),
+        fallback_source="fmp",
     )
     assert snap.currency == "HKD"
     assert snap.quote.meta.status == "available"
-    assert snap.quote.meta.source == "yfinance"
+    assert snap.quote.meta.source == "fmp"
     assert snap.quote.last == 320.0
     assert "opend 未连接" in (snap.quote.meta.error or "")
-    assert snap.kline.meta.source == "yfinance"
+    assert snap.kline.meta.source == "fmp"
 
 
 def test_both_sources_missing():
     snap = build_snapshot(
         ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW,
         futu_error="opend 未连接",
-        yahoo_error="429",
+        fallback_error="429",
     )
     assert snap.quote.meta.status == "missing"
     assert snap.quote.last is None
     assert "opend 未连接" in snap.quote.meta.error
     assert "429" in snap.quote.meta.error
+    assert "yfinance" not in snap.quote.meta.error
     assert snap.kline.meta.status == "missing"
 
 

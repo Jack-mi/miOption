@@ -20,7 +20,7 @@ class MacroPoint:
     series: str
     as_of: date
     value: float
-    source: str = "alphavantage"
+    source: str = "fred"
 
 
 @dataclass
@@ -58,6 +58,7 @@ class FilingExcerpt:
     text: str
     source: str
     as_of: date | None = None
+    quality: str = ""
 
 
 @dataclass

@@ -1,4 +1,4 @@
-"""标的快照编排：Futu 报价/日线为主，失败时按字段降级 yfinance。
+"""标的快照编排：Futu 报价/日线为主。失败时由数据层降级 FMP。
 
 资金流、基本面、新闻本轮只占位，不取数。覆盖账本只写状态与来源，不写价格。
 
@@ -14,6 +14,7 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from ..config import REPO_ROOT, require_runtime_python, NormTicker, Settings
+from ..sessions import session_for
 from ..schema.underlying import (
     DailyBar,
     FieldMeta,
@@ -26,8 +27,6 @@ from ..schema.underlying import (
 _BRIDGE_TIMEOUT = 45
 _TZ = {"US": "America/New_York", "HK": "Asia/Hong_Kong"}
 _CCY = {"US": "USD", "HK": "HKD"}
-# 日 K 在收盘前往往停在上一交易日。超过 4 个自然日视为过期，避免把旧价当成今日日线。
-_KLINE_LAG_DAYS = 4
 
 
 def coverage_entry(snapshot: UnderlyingSnapshot, sources: list | None = None) -> dict[str, Any]:
@@ -106,7 +105,7 @@ def _quote_field(
             meta=FieldMeta(
                 status="stale", source=source, as_of=session, fetched_at=fetched_at,
                 timezone=tz,
-                error=f"报价交易日 {session.isoformat()} 不是运行日 {trade_date.isoformat()}",
+                error=f"报价交易日 {session.isoformat()} 不是这场交易 {trade_date.isoformat()}",
             ),
             currency=currency,  # type: ignore[arg-type]
         )
@@ -156,12 +155,11 @@ def _kline_field(
             adjusted=adjusted,
         )
     last = parsed[-1].trade_date
-    lag = (trade_date - last).days
-    if last > trade_date or lag > _KLINE_LAG_DAYS:
+    if last != trade_date:
         return KlineField(
             meta=FieldMeta(
                 status="stale", source=source, as_of=last, fetched_at=fetched_at, timezone=tz,
-                error=f"日线最后交易日 {last.isoformat()} 距运行日 {trade_date.isoformat()} 超过 {_KLINE_LAG_DAYS} 天",
+                error=f"日线最后交易日 {last.isoformat()} 不是这场交易 {trade_date.isoformat()}",
             ),
             adjusted=adjusted,
         )
@@ -179,16 +177,17 @@ def _with_error(field, message: str):
     return field.model_copy(update={"meta": meta})
 
 
-def _pick(primary, secondary, *, futu_error: str | None, yahoo_error: str | None):
+def _pick(primary, secondary, *, futu_error: str | None, fallback_error: str | None):
     """主源可用则用主源；否则仅在降级源 available 时替换，并写明 Futu 失败原因。"""
     if primary.meta.status == "available":
         return primary
     if secondary.meta.status == "available":
         why = primary.meta.error or futu_error or "futu 不可用"
-        return _with_error(secondary, f"Futu 未采用（{why}），已降级 yfinance")
-    extra = yahoo_error or (secondary.meta.error if secondary.meta.status != "available" else None)
+        label = secondary.meta.source or "降级源"
+        return _with_error(secondary, f"Futu 未采用（{why}），已降级 {label}")
+    extra = fallback_error or (secondary.meta.error if secondary.meta.status != "available" else None)
     if extra and primary.meta.error and extra not in primary.meta.error:
-        return _with_error(primary, f"{primary.meta.error}；yfinance: {extra}")
+        return _with_error(primary, f"{primary.meta.error}；降级: {extra}")
     if primary.meta.source or primary.meta.error:
         return primary
     return secondary
@@ -228,39 +227,41 @@ def build_snapshot(
     fetched_at: datetime,
     futu: dict | None = None,
     futu_error: str | None = None,
-    yahoo: dict | None = None,
-    yahoo_error: str | None = None,
+    fallback: dict | None = None,
+    fallback_error: str | None = None,
+    fallback_source: str = "fmp",
 ) -> UnderlyingSnapshot:
-    """把两次探测收成一份快照。过期价格清掉，不带进 available。"""
+    """把富途探测和可选降级源收成一份快照。as_of 是这场交易日，不是运行日。"""
     if market not in _CCY:
         raise ValueError(f"本轮仅支持美/港标的，收到 {market}")
+    session = session_for(market, trade_date)
     tz = _TZ[market]
     currency = _CCY[market]
     futu = futu or {}
-    yahoo = yahoo or {}
+    fallback = fallback or {}
     quote = _pick(
-        _quote_field(futu.get("quote"), source="futu" if futu else None, trade_date=trade_date,
+        _quote_field(futu.get("quote"), source="futu" if futu else None, trade_date=session,
                      fetched_at=fetched_at, tz=tz, currency=currency, prior_error=futu_error),
-        _quote_field(yahoo.get("quote"), source="yfinance" if yahoo else None, trade_date=trade_date,
-                     fetched_at=fetched_at, tz=tz, currency=currency, prior_error=yahoo_error),
-        futu_error=futu_error, yahoo_error=yahoo_error,
+        _quote_field(fallback.get("quote"), source=fallback_source if fallback else None, trade_date=session,
+                     fetched_at=fetched_at, tz=tz, currency=currency, prior_error=fallback_error),
+        futu_error=futu_error, fallback_error=fallback_error,
     )
     kline = _pick(
-        _kline_field(futu.get("kline"), source="futu" if futu else None, trade_date=trade_date,
+        _kline_field(futu.get("kline"), source="futu" if futu else None, trade_date=session,
                      fetched_at=fetched_at, tz=tz, prior_error=futu_error),
-        _kline_field(yahoo.get("kline"), source="yfinance" if yahoo else None, trade_date=trade_date,
-                     fetched_at=fetched_at, tz=tz, prior_error=yahoo_error),
-        futu_error=futu_error, yahoo_error=yahoo_error,
+        _kline_field(fallback.get("kline"), source=fallback_source if fallback else None, trade_date=session,
+                     fetched_at=fetched_at, tz=tz, prior_error=fallback_error),
+        futu_error=futu_error, fallback_error=fallback_error,
     )
     return UnderlyingSnapshot(
         ticker=ticker,
         market=market,  # type: ignore[arg-type]
         currency=currency,  # type: ignore[arg-type]
-        as_of=trade_date,
+        as_of=session,
         fetched_at=fetched_at,
         quote=quote,
         kline=kline,
-        technical=_technical(kline, trade_date, fetched_at, tz),
+        technical=_technical(kline, session, fetched_at, tz),
     )
 
 
@@ -297,91 +298,24 @@ def probe_futu(t: NormTicker, trade_date: date, settings: Settings) -> tuple[dic
     return payload, None
 
 
-def probe_yahoo(t: NormTicker, trade_date: date) -> tuple[dict | None, str | None]:
-    from .yfinance_chain import run_yahoo
-
-    def _history():
-        import yfinance as yf
-        return yf.Ticker(t.ta_format).history(
-            start=trade_date - timedelta(days=120),
-            end=trade_date + timedelta(days=1),
-            interval="1d",
-            auto_adjust=True,
-        )
-
-    try:
-        from zoneinfo import ZoneInfo
-
-        hist = run_yahoo(_history, label=t.ta_format)
-    except Exception as exc:
-        return None, str(exc)[:400]
-    if hist is None or hist.empty:
-        return None, f"yfinance: {t.ta_format} 无日线"
-    idx = hist.index
-    tz = ZoneInfo(_TZ[t.market])
-    if getattr(idx, "tz", None) is not None:
-        idx = idx.tz_convert(tz)
-    bars = []
-    for ts, row in zip(idx, hist.itertuples(index=False)):
-        session = ts.date()
-        if session > trade_date:
-            continue
-        close = getattr(row, "Close", None)
-        open_ = getattr(row, "Open", None)
-        if close is None or open_ is None:
-            continue
-        try:
-            close_f = float(close)
-            open_f = float(open_)
-        except (TypeError, ValueError):
-            continue
-        if close_f != close_f or open_f != open_f:
-            continue
-        high = getattr(row, "High", open_f)
-        low = getattr(row, "Low", open_f)
-        volume = getattr(row, "Volume", None)
-        bars.append({
-            "trade_date": session.isoformat(),
-            "open": open_f,
-            "high": float(high),
-            "low": float(low),
-            "close": close_f,
-            "volume": None if volume is None else float(volume),
-        })
-    if not bars:
-        return None, f"yfinance: {t.ta_format} 无有效日线"
-    last = bars[-1]
-    return {
-        "quote": {"last": last["close"], "session_date": last["trade_date"], "error": None},
-        "kline": {"adjusted": True, "bars": bars, "error": None},
-    }, None
-
-
-def _futu_field_fresh(payload: dict | None, trade_date: date, kind: str) -> bool:
+def _futu_field_fresh(payload: dict | None, session: date, kind: str) -> bool:
     if not payload:
         return False
-    day = trade_date.isoformat()
+    day = session.isoformat()
     if kind == "quote":
         quote = payload.get("quote") or {}
-        return quote.get("last") is not None and quote.get("session_date") == day
+        return quote.get("last") is not None and str(quote.get("session_date") or "")[:10] == day
     bars = (payload.get("kline") or {}).get("bars") or []
-    dates = [b.get("trade_date") for b in bars if b.get("trade_date")]
-    if not dates:
-        return False
-    last = date.fromisoformat(max(dates))
-    lag = (trade_date - last).days
-    return last <= trade_date and lag <= _KLINE_LAG_DAYS
+    dates = [str(b.get("trade_date") or "")[:10] for b in bars if b.get("trade_date")]
+    return bool(dates) and max(dates) == day
 
 
 def fetch_underlying(t: NormTicker, trade_date: date, settings: Settings) -> UnderlyingSnapshot:
-    """只读探测。OpenD 或 Yahoo 失败都留下状态，不把失败记成可用。"""
+    """只读探测。OpenD 失败留下状态，不把失败记成可用。"""
     if t.market not in _CCY:
         raise ValueError(f"本轮仅支持美/港标的，收到 {t.canonical}")
     fetched_at = datetime.now(timezone.utc)
     futu, futu_error = probe_futu(t, trade_date, settings)
-    yahoo, yahoo_error = (None, None)
-    if not _futu_field_fresh(futu, trade_date, "quote") or not _futu_field_fresh(futu, trade_date, "kline"):
-        yahoo, yahoo_error = probe_yahoo(t, trade_date)
     return build_snapshot(
         ticker=t.canonical,
         market=t.market,
@@ -389,8 +323,6 @@ def fetch_underlying(t: NormTicker, trade_date: date, settings: Settings) -> Und
         fetched_at=fetched_at,
         futu=futu,
         futu_error=futu_error,
-        yahoo=yahoo,
-        yahoo_error=yahoo_error,
     )
 
 

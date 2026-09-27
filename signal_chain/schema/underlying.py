@@ -110,8 +110,8 @@ class UnderlyingSnapshot(BaseModel):
             last = self.kline.bars[-1].trade_date
             if meta.as_of != last:
                 raise ValueError("日线 as_of 与最后一根 K 线不一致")
-            if last > self.as_of or (self.as_of - last).days > 4:
-                raise ValueError("日线最后交易日不在运行日的可接受窗口内")
+            if last != self.as_of:
+                raise ValueError("日线最后交易日不是这场交易")
             if self.kline.adjusted is None:
                 raise ValueError("日线 available 但未标明是否复权")
             if not meta.source or meta.fetched_at is None:
@@ -124,8 +124,8 @@ class UnderlyingSnapshot(BaseModel):
         if meta.status == "available":
             if not self.technical.indicators:
                 raise ValueError("技术指标 available 但没有指标值")
-            if meta.as_of is None or meta.as_of > self.as_of or (self.as_of - meta.as_of).days > 4:
-                raise ValueError("技术指标交易日不在运行日的可接受窗口内")
+            if meta.as_of != self.as_of:
+                raise ValueError("技术指标交易日不是这场交易")
         elif self.technical.indicators:
             raise ValueError("非 available 技术指标不得携带数值")
 

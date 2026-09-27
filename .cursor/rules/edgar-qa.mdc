@@ -1,0 +1,10 @@
+---
+description: 美股申报问答走 edgartools MCP，盘面仍走富途
+alwaysApply: true
+---
+
+# EDGAR 问答
+
+用户问美股申报、10-K、20-F、附注、薪酬、内部人、13F 时，调用 `edgartools` MCP。不要调用 `signal_chain.data.load`，也不要现场写 SEC HTTP。
+
+盘面、期权链、收租仍先 `wiki_query`、`futu_probe`，标的对上唯一 `name` 再往下。

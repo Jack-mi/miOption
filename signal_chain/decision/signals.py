@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from ..adapters.base import RawBundle
 from ..adapters.quality import apply_data_gate
 from .ratings import RATING_MAP as _RATING_MAP
+from ..data.context import card, slice
 from ..data.models import MarketData
 from ..research.workflow import ROLE_GAPS, gap_memo, run_workflow
 from ..schema import Direction, EngineSignal, make_signal_id
@@ -112,7 +113,13 @@ def trend_signal(market: MarketData) -> RawBundle:
     else:
         direction, conviction = Direction.NEUTRAL, 0.0
         lead = "已有的面没有方向。"
-    text = " ".join([lead, *faces, *gaps, *side])
+    text = "\n".join([
+        card(market),
+        slice(market, "quote"),
+        slice(market, "sma"),
+        slice(market, "flow"),
+        " ".join([lead, *faces, *gaps, *side]),
+    ])
     return _bundle("trend", market, direction, conviction, text, "；".join(faces), gaps)
 
 

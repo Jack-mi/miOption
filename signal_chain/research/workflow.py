@@ -10,6 +10,7 @@ from pathlib import Path
 from pydantic import BaseModel
 
 from ..decision.ratings import RATING_MAP as _RATING_MAP
+from ..data.context import card, slice
 from ..data.models import MarketData
 
 VERSION = "1"
@@ -108,28 +109,12 @@ class WorkflowRun:
 
 
 def finance_slice(market: MarketData) -> str:
-    snap = market.snapshot
-    lines = ["## 财务切片"]
-    fund = snap.fundamentals
-    if fund.status == "available":
-        period = fund.period or "无期间"
-        lines.append(f"- 财务: available，出处 {fund.source or '无出处'}，期间 {period}")
-    else:
-        lines.append(f"- 财务缺失: {fund.error or fund.status}")
-    for ratio in market.ratios:
-        lines.append(f"- {ratio.metric}: {ratio.value}，出处 {ratio.source}，期间 {ratio.period}")
-    if market.facts:
-        for fact in market.facts:
-            lines.append(
-                f"- 单源 {fact.metric}: {fact.value}，出处 {fact.source}，期间 {fact.period}"
-            )
-    else:
-        lines.append("- 单源营收缺失")
-    if snap.earnings_date is not None:
-        lines.append(f"- 财报日: {snap.earnings_date.isoformat()}，出处 {snap.earnings_source}")
-    else:
-        lines.append("- 财报日缺失")
-    return "\n".join(lines)
+    return "\n".join([
+        card(market),
+        slice(market, "fundamentals"),
+        slice(market, "earnings"),
+        slice(market, "filing"),
+    ])
 
 
 def gap_memo() -> str:
@@ -139,28 +124,35 @@ def gap_memo() -> str:
 def role_packets(market: MarketData) -> list[Packet]:
     by = {item.section: item for item in market.excerpts}
     business = by.get("business")
-    risk_bits = []
-    for key in ("risk_factors", "governance"):
-        item = by.get(key)
-        if item is None:
-            continue
-        if key == "governance" and looks_like_toc(item.text):
-            continue
-        risk_bits.append(item.text)
     competition = by.get("competition")
-    packets = [
-        Packet("business", "excerpt", f"商业模式：{business.text}") if business
-        else Packet("business", "gap", _GAP_TEXT["business"]),
-        Packet("competition", "excerpt", f"竞争：{competition.text}") if competition
-        else Packet("competition", "gap", _GAP_TEXT["competition"]),
-        Packet("risk", "excerpt", "风险：" + " ".join(risk_bits)) if risk_bits
-        else Packet("risk", "gap", _GAP_TEXT["risk"]),
+    risk_item = by.get("risk_factors")
+    governance = by.get("governance")
+    governance_ok = bool(governance and governance.text and not looks_like_toc(governance.text))
+    risk_ok = bool(risk_item and risk_item.text) or governance_ok
+    risk_text = slice(market, "risk")
+    if governance_ok:
+        risk_text = f"{risk_text}\n{slice(market, 'governance')}"
+    return [
+        Packet(
+            "business",
+            "excerpt" if business and business.text else "gap",
+            f"商业模式：{business.text}" if business and business.text else slice(market, "business"),
+        ),
+        Packet(
+            "competition",
+            "excerpt" if competition and competition.text else "gap",
+            f"竞争：{competition.text}" if competition and competition.text else slice(market, "competition"),
+        ),
+        Packet("risk", "excerpt" if risk_ok else "gap", risk_text if risk_ok else slice(market, "risk")),
     ]
-    return packets
 
 
 def role_memo(market: MarketData) -> str:
-    return " ".join(clip_memo(packet.text) for packet in role_packets(market))
+    parts = [card(market)]
+    for packet in role_packets(market):
+        text = clip_memo(packet.text, 16000) if packet.id == "risk" else packet.text
+        parts.append(text)
+    return " ".join(parts)
 
 
 def role_gap_labels(market: MarketData) -> list[str]:
