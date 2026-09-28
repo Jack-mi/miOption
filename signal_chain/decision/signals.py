@@ -159,12 +159,18 @@ async def research_signal(market: MarketData, pack: str, runner, model: str | No
     return _with_calls(bundle, [{"agent": "research", "thread_id": thread_id, "usage": usage}], model)
 
 
+def _stamp_value(bundle: RawBundle, run) -> RawBundle:
+    bundle.texts["analysis"] = run.memo
+    bundle.texts["claims"] = "\n".join(run.accepted_claims)
+    return bundle
+
+
 async def value_signal(market: MarketData, runner, model: str | None, *, trace_dir=None) -> RawBundle:
     run = await run_workflow(market, runner, model, trace_dir=trace_dir)
     faces = "财务"
     if run.abstain_reason or run.rating is None:
         bundle = _abstain("value", market, run.abstain_reason or "价值信号弃权", faces)
-        bundle.texts["analysis"] = run.memo
+        _stamp_value(bundle, run)
         for gap in (run.role_gaps or ROLE_GAPS):
             if gap not in bundle.data_gaps:
                 bundle.data_gaps.append(gap)
@@ -172,13 +178,12 @@ async def value_signal(market: MarketData, runner, model: str | None, *, trace_d
     mapped = _RATING_MAP.get(run.rating)
     if mapped is None:
         bundle = _abstain("value", market, f"价值信号评级无法识别: {run.rating}", faces)
-        bundle.texts["analysis"] = run.memo
-        return _with_calls(bundle, run.calls, model)
+        return _with_calls(_stamp_value(bundle, run), run.calls, model)
     direction, conviction = mapped
-    return _with_calls(
-        _bundle("value", market, direction, conviction, run.memo, faces, list(run.role_gaps or ROLE_GAPS)),
-        run.calls, model,
+    bundle = _bundle(
+        "value", market, direction, conviction, run.memo, faces, list(run.role_gaps or ROLE_GAPS),
     )
+    return _with_calls(_stamp_value(bundle, run), run.calls, model)
 
 
 async def build_signals(market: MarketData, runner, model: str | None, *, trace_dir=None) -> list[RawBundle]:
@@ -204,6 +209,7 @@ def to_engine_signal(bundle: RawBundle) -> EngineSignal:
         direction=bundle.direction or Direction.NEUTRAL,
         conviction=bundle.conviction if bundle.direction is not None else 0.0,
         reasoning=bundle.texts.get("analysis", ""),
+        claims=[line for line in (bundle.texts.get("claims") or "").splitlines() if line.strip()],
         degraded=bundle.data_status == "insufficient_data",
         data_status=bundle.data_status,
         data_gaps=list(bundle.data_gaps),

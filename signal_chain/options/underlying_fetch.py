@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from ..config import REPO_ROOT, require_runtime_python, NormTicker, Settings
-from ..sessions import session_for
+from ..sessions import align_futu_quote, session_for
 from ..schema.underlying import (
     DailyBar,
     FieldMeta,
@@ -234,9 +234,10 @@ def build_snapshot(
     """把富途探测和可选降级源收成一份快照。as_of 是这场交易日，不是运行日。"""
     if market not in _CCY:
         raise ValueError(f"本轮仅支持美/港标的，收到 {market}")
-    session = session_for(market, trade_date)
+    session = session_for(market, trade_date, now=fetched_at)
     tz = _TZ[market]
     currency = _CCY[market]
+    futu = align_futu_quote(futu) if market == "US" else futu
     futu = futu or {}
     fallback = fallback or {}
     quote = _pick(

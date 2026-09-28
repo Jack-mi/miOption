@@ -97,6 +97,48 @@ def test_kline_must_end_on_the_session():
     assert "这场交易" in (snap.kline.meta.error or "")
 
 
+def test_preopen_monday_uses_friday_session():
+    monday = date(2026, 9, 28)
+    friday = date(2026, 9, 25)
+    fetched = datetime(2026, 9, 28, 6, 12, tzinfo=timezone.utc)
+    snap = build_snapshot(
+        ticker="US.GLD", market="US", trade_date=monday, fetched_at=fetched,
+        futu={
+            "quote": {
+                "last": 393.41,
+                "session_date": monday.isoformat(),
+                "update_time": "2026-09-28 02:12:35.650",
+                "error": None,
+            },
+            "kline": {"adjusted": True, "bars": _bars(end=friday), "error": None},
+        },
+    )
+    assert snap.as_of == friday
+    assert snap.quote.meta.status == "available"
+    assert snap.quote.last == 393.41
+    assert snap.quote.meta.as_of == friday
+    assert snap.kline.meta.status == "available"
+    assert snap.kline.bars[-1].trade_date == friday
+    assert snap.technical.meta.status == "available"
+    assert "sma_5" in snap.technical.indicators
+
+
+def test_closed_session_ignores_a_later_preopen_clock():
+    wednesday = date(2026, 9, 23)
+    fetched = datetime(2026, 9, 28, 6, 12, tzinfo=timezone.utc)
+    snap = build_snapshot(
+        ticker="US.AAPL", market="US", trade_date=wednesday, fetched_at=fetched,
+        futu={
+            "quote": {"last": 180.0, "session_date": wednesday.isoformat(), "error": None},
+            "kline": {"adjusted": True, "bars": _bars(end=wednesday), "error": None},
+        },
+    )
+    assert snap.as_of == wednesday
+    assert snap.quote.meta.status == "available"
+    assert snap.kline.meta.status == "available"
+    assert snap.kline.meta.as_of == wednesday
+
+
 def test_sunday_quote_uses_friday_session():
     sunday = date(2026, 9, 27)
     friday = date(2026, 9, 25)

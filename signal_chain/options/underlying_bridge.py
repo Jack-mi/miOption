@@ -122,13 +122,18 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
             quote["error"] = f"snapshot 失败: {snap}"[:400]
         else:
             row = snap.iloc[0]
-            session = _session_date(row.get("update_time"))
+            raw_update = row.get("update_time")
+            update_text = "" if raw_update is None else str(raw_update).strip()
+            if update_text.lower() in {"nat", "nan", "none"}:
+                update_text = ""
+            session = _session_date(update_text)
             last = _num(row.get("last_price"))
             if last is None or session is None:
                 quote["error"] = "snapshot 无 last_price 或 update_time，不能确认交易日"
             else:
                 quote["last"] = last
                 quote["session_date"] = session
+                quote["update_time"] = update_text
 
         start = (trade_date - timedelta(days=120)).isoformat()
         bars, k_error = _history(quote_ctx, symbol, start, trade_date.isoformat())

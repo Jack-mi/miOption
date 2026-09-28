@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from signal_chain.config import NormTicker
 from signal_chain.data import earnings_calendar, edgar, fmp, polymarket
-from signal_chain.data.layer import clear_macro_cache, load
+from signal_chain.data.layer import _price_rows, clear_macro_cache, load
 from signal_chain.options.underlying_fetch import build_snapshot
 from signal_chain.schema.underlying import UnderlyingSnapshot
 
@@ -40,6 +40,20 @@ def _futu(price=180.0, flow=True):
     if flow:
         payload["capital_flow"] = {"net": 12.0, "as_of": D0.isoformat(), "error": None}
     return payload
+
+
+def test_stale_kline_is_not_recorded_as_a_successful_fetch():
+    snap = build_snapshot(
+        ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW,
+        futu={
+            "quote": {"last": 180.0, "session_date": D0.isoformat(), "error": None},
+            "kline": {"adjusted": True, "bars": _bars()[:-1], "error": None},
+        },
+    )
+    row = next(item for item in _price_rows(snap, {"futu": "ok"}) if item.field == "kline")
+    assert row.id == "futu"
+    assert row.state == "stale"
+    assert "不是这场交易" in row.note
 
 
 def _states(market, field):

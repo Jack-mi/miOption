@@ -42,6 +42,25 @@ def test_review_flags_a_skip_that_was_used():
     assert "该跳过的源却用了" in findings_for(market, decided)
 
 
+def test_review_ignores_filing_numbers_when_value_abstains():
+    market = _market()
+    decided = asyncio.run(run_decision(market, None, _SETTINGS, D0))
+    for sig in decided.signals:
+        if sig.engine == "value":
+            sig.reasoning += " 供应 3483 吨，金价 1770。"
+            sig.claims = []
+    assert "价值主张里的数字切片对不上" not in findings_for(market, decided)
+
+
+def test_review_flags_a_value_claim_missing_from_the_slice():
+    market = _market()
+    decided = asyncio.run(run_decision(market, None, _SETTINGS, D0))
+    for sig in decided.signals:
+        if sig.engine == "value":
+            sig.claims = ["收入 999 百万"]
+    assert "价值主张里的数字切片对不上" in findings_for(market, decided)
+
+
 def test_review_keeps_harness_findings_when_the_model_disagrees():
     market = _market()
     market.sources.append(SourceRow("fmp", "quote", "used", "上一级已可用"))

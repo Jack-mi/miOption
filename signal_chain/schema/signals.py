@@ -59,6 +59,8 @@ class EngineSignal(BaseModel):
     conviction: float = Field(ge=-1.0, le=1.0)
     horizon_days: tuple[int, int] = (3, 20)
     reasoning: str = ""
+    # 价值流程接受的财务主张。弃权时为空，备忘录里的申报原文不算主张。
+    claims: list[str] = Field(default_factory=list)
     risk_flags: list[str] = Field(default_factory=list)
     # 期权决策增量视图
     volatility_view: VolatilityView = "unknown"

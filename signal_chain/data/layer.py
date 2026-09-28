@@ -13,10 +13,10 @@ from ..options.underlying_fetch import (
     build_snapshot,
     probe_futu,
 )
+from ..sessions import align_futu_quote, session_for
 from ..research.berkshire import _cross_validate, attach_fundamentals, note_earnings
 from ..schema.underlying import FieldMeta
 from . import earnings_calendar, edgar, finnhub, fmp, fred, polymarket, reddit
-from ..sessions import session_for
 from .http import get_json, get_text
 from .keys import load_keys
 from .models import (
@@ -71,6 +71,8 @@ def _price_rows(snap, tried: dict[str, str]) -> list[SourceRow]:
                 continue
             if winner == source and meta.status == "available":
                 rows.append(_row(source, field, "used"))
+            elif winner == source and meta.status == "stale":
+                rows.append(_row(source, field, "stale", meta.error or "stale"))
             elif source in tried and tried[source] == "skipped":
                 rows.append(_row(source, field, "skipped", "上一级已可用"))
             elif source in tried:
@@ -130,9 +132,11 @@ def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_
     """报价和日线按富途、FMP 级联。资金流只用这次富途探测。"""
     tried: dict[str, str] = {}
     futu, futu_error = futu_probe(t, trade_date, settings)
+    if t.market == "US":
+        futu = align_futu_quote(futu)
     tried["futu"] = futu_error or "ok"
     from ..options.underlying_fetch import _futu_field_fresh
-    session = session_for(t.market, trade_date)
+    session = session_for(t.market, trade_date, now=fetched_at)
     fresh = _futu_field_fresh(futu, session, "quote") and _futu_field_fresh(futu, session, "kline")
     snap = build_snapshot(
         ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
@@ -231,7 +235,7 @@ def load(
             _earnings, t, skeleton, trade_date, fetched_at, keys, get, get_text,
         )
         news_f = pool.submit(
-            _news, t, session_for(t.market, trade_date), skeleton, trade_date, fetched_at, keys, get,
+            _news, t, session_for(t.market, trade_date, now=fetched_at), skeleton, trade_date, fetched_at, keys, get,
         )
         social_f = pool.submit(_social, t, keys, get, trade_date)
         events_f = pool.submit(_events, t, get, fetch_macro)

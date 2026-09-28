@@ -60,7 +60,7 @@ def findings_for(market, decision) -> list[str]:
         for sig in decision.signals:
             if sig.engine != "value":
                 continue
-            nums = _numbers(sig.reasoning or "")
+            nums = _numbers("\n".join(getattr(sig, "claims", None) or []))
             if nums and not nums <= allowed:
                 found.append("价值主张里的数字切片对不上")
     voting = [

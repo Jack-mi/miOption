@@ -11,7 +11,7 @@ from ..schema.underlying import UnderlyingSnapshot
 class SourceRow:
     id: str
     field: str
-    state: str  # used / missing / unsupported / skipped
+    state: str  # used / missing / unsupported / skipped / stale
     note: str = ""
 
 
