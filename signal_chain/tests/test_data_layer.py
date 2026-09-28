@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from signal_chain.config import NormTicker
-from signal_chain.data import earnings_calendar, edgar, fmp
+from signal_chain.data import earnings_calendar, edgar, fmp, polymarket
 from signal_chain.data.layer import clear_macro_cache, load
 from signal_chain.options.underlying_fetch import build_snapshot
 from signal_chain.schema.underlying import UnderlyingSnapshot
@@ -64,6 +64,7 @@ def _load(*, market="US", code="AAPL", futu=None, futu_error=None,
         get=getter,
         quota=quota or (lambda: False),
         futu_probe=futu_probe,
+        fetch_macro=lambda: [],
         **({} if get_text is None else {"get_text": get_text}),
     )
 
@@ -297,6 +298,28 @@ def test_social_stays_missing_without_reddit_credentials():
     assert market.social == []
     assert ("reddit", "missing") in _states(market, "social")
     assert all(row.id != "stocktwits" for row in market.sources)
+
+
+def test_macro_odds_keep_the_group_and_drop_thin_markets():
+    events = [
+        {"title": "Fed cuts", "slug": "fed-cuts", "markets": [
+            {"question": "No cuts", "closed": False, "negRisk": True,
+             "outcomePrices": "[\"0.9745\", \"0.0255\"]", "clobTokenIds": "[\"111\", \"222\"]",
+             "volume": 53_000_000},
+            {"question": "One cut", "closed": False, "negRisk": True,
+             "outcomePrices": "[\"0.02\", \"0.98\"]", "clobTokenIds": "[\"333\", \"444\"]",
+             "volume": 1_000},
+        ]},
+        {"title": "Thin", "slug": "thin", "markets": [
+            {"question": "Thin yes", "closed": False, "negRisk": False,
+             "outcomePrices": "[\"0.5\", \"0.5\"]", "clobTokenIds": "[\"555\"]", "volume": 100},
+        ]},
+    ]
+    rows = polymarket.macro_odds(events)
+    assert [row["question"] for row in rows] == ["No cuts", "One cut"]
+    assert rows[0]["prob_yes"] == 0.9745
+    assert rows[0]["token_id"] == "111"
+    assert rows[1]["token_id"] == "333"
 
 
 def test_annual_history_keeps_ten_years_and_filing_date():

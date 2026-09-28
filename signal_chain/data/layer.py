@@ -194,6 +194,7 @@ def load(
     futu_probe=probe_futu,
     chain_fetch=fetch_chain,
     get_text=get_text,
+    fetch_macro=None,
 ) -> MarketData:
     keys = keys if keys is not None else load_keys()
     fetched_at = datetime.now(timezone.utc)
@@ -233,7 +234,7 @@ def load(
             _news, t, session_for(t.market, trade_date), skeleton, trade_date, fetched_at, keys, get,
         )
         social_f = pool.submit(_social, t, keys, get, trade_date)
-        events_f = pool.submit(_events, t, get)
+        events_f = pool.submit(_events, t, get, fetch_macro)
         macro_f = pool.submit(load_macro, keys, trade_date, get)
         chain_f = pool.submit(chain_job)
         snap, price_rows, flow_net = price_f.result()
@@ -241,7 +242,7 @@ def load(
         earn_snap, earn_rows, excerpts = earn_f.result()
         news_snap, news_rows, news_text = news_f.result()
         social, social_rows = social_f.result()
-        events, event_row = events_f.result()
+        events, event_rows = events_f.result()
         macro, macro_rows = macro_f.result()
         chain, chain_error, chain_rows = chain_f.result()
 
@@ -253,7 +254,7 @@ def load(
     })
     rows = [
         *price_rows, *fact_rows, *earn_rows, *news_rows, *social_rows,
-        event_row, *macro_rows, *chain_rows,
+        *event_rows, *macro_rows, *chain_rows,
     ]
     return MarketData(
         snap, chain, chain_error, macro, social, events, facts, rows,
@@ -678,19 +679,48 @@ def _reddit_token(keys: dict) -> str:
     return token
 
 
-def _events(t, get):
+def _odds_failure(exc: BaseException) -> str:
+    text = str(exc)
+    lowered = text.lower()
+    kind = "parse_error"
+    if any(token in lowered for token in ("timed out", "timeout", "refused", "connect", "unreachable", "name or service")):
+        kind = "unreachable"
+    return f"{kind} {text[:120]}"
+
+
+def _events(t, get, fetch_macro=None):
+    items: list[EventOdds] = []
+    rows = []
     mapping = polymarket.load_map()
     slug = mapping.get(t.canonical)
     if not slug:
-        return [], _row("polymarket", "events", "skipped", "没有标的到事件的映射")
+        rows.append(_row("polymarket", "events", "skipped", "没有标的到事件的映射"))
+    else:
+        try:
+            payload = get(f"https://gamma-api.polymarket.com/events?slug={slug}")
+            found = polymarket.prices(payload)
+        except Exception as exc:
+            rows.append(_row("polymarket", "events", "missing", str(exc)[:160]))
+        else:
+            if not found:
+                rows.append(_row("polymarket", "events", "missing", "映射的事件没有价格"))
+            else:
+                items.extend(EventOdds(slug, name, price) for name, price in found)
+                rows.append(_row("polymarket", "events", "used", slug))
     try:
-        payload = get(f"https://gamma-api.polymarket.com/events?slug={slug}")
-        found = polymarket.prices(payload)
+        raw = fetch_macro() if fetch_macro else polymarket.fetch_macro_events()
+        odds = polymarket.macro_odds(raw)
     except Exception as exc:
-        return [], _row("polymarket", "events", "missing", str(exc)[:160])
-    if not found:
-        return [], _row("polymarket", "events", "missing", "映射的事件没有价格")
-    return [EventOdds(slug, name, price) for name, price in found], _row("polymarket", "events", "used", slug)
+        rows.append(_row("polymarket", "macro_odds", "missing", _odds_failure(exc)))
+        return items, rows
+    if not odds:
+        rows.append(_row("polymarket", "macro_odds", "missing", "没有宏观事件"))
+        return items, rows
+    items.extend(
+        EventOdds(row["slug"], row["question"], row["prob_yes"]) for row in odds
+    )
+    rows.append(_row("polymarket", "macro_odds", "used", f"{len(odds)} 个市场"))
+    return items, rows
 
 
 def clear_macro_cache() -> None:

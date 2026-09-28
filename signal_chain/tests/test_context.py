@@ -48,6 +48,40 @@ def _market():
     )
 
 
+def test_source_rows_stay_on_their_slice():
+    from signal_chain.decision.pack import render_pack
+    from signal_chain.research.workflow import finance_slice
+
+    market = _market()
+    market.sources = [
+        *market.sources,
+        SourceRow("fmp", "quote", "skipped", "上一级已可用"),
+        SourceRow("fmp", "fundamentals", "missing", "与 EDGAR 相差超过 1%"),
+    ]
+    quote = slice(market, "quote")
+    fundamentals = slice(market, "fundamentals")
+    assert "fmp skipped 上一级已可用" in quote
+    assert "上一级已可用" not in fundamentals
+    assert "与 EDGAR 相差超过 1%" in fundamentals
+    pack = render_pack(market)
+    value = finance_slice(market)
+    assert "上一级已可用" in pack
+    assert "上一级已可用" not in value
+    assert "与 EDGAR 相差超过 1%" in value
+
+
+def test_events_slice_shows_gamma_failure_not_the_empty_mapping():
+    market = _market()
+    market.events = []
+    market.sources = [
+        SourceRow("polymarket", "events", "skipped", "没有标的到事件的映射"),
+        SourceRow("polymarket", "macro_odds", "missing", "unreachable Connection refused"),
+    ]
+    text = slice(market, "events")
+    assert text.startswith("事件赔率缺失：unreachable")
+    assert "polymarket skipped 没有标的到事件的映射" in text
+
+
 def test_card_names_the_four_clocks():
     text = card(_market())
     assert "US.AAPL" in text

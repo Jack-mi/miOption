@@ -25,10 +25,42 @@ def card(market: MarketData) -> str:
     return "\n".join(lines)
 
 
+_FIELDS = {
+    "quote": ("quote",),
+    "kline": ("kline",),
+    "sma": ("technical",),
+    "flow": ("capital_flow",),
+    "chain": ("chain",),
+    "fundamentals": ("fundamentals",),
+    "earnings": ("earnings",),
+    "filing": ("earnings",),
+    "business": ("earnings",),
+    "competition": ("earnings",),
+    "risk": ("risk_factors", "earnings"),
+    "governance": ("earnings",),
+    "news": ("news",),
+    "social": ("social",),
+    "events": ("events", "macro_odds"),
+    "macro": ("macro",),
+}
+
+
 def slice(market: MarketData, name: str) -> str:
     if name not in _NAMES:
         return f"{name}缺失：没有这个切片"
-    return _SLICES[name](market)
+    return f"{_SLICES[name](market)}\n{_provenance(market, name)}"
+
+
+def _provenance(market: MarketData, name: str) -> str:
+    fields = _FIELDS[name]
+    rows = [row for row in market.sources if row.field in fields]
+    if not rows:
+        return "取数记录缺失"
+    lines = ["取数"]
+    for row in rows:
+        note = f" {row.note}" if row.note else ""
+        lines.append(f"{row.id} {row.state}{note}")
+    return "\n".join(lines)
 
 
 def _face(status: str, clock: str) -> str:
@@ -191,7 +223,12 @@ def _social(market: MarketData) -> str:
 
 def _events(market: MarketData) -> str:
     if not market.events:
-        note = next((row.note for row in market.sources if row.field == "events" and row.note), "没有事件")
+        note = next(
+            (row.note for row in market.sources if row.field == "macro_odds" and row.state == "missing" and row.note),
+            "",
+        )
+        if not note:
+            note = next((row.note for row in market.sources if row.field == "events" and row.note), "没有事件")
         return f"事件赔率缺失：{note}"
     return "\n".join(
         f"事件：{item.slug} {item.outcome} {item.price}" for item in market.events
