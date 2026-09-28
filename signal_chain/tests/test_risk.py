@@ -66,6 +66,16 @@ def test_earnings_window_short_vol_veto():
     assert any("财报窗口" in v for v in d.vetoes)
 
 
+def test_earnings_expiry_window_short_vol_veto_even_when_earnings_are_far():
+    cat = [Catalyst(type="earnings", expected_date=D0 + timedelta(days=27),
+                    description="Q3")]
+    proposal = _spread()
+    proposal.legs[0].expiry = D0 + timedelta(days=22)
+    proposal.legs[1].expiry = D0 + timedelta(days=22)
+    d = check_proposal(proposal, _ensemble(catalysts=cat), _chain())
+    assert any("财报窗口内到期" in v for v in d.vetoes)
+
+
 def test_rising_vol_short_vol_veto():
     d = check_proposal(_spread(), _ensemble(vol="rising"), _chain())
     assert any("short-vol" in v for v in d.vetoes)

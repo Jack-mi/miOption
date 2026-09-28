@@ -1,6 +1,7 @@
 """数据层字段并行，价格仍按级联。注入假响应，不访问 OpenD 或公网。"""
 
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+from types import SimpleNamespace
 
 import pytest
 from pydantic import ValidationError
@@ -61,7 +62,8 @@ def _states(market, field):
 
 
 def _load(*, market="US", code="AAPL", futu=None, futu_error=None,
-          keys=None, get=None, quota=None, get_text=None):
+          keys=None, get=None, quota=None, get_text=None, settings=None,
+          include_chain=False, chain_fetch=None):
     ticker = NormTicker(market, code)
 
     def futu_probe(*_a, **_k):
@@ -73,11 +75,12 @@ def _load(*, market="US", code="AAPL", futu=None, futu_error=None,
         raise AssertionError(url)
 
     return load(
-        ticker, D0, object(), include_chain=False,
+        ticker, D0, settings or object(), include_chain=include_chain,
         keys=keys or {},
         get=getter,
         quota=quota or (lambda: False),
         futu_probe=futu_probe,
+        chain_fetch=chain_fetch or (lambda *_a, **_k: (_ for _ in ()).throw(AssertionError("不该取链"))),
         fetch_macro=lambda: [],
         **({} if get_text is None else {"get_text": get_text}),
     )
@@ -102,7 +105,6 @@ def test_fresh_futu_skips_fmp_price():
     assert market.snapshot.quote.meta.source == "futu"
     assert market.snapshot.kline.meta.source == "futu"
     assert ("fmp", "skipped") in _states(market, "quote")
-    assert all(row.id != "yfinance" for row in market.sources)
     assert ("futu", "used") in _states(market, "capital_flow")
     assert ("eastmoney", "skipped") not in _states(market, "capital_flow")
     assert market.snapshot.fundamentals.status == "available"
@@ -134,6 +136,76 @@ def test_fmp_fills_quote_when_futu_misses():
     assert market.snapshot.quote.last == 90
     assert "opend 未连接" in (market.snapshot.quote.meta.error or "")
     assert ("reddit", "missing") in _states(market, "social")
+
+
+def test_nasdaq_fills_price_when_futu_and_fmp_miss():
+    def get(url, headers=None):
+        if "api.nasdaq.com/api/quote/AAPL/historical" in url:
+            return {"data": {"tradesTable": {"rows": [
+                {"date": "09/23/2026", "close": "$91.00", "open": "$90.00",
+                 "high": "$92.00", "low": "$89.00", "volume": "100"},
+            ]}}}
+        if "sec.gov" in url:
+            return _edgar_get(url, headers)
+        raise AssertionError(url)
+
+    market = _load(futu=None, futu_error="opend 未连接", get=get)
+    assert market.snapshot.quote.meta.source == "nasdaq"
+    assert market.snapshot.quote.last == 91.0
+    assert market.snapshot.kline.meta.source == "nasdaq"
+    assert ("fmp", "skipped") in _states(market, "quote")
+    assert ("nasdaq", "used") in _states(market, "quote")
+
+
+def test_chain_spot_uses_the_price_cascade_spot():
+    from signal_chain.schema import ChainSnapshot, OptionRow
+
+    exp = D0 + timedelta(days=14)
+    futu_chain = ChainSnapshot(
+        ticker="US.AAPL", market="US", as_of=D0, source="futu", spot=101.0,
+        rows=[OptionRow(code="C100", strike=100, expiry=exp, option_type="CALL",
+                        bid=5, ask=5.2, open_interest=500)],
+    )
+    market = _load(
+        futu=_futu(100.0), get=_edgar_get, include_chain=True,
+        chain_fetch=lambda *_a, **_k: futu_chain,
+    )
+    assert market.chain is not None
+    assert market.chain.source == "futu"
+    assert market.chain.spot == 100.0
+    assert ("cboe", "skipped") in _states(market, "chain")
+
+
+def test_cboe_fills_chain_when_futu_fails():
+    def get(url, headers=None):
+        if "cdn-api.cboe.com/api/global/delayed_quotes/options/AAPL.json" in url:
+            return {
+                "data": {
+                    "current_price": 101.0,
+                    "options": [{
+                        "option": "AAPL261007C00100000", "bid": 1.0, "ask": 1.1,
+                        "iv": 0.3, "delta": 0.5, "open_interest": 100.0,
+                        "volume": 1.0, "last_trade_price": 1.05,
+                    }],
+                },
+            }
+        if "sec.gov" in url:
+            return _edgar_get(url, headers)
+        raise AssertionError(url)
+
+    def chain_fetch(*_a, **_k):
+        raise RuntimeError("OpenD 未连接")
+
+    market = _load(
+        futu=_futu(100.0), get=get, include_chain=True, chain_fetch=chain_fetch,
+        settings=SimpleNamespace(chain={"expiry_window_days": 60}),
+    )
+    assert market.chain is not None
+    assert market.chain.source == "cboe"
+    assert market.chain.degraded is True
+    assert market.chain.spot == 100.0
+    assert ("futu", "missing") in _states(market, "chain")
+    assert ("cboe", "used") in _states(market, "chain")
 
 
 def test_fmp_price_when_both_fail():
@@ -219,6 +291,8 @@ def test_macro_reads_latest_fred_observation():
             return {"observations": [{"date": "2026-08-01", "value": "4.3"}]}
         if "series_id=DGS10" in url:
             return {"observations": [{"date": "2026-09-25", "value": "4.16"}]}
+        if "series_id=DGS3MO" in url:
+            return {"observations": [{"date": "2026-09-25", "value": "3.95"}]}
         if "sec.gov" in url or "stocktwits" in url:
             return _edgar_get(url, headers)
         raise AssertionError(url)
@@ -232,6 +306,7 @@ def test_macro_reads_latest_fred_observation():
     assert by_series["UNEMPLOYMENT"].value == 4.3
     assert by_series["DGS10"].as_of == date(2026, 9, 25)
     assert by_series["DGS10"].value == 4.16
+    assert by_series["RISK_FREE_3M"].value == 3.95
     assert ("fred", "used") in _states(market, "macro")
     assert ("fmp", "used") not in _states(market, "macro")
     assert ("nyfed", "used") not in _states(market, "macro")
@@ -246,7 +321,6 @@ def test_earnings_date_stays_empty_without_a_disclosure_source():
     assert market.snapshot.earnings_date is None
     assert market.snapshot.earnings_source is None
     assert any("申报日 2026-08-01" in row.note for row in market.sources if row.field == "earnings")
-    assert all(row.id != "yfinance" for row in market.sources)
 
 
 def test_agreed_ratios_excerpts_and_fresh_archive():

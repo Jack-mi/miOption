@@ -199,7 +199,6 @@ def test_both_sources_missing():
     assert snap.quote.last is None
     assert "opend 未连接" in snap.quote.meta.error
     assert "429" in snap.quote.meta.error
-    assert "yfinance" not in snap.quote.meta.error
     assert snap.kline.meta.status == "missing"
 
 

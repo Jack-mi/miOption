@@ -6,6 +6,7 @@ from datetime import date
 
 SERIES = (
     ("FEDERAL_FUNDS_RATE", "DFF"),
+    ("RISK_FREE_3M", "DGS3MO"),
     ("CPI", "CPIAUCSL"),
     ("UNEMPLOYMENT", "UNRATE"),
     ("DGS10", "DGS10"),

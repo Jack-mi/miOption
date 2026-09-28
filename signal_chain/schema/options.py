@@ -40,7 +40,7 @@ class ChainSnapshot(BaseModel):
     market: Literal["US", "HK", "CN"]
     as_of: date
     fetched_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    source: Literal["futu"]
+    source: Literal["futu", "cboe"]
     spot: float | None = None
     rows: list[OptionRow] = Field(default_factory=list)
     degraded: bool = False

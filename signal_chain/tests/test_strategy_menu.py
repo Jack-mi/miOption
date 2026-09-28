@@ -37,6 +37,9 @@ def test_neutral_rising_keeps_straddle_and_drops_the_rest():
     straddle = by_name["买入跨式"]
     assert straddle.status == "fit"
     assert {lg.code for lg in straddle.proposal.legs} <= {"C340", "P340"}
+    assert straddle.proposal.notes is not None
+    assert "到期压力情景" in straddle.proposal.notes
+    assert "现价-5% 780，-10% 2480" in straddle.proposal.notes
     assert "风控" not in straddle.reason
     text = render_menu([MenuVerdict("买入看涨", "unfit", "方向不合。", None, None)])
     assert "Participate in an expected rise" in text

@@ -223,6 +223,22 @@ def _max_loss(shape: str, legs: list[StrategyLeg], net: float | None) -> float |
     return round(abs(min(net, 0)) * _MULT, 2)
 
 
+def _scenario_note(legs: list[StrategyLeg], net: float | None, spot: float) -> str | None:
+    """同到期结构给 -5%/-10% 的到期损益边界；非到期市值不做假精确。"""
+    if net is None or len({leg.expiry for leg in legs}) != 1:
+        return None
+
+    def pnl(target: float) -> float:
+        total = net * _MULT
+        for leg in legs:
+            intrinsic = max(target - leg.strike, 0) if leg.option_type == "CALL" else max(leg.strike - target, 0)
+            total += (-1 if leg.side == "sell" else 1) * intrinsic * leg.quantity * _MULT
+        return total
+
+    down_5, down_10 = pnl(spot * 0.95), pnl(spot * 0.90)
+    return f"到期压力情景：现价-5% {down_5:.0f}，-10% {down_10:.0f}"
+
+
 def _finish(name: str, thesis: str, shape: str, short_vol: bool,
             legs: list[StrategyLeg], chain: ChainSnapshot) -> StrategyProposal | None:
     if not legs or any(lg is None for lg in legs):
@@ -236,6 +252,7 @@ def _finish(name: str, thesis: str, shape: str, short_vol: bool,
         max_loss=_max_loss(shape, legs, net),
         net_premium=None if net is None else round(net * _MULT, 2),
         is_short_vol=short_vol,
+        notes=_scenario_note(legs, net, chain.spot or 0),
     )
 
 
@@ -471,6 +488,8 @@ def render_menu(verdicts: list[MenuVerdict]) -> str:
             legs = "，".join(f"{lg.side} {lg.code} K={lg.strike}" for lg in v.proposal.legs)
             loss = "算不出" if v.proposal.max_loss is None else f"{v.proposal.max_loss:.0f}"
             extra = f"合约 {legs}。最大亏损 {loss}。"
+            if v.proposal.notes:
+                extra += f"{v.proposal.notes}。"
             if v.risk and v.risk.vetoes:
                 extra += "风控否决：" + "；".join(v.risk.vetoes) + "。"
             elif v.risk and v.risk.approved:

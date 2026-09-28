@@ -16,7 +16,7 @@ from ..options.underlying_fetch import (
 from ..sessions import align_futu_quote, session_for
 from ..research.berkshire import _cross_validate, attach_fundamentals, note_earnings
 from ..schema.underlying import FieldMeta
-from . import earnings_calendar, edgar, finnhub, fmp, fred, polymarket, reddit
+from . import cboe, earnings_calendar, edgar, finnhub, fmp, fred, nasdaq, polymarket, reddit
 from .http import get_json, get_text
 from .keys import load_keys
 from .models import (
@@ -24,6 +24,20 @@ from .models import (
 )
 
 _MACRO: dict[str, tuple[list[MacroPoint], list[SourceRow]]] = {}
+
+# 取源顺序是 source of truth。新增源必须先登记在这里，再接入级联。
+SOURCE_ORDER = {
+    "quote": ("futu", "fmp", "nasdaq"),
+    "kline": ("futu", "fmp", "nasdaq"),
+    "chain": ("futu", "cboe"),
+    "earnings": ("nasdaq", "finnhub", "edgar"),
+    "fundamentals": ("edgar", "fmp"),
+    "news": ("finnhub",),
+    "social": ("reddit",),
+    "macro": ("fred",),
+}
+
+_NASDAQ_HEADERS = {"User-Agent": "mioption data", "Accept": "application/json"}
 
 
 def _row(source: str, field: str, state: str, note: str = "") -> SourceRow:
@@ -66,9 +80,7 @@ def _price_rows(snap, tried: dict[str, str]) -> list[SourceRow]:
     rows = []
     for field, meta in (("quote", snap.quote.meta), ("kline", snap.kline.meta)):
         winner = meta.source
-        for source in ("futu", "fmp"):
-            if source not in tried and source != "futu":
-                continue
+        for source in SOURCE_ORDER[field]:
             if winner == source and meta.status == "available":
                 rows.append(_row(source, field, "used"))
             elif winner == source and meta.status == "stale":
@@ -79,6 +91,8 @@ def _price_rows(snap, tried: dict[str, str]) -> list[SourceRow]:
                 rows.append(_row(source, field, "missing", tried[source]))
             elif source == "futu" and meta.status != "available":
                 rows.append(_row("futu", field, "missing", meta.error or meta.status))
+            elif source not in tried:
+                rows.append(_row(source, field, "skipped", "上一级已可用"))
     if snap.technical.meta.status == "available":
         rows.append(_row("local_technical", "technical", "used", snap.technical.meta.source or ""))
     else:
@@ -129,7 +143,7 @@ def load_macro(keys: dict[str, str], today: date, get=get_json, quota=None) -> t
 
 
 def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_probe):
-    """报价和日线按富途、FMP 级联。资金流只用这次富途探测。"""
+    """报价和日线按 SOURCE_ORDER 级联。资金流只用这次富途探测。"""
     tried: dict[str, str] = {}
     futu, futu_error = futu_probe(t, trade_date, settings)
     if t.market == "US":
@@ -168,21 +182,60 @@ def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_
                 )
         except Exception as exc:
             tried["fmp"] = fmp.public_error(exc)
+    both_available = snap.quote.meta.status == "available" and snap.kline.meta.status == "available"
+    used_nasdaq = any(
+        meta.source == "nasdaq" and meta.status == "available"
+        for meta in (snap.quote.meta, snap.kline.meta)
+    )
+    if both_available and not used_nasdaq:
+        tried["nasdaq"] = "skipped"
+    else:
+        tried["nasdaq"] = "ok"
+        url = nasdaq.historical_url(t.code, trade_date - timedelta(days=14), trade_date)
+        try:
+            probe = nasdaq.daily_probe(get(url, _NASDAQ_HEADERS))
+            if probe is None:
+                tried["nasdaq"] = "无日线"
+            else:
+                snap = build_snapshot(
+                    ticker=t.canonical, market=t.market, trade_date=trade_date,
+                    fetched_at=fetched_at,
+                    futu=_probe_from_snapshot(snap),
+                    fallback=probe,
+                    futu_error=snap.quote.meta.error,
+                    fallback_source="nasdaq",
+                )
+                used_nasdaq = any(
+                    meta.source == "nasdaq" and meta.status == "available"
+                    for meta in (snap.quote.meta, snap.kline.meta)
+                )
+                if not used_nasdaq:
+                    tried["nasdaq"] = "无这场日线"
+        except Exception as exc:
+            tried["nasdaq"] = nasdaq.public_error(exc)
     rows = _price_rows(snap, tried)
     snap, flow_rows, flow_net = _capital_flow(snap, futu, fetched_at)
     rows.extend(flow_rows)
     return snap, rows, flow_net
 
 
-def _option_chain(t, settings, chain_fetch):
+def _option_chain(t, trade_date, settings, chain_fetch, get):
     rows: list[SourceRow] = []
     try:
         chain = chain_fetch(t, settings)
     except Exception as exc:
-        chain_error = str(exc)[:300]
-        rows.append(_row("futu", "chain", "missing", chain_error or "富途不可用"))
-        return None, chain_error, rows
+        futu_error = str(exc)[:300]
+        rows.append(_row("futu", "chain", "missing", futu_error or "富途不可用"))
+        try:
+            chain = cboe.fetch_chain(t, trade_date, settings, get)
+        except Exception as exc:
+            chain_error = f"futu: {futu_error}；cboe: {str(exc)[:160]}"
+            rows.append(_row("cboe", "chain", "missing", str(exc)[:160]))
+            return None, chain_error, rows
+        rows.append(_row("cboe", "chain", "used", "Futu 失败后降级"))
+        return chain, None, rows
     rows.append(_row("futu", "chain", "used"))
+    rows.append(_row("cboe", "chain", "skipped", "上一级已可用"))
     return chain, None, rows
 
 
@@ -221,7 +274,7 @@ def load(
     def chain_job():
         if not include_chain:
             return None, None, []
-        return _option_chain(t, settings, chain_fetch)
+        return _option_chain(t, trade_date, settings, chain_fetch, get)
 
     with ThreadPoolExecutor(max_workers=8) as pool:
         price_f = pool.submit(
@@ -249,6 +302,10 @@ def load(
         events, event_rows = events_f.result()
         macro, macro_rows = macro_f.result()
         chain, chain_error, chain_rows = chain_f.result()
+
+    # 报价/日线级联选出的 spot 是唯一基准价；期权链只保留链合约，不另立价格。
+    if chain is not None and snap.quote.meta.status == "available" and snap.quote.last is not None:
+        chain = chain.model_copy(update={"spot": snap.quote.last})
 
     snap = snap.model_copy(update={
         "fundamentals": fund_snap.fundamentals,
@@ -566,9 +623,6 @@ def _earnings(t, snap, trade_date, fetched_at, keys, get, read_text):
         return snap, rows, excerpts
     snap = note_earnings(snap, found[0], source=found[1])
     return snap, rows + [_row(found[1], "earnings", "used", note or found[0].isoformat())], excerpts
-
-
-_NASDAQ_HEADERS = {"User-Agent": "mioption data", "Accept": "application/json"}
 
 
 def _next_earnings(symbol: str, day: date, keys: dict, get) -> tuple[tuple[date, str] | None, str]:

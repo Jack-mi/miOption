@@ -2,7 +2,7 @@
 
 一票否决项（方案 v5）：
 - conflicted 信号；
-- 财报窗口（earnings_blackout_days）内的 short-vol 结构；volatility_view=rising 时 short-vol；
+- 财报日前后 earnings_blackout_days 内到期的 short-vol 结构；volatility_view=rising 时 short-vol；
 - 单腿流动性不达标：OI < min_open_interest 或 spread_pct > max_spread_pct；
 - 单标的新结构最大亏损 > max_position_risk_pct * 账户权益（美股为总资产折美元；读取失败时跳过并告警）。
 """
@@ -64,6 +64,13 @@ def check_proposal(
                     vetoes.append(
                         f"财报窗口内禁止 short-vol：{c.expected_date} 财报（{gap} 天后），结构 {proposal.name}"
                     )
+                for leg in proposal.legs:
+                    expiry_gap = (leg.expiry - c.expected_date).days
+                    if abs(expiry_gap) <= earnings_blackout_days:
+                        vetoes.append(
+                            f"财报窗口内到期禁止 short-vol：{leg.expiry} 距 {c.expected_date} 财报 "
+                            f"{expiry_gap} 天，结构 {proposal.name}"
+                        )
         if signal.volatility_view == "rising":
             vetoes.append(f"volatility_view=rising 时禁止 short-vol 结构：{proposal.name}")
 
