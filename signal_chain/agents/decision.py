@@ -8,7 +8,6 @@ from datetime import date
 from ..decision import build_signals, to_engine_signal
 from ..options.iv import derive_volatility_view
 from ..options.strategy_menu import apply_user_bias, decision_action, screen_menu
-from ..pipeline.steps import synthesize_notes
 from ..research.berkshire import earnings_catalyst
 from ..risk.account_equity import read_account_equity
 from ..risk.limits import check_signal
@@ -90,10 +89,6 @@ async def run(
     earnings = earnings_catalyst(market.snapshot)
     if earnings is not None:
         ensemble = ensemble.model_copy(update={"catalysts": [*ensemble.catalysts, earnings]})
-    if runner is not None:
-        ensemble, meta = await synthesize_notes(runner, ensemble, models["synthesis"])
-        if meta:
-            agents["synthesize"] = {"thread_id": meta.thread_id, "model": meta.model}
     risk_cfg = settings.risk
     account = read_account_equity(market.snapshot.market, settings) if risk_cfg.get("auto_account_equity") else None
     sig_gate = check_signal(ensemble)

@@ -1,4 +1,4 @@
-"""Orchestrator：每标的完整链路编排。确定性代码，LLM 只在 pipeline.steps 里出现。
+"""Orchestrator：每标的完整链路编排。确定性代码，LLM 只出现在研究和简报环节。
 
 用法:
   python -m signal_chain.orchestrator --tickers US.AAPL [--date 2026-09-23]
@@ -148,6 +148,8 @@ async def process_ticker(
             f"你是中文金融简报撰写人。根据以下材料写一份 {t.canonical} 的期权决策简报"
             f"（markdown，不超过 1000 字）：合成信号 {ensemble.model_dump_json()}；"
             f"决策动作 {action}。review：{review_text}。"
+            "简报开头先用 150 字以内写合成说明：各引擎是否互相印证、各自的增量信息是什么；"
+            "方向异号时再写一段分歧焦点。"
             "可以引用 review 的毛病清单，但不能把它改写成另一份判断。"
             "结构菜单会附在简报后面，不要改写其中的适合、不适合、做不了，也不要另造结构。"
             f"富途价格证据：报价 {snapshot.quote.meta.status} as_of {snapshot.quote.meta.as_of}，"
