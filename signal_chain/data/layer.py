@@ -16,7 +16,7 @@ from ..options.underlying_fetch import (
 from ..sessions import align_futu_quote, session_for
 from ..research.berkshire import _cross_validate, attach_fundamentals, note_earnings
 from ..schema.underlying import FieldMeta
-from . import cboe, earnings_calendar, edgar, finnhub, fmp, fred, nasdaq, polymarket, reddit
+from . import cboe, earnings_calendar, edgar, finnhub, fmp, fred, macro, nasdaq, polymarket, reddit
 from .http import get_json, get_text
 from .keys import load_keys
 from .models import (
@@ -34,7 +34,7 @@ SOURCE_ORDER = {
     "fundamentals": ("edgar", "fmp"),
     "news": ("finnhub",),
     "social": ("reddit",),
-    "macro": ("fred",),
+    "macro": ("supabase",),
 }
 
 _NASDAQ_HEADERS = {"User-Agent": "mioption data", "Accept": "application/json"}
@@ -113,31 +113,11 @@ def _news_meta(text: str | None, source: str, as_of: date, fetched_at: datetime,
 
 
 def load_macro(keys: dict[str, str], today: date, get=get_json, quota=None) -> tuple[list[MacroPoint], list[SourceRow]]:
+    """宏观只读共享层。刷新由 macro_refresh 单独负责，不在这里发 FRED 请求。"""
     cached = _MACRO.get(today.isoformat())
     if cached is not None:
         return cached
-    if not keys.get("FRED_API_KEY"):
-        result = ([], [_row("fred", "macro", "skipped", "没有 FRED_API_KEY")])
-        _MACRO[today.isoformat()] = result
-        return result
-    points: list[MacroPoint] = []
-    errors: list[str] = []
-    for series, series_id in fred.SERIES:
-        try:
-            payload = get(fred.observations_url(series_id, keys["FRED_API_KEY"]))
-            obs = fred.latest(payload)
-        except Exception as exc:
-            errors.append(f"{series}: {fred.public_error(exc)}")
-            continue
-        if obs is None:
-            errors.append(f"{series}: 无观测")
-            continue
-        points.append(MacroPoint(series, obs[0], obs[1], "fred"))
-    if points:
-        rows = [_row("fred", "macro", "used", "；".join(f"{point.series} {point.as_of.isoformat()}" for point in points))]
-    else:
-        rows = [_row("fred", "macro", "missing", "；".join(errors) or "无观测")]
-    result = (points, rows)
+    result = macro.read_macro(keys.get("SUPABASE_SERVICE_ROLE_KEY"), get=get)
     _MACRO[today.isoformat()] = result
     return result
 

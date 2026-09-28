@@ -146,7 +146,7 @@ async def process_ticker(
     if runner is not None and not skip_report:
         prompt = (
             f"你是中文金融简报撰写人。根据以下材料写一份 {t.canonical} 的期权决策简报"
-            f"（markdown，不超过 600 字）：合成信号 {ensemble.model_dump_json()}；"
+            f"（markdown，不超过 1000 字）：合成信号 {ensemble.model_dump_json()}；"
             f"决策动作 {action}。review：{review_text}。"
             "可以引用 review 的毛病清单，但不能把它改写成另一份判断。"
             "结构菜单会附在简报后面，不要改写其中的适合、不适合、做不了，也不要另造结构。"

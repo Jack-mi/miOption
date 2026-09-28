@@ -38,7 +38,7 @@
 - [x] 账户权益只读富途真实账户（美股 `usd_assets`，港股 `hkd_assets`）。失败只告警，并跳过敞口上限。
 - [x] 美股资金流只有富途 `in_flow`。没有则缺失。成交额不当净流入。
 - [x] 数据层只取美股。港股和 A 股在 `load` 入口拒绝，不发请求。
-- [x] 宏观只走 FRED：联邦基金利率（DFF）、3 个月无风险利率（DGS3MO）、CPI（CPIAUCSL）、失业率（UNRATE），各取最新有效观测。账本不写数值。
+- [x] 宏观共享层走 Supabase `macro_observations` 表 + `macro_latest` 视图。每日 08:30 由 launchd `com.mioption.macro-refresh` 刷新 FRED 序列（DFF、DGS3MO、CPIAUCSL、UNRATE、DGS10）。标的请求只读共享层，不重复发 FRED 请求。
 - [x] 财报日不再从 Yahoo 取。EDGAR 申报日只留在来源备注，不写入 `earnings_date`。
 - [x] FMP 新闻用美股代码，不用交易所后缀。
 

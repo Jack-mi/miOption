@@ -114,7 +114,7 @@ def test_fresh_futu_skips_fmp_price():
     assert market.snapshot.earnings_source is None
     assert any(row.id == "edgar" and row.state == "used" and "申报日 2026-08-01" in row.note
                for row in market.sources if row.field == "earnings")
-    assert ("fred", "skipped") in _states(market, "macro")
+    assert ("supabase", "missing") in _states(market, "macro")
     assert ("polymarket", "skipped") in _states(market, "events")
 
 
@@ -280,40 +280,47 @@ def test_capital_flow_available_requires_source():
 
 def test_macro_reads_latest_fred_observation():
     def get(url, headers=None):
-        if "series_id=DFF" in url:
-            return {"observations": [
-                {"date": "2026-09-25", "value": "."},
-                {"date": "2026-09-24", "value": "4.09"},
-            ]}
-        if "series_id=CPIAUCSL" in url:
-            return {"observations": [{"date": "2026-08-01", "value": "326.8"}]}
-        if "series_id=UNRATE" in url:
-            return {"observations": [{"date": "2026-08-01", "value": "4.3"}]}
-        if "series_id=DGS10" in url:
-            return {"observations": [{"date": "2026-09-25", "value": "4.16"}]}
-        if "series_id=DGS3MO" in url:
-            return {"observations": [{"date": "2026-09-25", "value": "3.95"}]}
+        if "/rest/v1/macro_latest" in url:
+            assert headers and headers.get("apikey")
+            return [
+                {"series": "FEDERAL_FUNDS_RATE", "as_of": "2026-09-24", "value": 4.09,
+                 "source": "fred", "fetched_at": "2026-09-28T00:00:00Z"},
+                {"series": "RISK_FREE_3M", "as_of": "2026-09-24", "value": 3.95,
+                 "source": "fred", "fetched_at": "2026-09-28T00:00:00Z"},
+                {"series": "CPI", "as_of": "2026-08-01", "value": 326.8,
+                 "source": "fred", "fetched_at": "2026-09-28T00:00:00Z"},
+                {"series": "UNEMPLOYMENT", "as_of": "2026-08-01", "value": 4.3,
+                 "source": "fred", "fetched_at": "2026-09-28T00:00:00Z"},
+                {"series": "DGS10", "as_of": "2026-09-24", "value": 4.16,
+                 "source": "fred", "fetched_at": "2026-09-28T00:00:00Z"},
+            ]
         if "sec.gov" in url or "stocktwits" in url:
             return _edgar_get(url, headers)
         raise AssertionError(url)
 
-    market = _load(futu=_futu(), keys={"FRED_API_KEY": "k"}, get=get)
+    market = _load(futu=_futu(), keys={"SUPABASE_SERVICE_ROLE_KEY": "k"}, get=get)
     by_series = {point.series: point for point in market.macro}
     assert by_series["FEDERAL_FUNDS_RATE"].as_of == date(2026, 9, 24)
     assert by_series["FEDERAL_FUNDS_RATE"].value == 4.09
     assert by_series["FEDERAL_FUNDS_RATE"].source == "fred"
     assert by_series["CPI"].value == 326.8
     assert by_series["UNEMPLOYMENT"].value == 4.3
-    assert by_series["DGS10"].as_of == date(2026, 9, 25)
+    assert by_series["DGS10"].as_of == date(2026, 9, 24)
     assert by_series["DGS10"].value == 4.16
     assert by_series["RISK_FREE_3M"].value == 3.95
-    assert ("fred", "used") in _states(market, "macro")
+    assert ("supabase", "used") in _states(market, "macro")
     assert ("fmp", "used") not in _states(market, "macro")
-    assert ("nyfed", "used") not in _states(market, "macro")
+    assert ("fred", "used") not in _states(market, "macro")
     from signal_chain.decision.pack import render_pack
     text = render_pack(market)
     assert "FEDERAL_FUNDS_RATE" in text
     assert "4.09" in text
+
+
+def test_macro_shared_layer_missing_without_supabase_key():
+    market = _load(futu=_futu(), get=_edgar_get)
+    assert market.macro == []
+    assert ("supabase", "missing") in _states(market, "macro")
 
 
 def test_earnings_date_stays_empty_without_a_disclosure_source():
