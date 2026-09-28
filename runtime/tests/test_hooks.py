@@ -16,6 +16,18 @@ def test_deny_real_when_locked():
     assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
 
 
+def test_deny_non_us_before_data_agent():
+    policy = TradePolicy()
+    out = pre_tool_use_gate(
+        {"tool_name": "mcp__mioption__data_agent", "tool_input": {"ticker": "HK.00700"}},
+        None,
+        None,
+        policy=policy,
+    )
+    assert out["hookSpecificOutput"]["permissionDecision"] == "deny"
+    assert out["hookSpecificOutput"]["permissionDecisionReason"] == "只覆盖美股"
+
+
 def test_allow_simulate():
     policy = TradePolicy()
     out = pre_tool_use_gate(

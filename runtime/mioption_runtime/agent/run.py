@@ -105,6 +105,9 @@ def cmd_agent(args: argparse.Namespace) -> int:
         system_prompt=SYSTEM_PROMPT,
         mcp_servers={"mioption": server},
         allowed_tools=[
+            "mcp__mioption__data_agent",
+            "mcp__mioption__decision_agent",
+            "mcp__mioption__review_agent",
             "mcp__mioption__wiki_query",
             "mcp__mioption__futu_probe",
             "mcp__mioption__futu_quote_chain",

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import os
+import sys
+from pathlib import Path
 from typing import Any
 
 from ..bot.engine import BotEngine, demo_automation
@@ -17,6 +19,51 @@ from ..seller.scan import resolve_symbol
 from .wiki import wiki_query
 
 TOOL_DEFS: list[dict[str, Any]] = [
+    {
+        "name": "data_agent",
+        "description": (
+            "Fetch the full US snapshot for one ticker and return every slice. "
+            "Does not score, scan, or place orders. Hong Kong and China A-shares are refused."
+        ),
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "ticker": {"type": "string"},
+                "question": {"type": "string"},
+            },
+            "required": ["ticker"],
+        },
+    },
+    {
+        "name": "decision_agent",
+        "description": (
+            "Run trend, value, and research signals, then synthesis, the structure menu, and risk. "
+            "Requires a snapshot from data_agent. Does not fetch or place orders."
+        ),
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "inputSchema": {
+            "type": "object",
+            "properties": {"ticker": {"type": "string"}},
+            "required": ["ticker"],
+        },
+    },
+    {
+        "name": "review_agent",
+        "description": (
+            "Review the snapshot and the decision record for defects. "
+            "Requires decision_agent. Does not fetch or rewrite directions."
+        ),
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "inputSchema": {
+            "type": "object",
+            "properties": {"ticker": {"type": "string"}},
+            "required": ["ticker"],
+        },
+    },
     {
         "name": "wiki_query",
         "description": (
@@ -153,6 +200,27 @@ class ToolRuntime:
         args = args or {}
         if os.environ.get("MIOPTION_RESEARCH_ONLY") == "1" and name in ("futu_place_option_order", "bot_run_automation"):
             return {"ok": False, "error": "research_only", "place_order": False}
+        if name == "data_agent":
+            root = Path(__file__).resolve().parents[3]
+            if str(root) not in sys.path:
+                sys.path.insert(0, str(root))
+            from signal_chain.agents.data import run_public
+
+            return run_public(str(args.get("ticker") or ""), question=str(args.get("question") or ""))
+        if name == "decision_agent":
+            root = Path(__file__).resolve().parents[3]
+            if str(root) not in sys.path:
+                sys.path.insert(0, str(root))
+            from signal_chain.agents.decision import run_public as decide_public
+
+            return decide_public(str(args.get("ticker") or ""))
+        if name == "review_agent":
+            root = Path(__file__).resolve().parents[3]
+            if str(root) not in sys.path:
+                sys.path.insert(0, str(root))
+            from signal_chain.agents.review import run_public as review_public
+
+            return review_public(str(args.get("ticker") or ""))
         if name == "wiki_query":
             return wiki_query(str(args.get("query") or ""), top=int(args.get("top") or 5))
         if name == "futu_probe":

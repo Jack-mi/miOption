@@ -5,6 +5,8 @@ alwaysApply: true
 
 # 美股盘点与收租
 
+标的对上唯一 `name` 之后，顺序固定为 `data_agent`、`decision_agent`、`review_agent`，不能调换或跳过。取数没有完成时不要点研究决策。没有决策记录时不要点 review。不下单。申报问答仍走 `edgartools`。
+
 盘一只美股、看期权链、或找收租结构时：
 
 1. 先调 MCP：`wiki_query`、`futu_probe`。然后只用富途快照或名称搜索确认标的，到此为止。

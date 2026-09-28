@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from pathlib import Path
+import sys
+
 from ..futu.policy import TradeEnv, TradePolicy
 
 
@@ -25,6 +28,20 @@ def pre_tool_use_gate(
     del tool_use_id, context
     tool_name = str(input_data.get("tool_name") or "")
     tool_input = input_data.get("tool_input") or {}
+    root = Path(__file__).resolve().parents[3]
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    from signal_chain.agents.gates import deny_reason
+
+    reason = deny_reason(tool_name, tool_input)
+    if reason:
+        return {
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": reason,
+            }
+        }
     env = str(tool_input.get("env") or policy.env.value).upper()
 
     if env == TradeEnv.REAL.value and not policy.real_unlocked:

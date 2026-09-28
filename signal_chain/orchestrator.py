@@ -12,19 +12,16 @@ import asyncio
 import time
 from datetime import date
 
+from .agents.data import collect as collect_data
+from .agents.decision import run as run_decision
 from .agents.llm import LlmRunner
+from .agents.review import run as run_review
 from .config import RUNS_DIR, load_settings, parse_ticker
-from .options.iv import derive_volatility_view
-from .options.strategy_menu import apply_user_bias, decision_action, render_menu, screen_menu
-from .data.layer import clear_macro_cache, load as load_market
-from .decision import build_signals, render_signals, to_engine_signal
-from .pipeline.steps import synthesize_notes
-from .risk.limits import check_signal
-from .risk.account_equity import read_account_equity
-from .research.berkshire import earnings_catalyst
-from .schema import EngineSignal, EnsembleSignal
+from .options.strategy_menu import render_menu
+from .data.layer import clear_macro_cache
+from .decision import render_signals
+from .schema import EnsembleSignal
 from .storage import RunLedger, append_signal, write_chain, write_coverage, write_report
-from .synth.combine import combine
 
 
 def _fallback_report(ticker: str, ensemble: EnsembleSignal, proposals, decisions, snapshot=None) -> str:
@@ -74,7 +71,19 @@ async def process_ticker(
     entry: dict = {"engines": {}, "agents": {}}
     entry["error"] = None  # 清掉上一次运行的陈旧错误（ledger 是合并语义）
     t0 = time.monotonic()
-    market = load_market(t, trade_date, settings, include_chain=True)
+    model = models.get("synthesis")
+    fetched = await collect_data(
+        ticker_text, trade_date, settings, runner, model, include_chain=True,
+    )
+    entry["agents"]["data"] = fetched.calls or [
+        {"agent": fetched.agent, "thread_id": None, "usage": None},
+    ]
+    if not fetched.ok or fetched.market is None:
+        entry["error"] = fetched.text
+        entry["elapsed_sec"] = round(time.monotonic() - t0, 1)
+        ledger.record(t.canonical, entry)
+        return entry
+    market = fetched.market
     snapshot = market.snapshot
     write_coverage(trade_date, t.canonical, snapshot, sources=market.sources)
     entry["data_layer"] = [
@@ -94,110 +103,52 @@ async def process_ticker(
         "news": snapshot.news.status,
     }
 
-    selected = await build_signals(
-        market, runner, models.get("synthesis"),
-        trace_dir=RUNS_DIR / "research",
+    decided = await run_decision(
+        market, runner, settings, trade_date,
+        bias=bias, shares=shares, trace_dir=RUNS_DIR / "research",
     )
-
-    signals: list[EngineSignal] = []
-    for b in selected:
-        sig = to_engine_signal(b)
-        if b.meta.get("calls"):
-            entry["agents"][b.engine] = b.meta["calls"]
-        signals.append(sig)
+    if not decided.ok or decided.ensemble is None:
+        entry["error"] = decided.error or "没有决策记录"
+        entry["elapsed_sec"] = round(time.monotonic() - t0, 1)
+        ledger.record(t.canonical, entry)
+        return entry
+    signals = decided.signals
+    for sig in signals:
         append_signal(trade_date, t.canonical, sig)
-    entry["signals"] = [
-        {
-            "engine": sig.engine,
-            "direction": sig.direction.value,
-            "conviction": sig.conviction,
-            "data_status": sig.data_status,
-            "faces": sig.quality_notes,
-            "gaps": list(sig.data_gaps),
-            "analysis": sig.reasoning,
-        }
-        for sig in signals
-    ]
-
-    # 4. 规则合成
-    syn_cfg = settings.synthesis
-    ensemble = combine(
-        signals, as_of=trade_date,
-        aligned_boost=syn_cfg["aligned_boost"],
-        single_source_discount=syn_cfg["single_source_discount"],
-        max_asof_gap_days=syn_cfg["max_asof_gap_days"],
-    )
-
-    # 5. 取链 + IV 派生
-    chain = market.chain
-    if market.chain_error:
-        entry["chain"] = {"error": market.chain_error}
-    elif chain is not None:
-        write_chain(trade_date, t.canonical, chain)
-        entry["chain"] = {"source": chain.source, "rows": len(chain.rows),
-                          "degraded": chain.degraded}
-    ensemble = ensemble.model_copy(update={
-        "volatility_view": derive_volatility_view(ensemble, chain)})
-    earnings = earnings_catalyst(snapshot)
-    if earnings is not None:
-        ensemble = ensemble.model_copy(update={
-            "catalysts": [*ensemble.catalysts, earnings]})
-
-    # 6. 合成说明（Claude Agent SDK）
-    if runner is not None:
-        ensemble, meta = await synthesize_notes(runner, ensemble, models["synthesis"])
-        if meta:
-            entry["agents"]["synthesize"] = {"thread_id": meta.thread_id,
-                                             "model": meta.model}
+    entry["agents"].update(decided.agents)
+    entry["signals"] = decided.signal_rows
+    if decided.chain and decided.chain.get("error"):
+        entry["chain"] = decided.chain
+    elif market.chain is not None:
+        write_chain(trade_date, t.canonical, market.chain)
+        entry["chain"] = decided.chain
+    ensemble = decided.ensemble
     append_signal(trade_date, t.canonical, ensemble)
     entry["ensemble"] = {
         "agreement": ensemble.agreement,
         "direction": ensemble.direction.value,
         "quality_notes": ensemble.quality_notes,
     }
+    entry["risk"] = decided.risk
+    proposals = decided.proposals
+    decisions = decided.risk_decisions
+    action = decided.action
+    verdicts = decided.verdicts
 
-    # 7. 结构菜单：27 项先给结论，过关的才选合约并过风控。不再让模型挑结构。
-    risk_cfg = settings.risk
-    account = read_account_equity(t.market, settings) if risk_cfg.get("auto_account_equity") else None
-    sig_gate = check_signal(ensemble)
-    verdicts = screen_menu(
-        apply_user_bias(ensemble, bias), chain,
-        holds_shares=shares >= 100,
-        account_equity=account["value"] if account else None,
-        equity_currency=account["currency"] if account else None,
-        equity_note=account.get("note") if account else None,
-        earnings_blackout_days=risk_cfg["earnings_blackout_days"],
-        min_open_interest=risk_cfg["min_open_interest"],
-        max_spread_pct=risk_cfg["max_spread_pct"],
-        max_position_risk_pct=risk_cfg["max_position_risk_pct"],
-        today=trade_date,
-    )
-    proposals = [v.proposal for v in verdicts if v.proposal is not None]
-    decisions = [v.risk for v in verdicts if v.risk is not None]
-    action = decision_action(verdicts)
-    entry["risk"] = {
-        "signal_gate": sig_gate.model_dump(mode="json"),
-        "account_equity": account,
-        "decision": action,
-        "menu": [
-            {
-                "name": v.name, "status": v.status, "reason": v.reason,
-                "approved": None if v.risk is None else v.risk.approved,
-                "vetoes": [] if v.risk is None else v.risk.vetoes,
-                "max_loss": None if v.proposal is None else v.proposal.max_loss,
-            }
-            for v in verdicts
-        ],
-    }
-    if not sig_gate.approved:
-        entry["risk"]["decline_reason"] = "; ".join(sig_gate.vetoes)
+    reviewed = await run_review(market, decided, runner, model)
+    entry["agents"]["review"] = reviewed.calls or [
+        {"agent": reviewed.agent, "thread_id": None, "usage": None},
+    ]
+    entry["review"] = {"ok": reviewed.ok, "findings": reviewed.findings}
+    review_text = "通过" if not reviewed.findings else "；".join(reviewed.findings)
 
-    # 8. 简报
+    # 简报在 review 之后
     if runner is not None and not skip_report:
         prompt = (
             f"你是中文金融简报撰写人。根据以下材料写一份 {t.canonical} 的期权决策简报"
             f"（markdown，不超过 600 字）：合成信号 {ensemble.model_dump_json()}；"
-            f"决策动作 {action}。"
+            f"决策动作 {action}。review：{review_text}。"
+            "可以引用 review 的毛病清单，但不能把它改写成另一份判断。"
             "结构菜单会附在简报后面，不要改写其中的适合、不适合、做不了，也不要另造结构。"
             f"富途价格证据：报价 {snapshot.quote.meta.status} as_of {snapshot.quote.meta.as_of}，"
             f"日线 {snapshot.kline.meta.status} 最后交易日 {snapshot.kline.meta.as_of}，"

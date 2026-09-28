@@ -19,6 +19,21 @@ def build_mcp(runtime: ToolRuntime | None = None) -> FastMCP:
     rt = runtime or ToolRuntime()
     mcp = FastMCP("mioption")
 
+    @mcp.tool(annotations=_READ, tags={"research"})
+    def data_agent(ticker: str, question: str = "") -> dict[str, Any]:
+        """Fetch one US ticker. First step. No scoring or orders."""
+        return rt.dispatch("data_agent", {"ticker": ticker, "question": question})
+
+    @mcp.tool(annotations=_READ, tags={"research"})
+    def decision_agent(ticker: str) -> dict[str, Any]:
+        """Signals, synthesis, structure menu, and risk. Requires data_agent."""
+        return rt.dispatch("decision_agent", {"ticker": ticker})
+
+    @mcp.tool(annotations=_READ, tags={"research"})
+    def review_agent(ticker: str) -> dict[str, Any]:
+        """Review the snapshot and decision record. Requires decision_agent. No fetch."""
+        return rt.dispatch("review_agent", {"ticker": ticker})
+
     @mcp.tool(annotations=_READ, tags={"knowledge"})
     def wiki_query(query: str, top: int = 5) -> dict[str, Any]:
         """Read-only vault retrieval. Use for strategy meaning and published P/L; never invent numbers."""
