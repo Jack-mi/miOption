@@ -20,6 +20,9 @@ class OptionRow(BaseModel):
     delta: float | None = None
     open_interest: int | None = None
     volume: int | None = None
+    quoted_at: str | None = None
+    fetched_at: str | None = None
+    contract_size: int | None = None
 
     @property
     def mid(self) -> float | None:
@@ -42,6 +45,8 @@ class ChainSnapshot(BaseModel):
     fetched_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     source: Literal["futu", "cboe"]
     spot: float | None = None
+    spot_at: str | None = None
+    spot_fetched_at: str | None = None
     rows: list[OptionRow] = Field(default_factory=list)
     degraded: bool = False
     notes: str | None = None

@@ -18,6 +18,14 @@ risk:
   max_spread_pct: 0.10                # 单腿 (ask-bid)/mid 上限
   auto_account_equity: true           # 美股用总资产折美元；没有汇率时用 usd_assets 并注明
   max_position_risk_pct: 0.05         # 单标的新结构最大亏损占权益比
+  dte_min: 4
+  dte_max: 60
+  widths: [2.5, 5.0, 10.0, 20.0]
+  min_credit_risk_ratio: 0.10
+  min_conviction: 0.4
+  drawdown_pct: 0.10
+  quote_max_age_seconds: 60
+  account_max_age_seconds: 300
 
 chain:
   expiry_window_days: 60              # 取链范围

@@ -12,7 +12,8 @@ import logging
 import math
 import sys
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 logging.disable(logging.CRITICAL)  # futu 库日志走 stdout，会污染 JSON 输出
 
@@ -90,55 +91,70 @@ def main() -> int:
 
     quote_ctx = ft.OpenQuoteContext(host=host, port=port)
     try:
-        ret, snap = quote_ctx.get_market_snapshot([symbol])
-        if ret != ft.RET_OK or snap is None or snap.empty:
-            print(f"spot snapshot failed: {snap}", file=sys.stderr)
-            return 2
-        spot = _num(snap.iloc[0].get("last_price"))
-
         ret, dates = quote_ctx.get_option_expiration_date(symbol)
         if ret != ft.RET_OK:
             print(f"expiration dates failed: {dates}", file=sys.stderr)
             return 3
-        today = date.today()
+        today = datetime.now(ZoneInfo("America/New_York")).date()
         horizon = today + timedelta(days=window_days)
-        expiries = [
+        expiries = sorted({
             d for d in dates["strike_time"].tolist()
             if today <= datetime.strptime(d, "%Y-%m-%d").date() <= horizon
-        ]
+        })
         if not expiries:
             print("no expiries in window", file=sys.stderr)
             return 4
 
         rows: list[dict] = []
+        incomplete = False
         for exp in expiries:
             ret, chain = _option_chain_paced(quote_ctx, symbol, exp)
             if ret != ft.RET_OK or chain is None or chain.empty:
                 print(f"chain empty for {symbol} exp={exp}: ret={ret}", file=sys.stderr)
+                incomplete = True
                 continue
-            codes = chain["code"].tolist()
-            ret, snaps = quote_ctx.get_market_snapshot(codes)
-            snap_map = {}
-            if ret == ft.RET_OK and snaps is not None and not snaps.empty:
-                for _, r in snaps.iterrows():
-                    snap_map[r["code"]] = r
             for _, c in chain.iterrows():
-                s = snap_map.get(c["code"])
                 rows.append({
-                    "code": c["code"],
-                    "strike": _num(c.get("strike_price")),
-                    "expiry": exp,
-                    "option_type": "CALL"
-                    if str(c.get("option_type")).upper().startswith("CALL")
-                    else "PUT",
-                    "bid": _num(_get(s, "bid_price", "Bid_price")) if s is not None else None,
-                    "ask": _num(_get(s, "ask_price", "Ask_price")) if s is not None else None,
-                    "last": _num(_get(s, "last_price")) if s is not None else None,
-                    "iv": _iv(_get(s, "option_implied_volatility")) if s is not None else None,
-                    "delta": _num(_get(s, "option_delta")) if s is not None else None,
-                    "open_interest": _int(_get(s, "option_open_interest")) if s is not None else None,
-                    "volume": _int(_get(s, "volume")) if s is not None else None,
+                    "code": c["code"], "strike": _num(c.get("strike_price")),
+                    "expiry": exp, "option_type": "CALL"
+                    if str(c.get("option_type")).upper().startswith("CALL") else "PUT",
                 })
+
+        codes = list(dict.fromkeys(row["code"] for row in rows))
+        snap_map = {}
+        for offset in range(0, len(codes), 200):
+            ret, snaps = quote_ctx.get_market_snapshot(codes[offset:offset + 200])
+            if ret != ft.RET_OK or snaps is None or snaps.empty:
+                incomplete = True
+                continue
+            fetched_at = datetime.now(timezone.utc).isoformat()
+            for _, row in snaps.iterrows():
+                snap_map[row["code"]] = (row, fetched_at)
+        if len(snap_map) != len(codes):
+            incomplete = True
+        for row in rows:
+            observed = snap_map.get(row["code"])
+            snapshot = observed[0] if observed else None
+            row.update({
+                "bid": _num(_get(snapshot, "bid_price", "Bid_price")),
+                "ask": _num(_get(snapshot, "ask_price", "Ask_price")),
+                "last": _num(_get(snapshot, "last_price")),
+                "iv": _iv(_get(snapshot, "option_implied_volatility")),
+                "delta": _num(_get(snapshot, "option_delta")),
+                "open_interest": _int(_get(snapshot, "option_open_interest")),
+                "volume": _int(_get(snapshot, "volume")),
+                "quoted_at": str(_get(snapshot, "update_time")) if snapshot is not None else None,
+                "fetched_at": observed[1] if observed else None,
+                "contract_size": _int(_get(snapshot, "option_contract_size")),
+            })
+
+        ret, snap = quote_ctx.get_market_snapshot([symbol])
+        if ret != ft.RET_OK or snap is None or snap.empty:
+            print(f"spot snapshot failed: {snap}", file=sys.stderr)
+            return 2
+        spot = _num(snap.iloc[0].get("last_price"))
+        spot_at = str(snap.iloc[0].get("update_time") or "")
+        spot_fetched_at = datetime.now(timezone.utc).isoformat()
 
         out = {
             "ticker": symbol,
@@ -147,9 +163,11 @@ def main() -> int:
             "fetched_at": datetime.now(timezone.utc).isoformat(),
             "source": "futu",
             "spot": spot,
+            "spot_at": spot_at,
+            "spot_fetched_at": spot_fetched_at,
             "rows": rows,
-            "degraded": False,
-            "notes": None,
+            "degraded": incomplete,
+            "notes": "部分链或快照获取失败" if incomplete else None,
         }
         print(json.dumps(out, ensure_ascii=False))
         return 0

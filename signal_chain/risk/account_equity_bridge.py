@@ -6,6 +6,7 @@ import json
 import logging
 import math
 import sys
+from datetime import datetime, timezone
 
 logging.disable(logging.CRITICAL)
 
@@ -46,6 +47,10 @@ def main() -> int:
             print(f"accinfo_query failed: {data}", file=sys.stderr)
             return 3
         row = data.iloc[0]
+        positions_ret, positions = ctx.position_list_query(trd_env=TrdEnv.REAL)
+        if positions_ret != RET_OK:
+            print(f"position_list_query failed: {positions}", file=sys.stderr)
+            return 4
         print(json.dumps({
             "market": market,
             "env": "REAL",
@@ -54,6 +59,14 @@ def main() -> int:
             "usd_assets": _num(row, "usd_assets"),
             "hkd_assets": _num(row, "hkd_assets"),
             "other_assets": sum(_num(row, key) for key in _OTHER_ASSET_FIELDS),
+            "available_cash_usd": _num(row, "us_avl_withdrawal_cash") if market == "US" and row.get("us_avl_withdrawal_cash") is not None else None,
+            "positions": [
+                {"code": str(position.get("code") or ""),
+                 "can_sell_qty": _num(position, "can_sell_qty")}
+                for _, position in positions.iterrows()
+                if str(position.get("code") or "").startswith(market + ".")
+            ],
+            "fetched_at": datetime.now(timezone.utc).isoformat(),
         }, ensure_ascii=False))
         return 0
     finally:

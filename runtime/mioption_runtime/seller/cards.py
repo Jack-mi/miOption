@@ -73,6 +73,12 @@ class SellerCard:
     updated_at: str = ""
     quote_source: str = "unknown"
     quoted_at: str = ""
+    tier: str = "仅观察"
+    tier_reasons: list[str] = field(default_factory=list)
+    return_on_risk: float | None = None
+    quote_times: list[str | None] = field(default_factory=list)
+    fetched_times: list[str | None] = field(default_factory=list)
+    account_at: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         d = asdict(self)

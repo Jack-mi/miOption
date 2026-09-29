@@ -5,3 +5,4 @@ claude-agent-sdk>=0.1.0
 fastmcp==4.0.9
 pytest>=8.0
 pytest-asyncio==1.4.0
+exchange-calendars>=4.0

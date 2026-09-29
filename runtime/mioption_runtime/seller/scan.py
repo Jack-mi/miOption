@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any, Iterable
 
-from ..futu.quote import OptionContract, QuoteBackend
+from ..futu.quote import FutuQuoteBackend, MockQuoteBackend, OptionContract, QuoteBackend, pull_underlying_pack
 from ..futu.quote_store import QuoteStore
 from .cards import WIKI_PATHS, LegQuote, SellerCard, card_id
 from .payoff import StructureId, conservative_credit, credit_vertical_payoff
 from .store import SellerStore
+from .income import candidates as income_candidates, evaluate as evaluate_income, market_time, DEFAULTS
 
 DEFAULT_WATCHLIST = (
     "US.SPY",
@@ -443,52 +444,131 @@ def scan_underlying(
     params: ScanParams | None = None,
     store: SellerStore | None = None,
     quote_store: QuoteStore | None = None,
+    account: dict | None = None,
+    closes: list[tuple[date, float]] | None = None,
+    earnings: date | None = None,
+    signal_ok: bool = False,
+    signal_direction: str | None = None,
+    review_ok: bool = False,
+    config: dict | None = None,
+    now: datetime | None = None,
 ) -> list[SellerCard]:
+    if not underlying.startswith("US."):
+        raise ValueError("只覆盖美股收租研究")
     pack = quote_store.current(underlying) if quote_store is not None else None
+    if isinstance(backend, FutuQuoteBackend) and quote_store is not None:
+        from .income import _sessions
+
+        clock = market_time(now or datetime.now(timezone.utc))
+        _, _, session_open, session_close = _sessions(clock)
+        pulled = market_time((pack or {}).get("pulled_at"))
+        cfg = {**DEFAULTS, **(config or {})}
+        if pack is None or (session_open <= clock < session_close and
+                            (pulled is None or clock - pulled > timedelta(seconds=cfg["quote_max_age_seconds"]))):
+            pack = pull_underlying_pack(underlying, days=cfg["dte_max"], host=backend.host, port=backend.port)
+            quote_store.replace_current(pack)
+    now = now or datetime.now(timezone.utc)
     if pack and pack.get("contracts"):
         if pack.get("stale"):
             raise ValueError("quote_snapshot_stale: refresh the option chain before scanning")
-        spot = _spot_from_pack(pack) or _spot(backend, underlying)
+        spot = _spot_from_pack(pack)
         chain = contracts_from_pack(pack)
     else:
+        if not isinstance(backend, MockQuoteBackend):
+            raise ValueError("完整实时盘口缺失：先只读拉取期权链")
         spot = _spot(backend, underlying)
         if spot <= 0:
             return []
         chain = enrich_chain(backend, backend.option_chain(underlying))
     if spot <= 0:
         return []
-    cards = credit_vertical_candidates(
-        underlying,
-        spot,
-        chain,
-        today=today,
-        params=params,
+    cfg = {**DEFAULTS, **(config or {})}
+    if params is not None:
+        cfg.update(dte_min=params.dte_min, dte_max=params.dte_max, widths=params.widths)
+    rows = pack["contracts"] if pack and pack.get("contracts") else [
+        {"code": c.code, "strike": c.strike, "expiry": c.expiry,
+         "option_type": c.option_type, "bid": c.bid, "ask": c.ask,
+         "last": c.last, "delta": c.delta,
+         "contract_size": 100 if isinstance(backend, MockQuoteBackend) else None,
+         "fetched_at": None}
+        for c in chain
+    ]
+    actual_source = str(pack.get("source") or "unknown") if pack else (
+        "mock" if type(backend).__name__ == "MockQuoteBackend" else "futu")
+    equity = pack.get("equity") if pack else backend.snapshot(underlying)
+    spot_at = (equity or {}).get("update_time")
+    complete = bool(pack and pack.get("coverage") and
+        int(pack["coverage"].get("chain_contracts", -1)) == len(rows)
+        and int(pack["coverage"].get("option_snapshots", -1)) == len(rows)
+        and not pack["coverage"].get("incomplete")
     )
+    cards = []
+    for short, long in income_candidates(rows, spot, now, cfg):
+        grade = evaluate_income(
+            {**short, "open_interest": short.get("open_interest", short.get("oi")),
+             "quoted_at": short.get("quoted_at", short.get("update_time")),
+             "contract_size": short.get("contract_size", short.get("option_contract_size")),
+             "fetched_at": short.get("fetched_at")},
+            {**long, "open_interest": long.get("open_interest", long.get("oi")),
+             "quoted_at": long.get("quoted_at", long.get("update_time")),
+             "contract_size": long.get("contract_size", long.get("option_contract_size")),
+             "fetched_at": long.get("fetched_at")},
+            spot=spot, spot_at=spot_at, source=actual_source, now=now,
+            account=account, closes=closes or [], earnings=earnings,
+            signal_ok=signal_ok and signal_direction == ("buy" if short["option_type"] == "PUT" else "sell"),
+            review_ok=review_ok, complete=complete, config=cfg,
+            fetched_at=pack.get("pulled_at") if pack else None,
+            spot_fetched_at=(equity or {}).get("fetched_at"),
+        )
+        if grade["max_loss"] is None:
+            continue
+        structure = "bull_put_spread" if short["option_type"] == "PUT" else "bear_call_spread"
+        card = SellerCard(
+            id=card_id(underlying, str(short["expiry"]), structure, short["strike"], long["strike"]),
+            underlying=underlying, structure_id=structure, wiki_path=WIKI_PATHS[structure],
+            expiry=str(short["expiry"])[:10], spot=spot,
+            dte=(date.fromisoformat(str(short["expiry"])[:10]) - market_time(now).date()).days,
+            short=LegQuote(code=short["code"], side="SELL", option_type=short["option_type"],
+                           strike=short["strike"], expiry=str(short["expiry"])[:10],
+                           bid=short["bid"], ask=short["ask"], last=short.get("last") or 0,
+                           delta=short.get("delta")),
+            long=LegQuote(code=long["code"], side="BUY", option_type=long["option_type"],
+                          strike=long["strike"], expiry=str(long["expiry"])[:10],
+                          bid=long["bid"], ask=long["ask"], last=long.get("last") or 0,
+                          delta=long.get("delta")),
+            credit=grade["credit"] / 100, width=abs(short["strike"] - long["strike"]),
+            max_profit=grade["max_profit"], max_loss=grade["max_loss"],
+            breakeven=grade["breakeven"],
+            short_distance_pct=round(abs(spot - short["strike"]) / spot, 4),
+            tier=grade["tier"], tier_reasons=grade["reasons"],
+            return_on_risk=grade["return_on_risk"], quote_times=grade["quote_at"],
+            fetched_times=grade["fetched_at"], account_at=grade["account_at"],
+        )
+        cards.append(card)
+    cards.sort(key=lambda card: (
+        {"可考虑": 0, "条件可考虑，开盘须重报价": 1, "仅观察": 2, "禁做": 3}[card.tier],
+        -(card.return_on_risk or 0), card.expiry,
+    ))
+    cards = cards[:10]
     for card in cards:
         card.quote_source = str(pack.get("source") or "unknown") if pack else (
             "mock" if type(backend).__name__ == "MockQuoteBackend" else "futu"
         )
         card.quoted_at = str(pack.get("pulled_at") or "") if pack else datetime.now(timezone.utc).isoformat()
     if store is not None:
-        keep = {card.id for card in cards}
-        for existing in store.list_cards():
-            if (
-                existing.underlying == underlying
-                and existing.id not in keep
-                and existing.status == "signal"
-                and not existing.verdict
-            ):
-                store.delete_card(existing.id)
-        for index, card in enumerate(cards):
+        for card in cards:
             existing = store.get_card(card.id)
-            if existing and (existing.status in ("tracked", "settled") or existing.verdict == "adopt"):
-                cards[index] = existing
-                continue
-            if existing and existing.verdict:
+            if existing:
                 card.verdict = existing.verdict
                 card.status = existing.status
                 card.follow_status = existing.follow_status
-            store.save_card(card)
+                card.leg_risk = existing.leg_risk
+                card.mark_pnl = existing.mark_pnl
+                card.mark_close_debit = existing.mark_close_debit
+                card.created_at = existing.created_at
+                card.updated_at = existing.updated_at
+            else:
+                store.save_card(card)
     return cards
 
 
@@ -500,6 +580,8 @@ def scan_watchlist(
     params: ScanParams | None = None,
     store: SellerStore | None = None,
     quote_store: QuoteStore | None = None,
+    evidence: dict[str, dict] | None = None,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     names = resolve_underlyings(underlyings)
     cards: list[SellerCard] = []
@@ -509,6 +591,7 @@ def scan_watchlist(
         try:
             pack = quote_store.current(name) if quote_store is not None else None
             sources.append("sqlite" if pack and pack.get("contracts") else "")
+            context = (evidence or {}).get(name) or {}
             cards.extend(
                 scan_underlying(
                     backend,
@@ -517,6 +600,11 @@ def scan_watchlist(
                     params=params,
                     store=store,
                     quote_store=quote_store,
+                    account=context.get("account"), closes=context.get("closes"),
+                    earnings=context.get("earnings"), signal_ok=context.get("signal_ok", False),
+                    signal_direction=context.get("signal_direction"),
+                    review_ok=context.get("review_ok", False), config=context.get("config"),
+                    now=now,
                 )
             )
         except Exception as exc:  # noqa: BLE001 — keep other names scanning

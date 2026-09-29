@@ -167,6 +167,24 @@ def test_follow_dry_run_places_nothing(tmp_path: Path):
     assert saved.follow_status == "dry_run"
 
 
+def test_research_rating_and_manual_verdict_never_authorize_follow_submission(tmp_path: Path):
+    store = SellerStore(tmp_path)
+    card = credit_vertical_candidates("US.BIDU", 99.47, _bidu_puts(),
+                                      today=date(2026, 8, 30), params=BIDU_SCAN)[0]
+    card.tier = "可考虑"
+    store.save_card(card)
+    apply_verdict(store, card.id, "adopt")
+    before = store.get_card(card.id).as_dict()
+
+    class NoTrade:
+        def place(self, _request):
+            raise AssertionError("research-only path must not place orders")
+
+    result = follow_once(store, trade=NoTrade(), submit=True, sequential=True)
+    assert result == {"ok": False, "error": "research_only_no_submission", "orders": []}
+    assert store.get_card(card.id).as_dict() == before
+
+
 def test_mark_card_uses_quotes(tmp_path: Path):
     puts = _bidu_puts()
     card = credit_vertical_candidates(
@@ -280,13 +298,10 @@ def test_scan_uses_quote_store_pack(tmp_path: Path):
     )
     assert out["quote_source"] == "sqlite"
     assert out["mock"] is False
-    credits = {c["structure_id"]: c["credit"] for c in out["cards"]}
-    assert credits["bull_put_spread"] == 0.26
-    assert credits["bear_call_spread"] == 0.25
-    assert any("2026-09-11" in c["id"] and "95" in c["id"] for c in out["cards"])
+    assert out["cards"] == []  # 已过期且缺乘数，不得从历史快照生成当前候选
 
 
-def test_scan_prunes_stale_cards_for_underlying(tmp_path: Path):
+def test_scan_preserves_historical_cards_for_underlying(tmp_path: Path):
     from mioption_runtime.futu.quote import MockQuoteBackend
     from mioption_runtime.seller.scan import scan_watchlist
 
@@ -301,9 +316,9 @@ def test_scan_prunes_stale_cards_for_underlying(tmp_path: Path):
     stale.id = "US.BIDU-stale-old"
     seller.save_card(stale)
     out = scan_watchlist(MockQuoteBackend(), underlyings=["US.BIDU"], store=seller)
-    assert seller.get_card("US.BIDU-stale-old") is None
+    assert seller.get_card("US.BIDU-stale-old") is not None
     assert out["count"] >= 1
-    assert all(c.id != "US.BIDU-stale-old" for c in seller.list_cards())
+    assert any(c.id == "US.BIDU-stale-old" for c in seller.list_cards())
 
 
 def test_mock_scan_yields_credit_verticals(tmp_path: Path):

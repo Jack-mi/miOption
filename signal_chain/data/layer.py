@@ -58,6 +58,8 @@ def _probe_from_snapshot(snap) -> dict:
         probe["quote"] = {
             "last": snap.quote.last,
             "session_date": snap.quote.meta.as_of.isoformat() if snap.quote.meta.as_of else None,
+            "update_time": snap.quote.meta.market_time,
+            "observed_at": snap.quote.meta.fetched_at.isoformat() if snap.quote.meta.fetched_at else None,
             "error": None,
         }
     if snap.kline.meta.status == "available" and snap.kline.bars:
@@ -284,8 +286,13 @@ def load(
         chain, chain_error, chain_rows = chain_f.result()
 
     # 报价/日线级联选出的 spot 是唯一基准价；期权链只保留链合约，不另立价格。
-    if chain is not None and snap.quote.meta.status == "available" and snap.quote.last is not None:
-        chain = chain.model_copy(update={"spot": snap.quote.last})
+    if chain is not None:
+        if snap.quote.meta.status == "available" and snap.quote.last is not None:
+            chain = chain.model_copy(update={"spot": snap.quote.last, "spot_at": snap.quote.meta.market_time,
+                                             "spot_fetched_at": snap.quote.meta.fetched_at.isoformat() if snap.quote.meta.fetched_at else None,
+                                             "degraded": chain.degraded or snap.quote.meta.source != "futu"})
+        else:
+            chain = chain.model_copy(update={"spot": None, "spot_at": None, "degraded": True})
 
     snap = snap.model_copy(update={
         "fundamentals": fund_snap.fundamentals,

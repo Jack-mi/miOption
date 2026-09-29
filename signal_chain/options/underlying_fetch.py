@@ -41,6 +41,7 @@ def coverage_entry(snapshot: UnderlyingSnapshot, sources: list | None = None) ->
             "timezone": m.timezone,
             "error": m.error,
             "period": m.period,
+            "market_time": m.market_time,
         }
 
     entry = {
@@ -89,6 +90,12 @@ def _quote_field(
     currency: str,
     prior_error: str | None,
 ) -> QuoteField:
+    observed_at = raw.get("observed_at") if source == "futu" and raw else None
+    if observed_at:
+        try:
+            fetched_at = datetime.fromisoformat(observed_at)
+        except (TypeError, ValueError):
+            pass
     last = None if raw is None else raw.get("last")
     session = _as_date(None if raw is None else raw.get("session_date"))
     err = prior_error if raw is None else (raw.get("error") or prior_error)
@@ -112,6 +119,7 @@ def _quote_field(
     return QuoteField(
         meta=FieldMeta(
             status="available", source=source, as_of=session, fetched_at=fetched_at,
+            market_time=raw.get("update_time") if raw else None,
             timezone=tz,
         ),
         currency=currency,  # type: ignore[arg-type]

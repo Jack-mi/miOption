@@ -5,7 +5,8 @@ from __future__ import annotations
 import argparse
 import asyncio
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from pydantic import BaseModel
 
@@ -79,6 +80,9 @@ def findings_for(market, decision) -> list[str]:
     for comp in ensemble.components:
         if original.get(comp.engine) != comp.direction:
             found.append("合成改写了某一份信号的方向")
+    if decision.action != "观望" and (not decision.risk.get("signal_gate", {}).get("approved") or
+                                        not any(v.income and v.risk and v.risk.approved for v in decision.verdicts)):
+        found.append("最终动作未遵守信号或结构风控")
     deduped = []
     for item in found:
         if item not in deduped:
@@ -114,6 +118,8 @@ async def run(market, decision, runner=None, model: str | None = None) -> Review
         )
         del note
     except Exception as exc:
+        report.ok = False
+        report.error = str(exc)[:160]
         report.calls.append({"agent": AGENT, "thread_id": None, "usage": None, "error": str(exc)[:160]})
         return report
     usage = getattr(meta, "usage", None) if meta is not None else None
@@ -123,21 +129,25 @@ async def run(market, decision, runner=None, model: str | None = None) -> Review
 
 
 def run_public(ticker: str, trade_date: date | None = None) -> dict:
-    from ..config import parse_ticker
+    from ..config import load_settings, parse_ticker
+    from .decision import finalize_review
 
-    day = trade_date or date.today()
+    day = trade_date or datetime.now(ZoneInfo("America/New_York")).date()
     parsed = parse_ticker(ticker)
     decision = session.get_decision(parsed.canonical, day)
     market = session.get_market(parsed.canonical, day)
-    if decision is None:
+    if decision is None or market is None:
         return {"ok": False, "agent": AGENT, "error": "没有决策记录"}
     report = asyncio.run(run(market, decision))
+    decision = finalize_review(market, decision, report, load_settings())
     return {
         "ok": report.ok,
         "agent": report.agent,
         "ticker": report.ticker,
         "findings": report.findings,
-        "verdict": "通过" if not report.findings else "fail",
+        "verdict": "通过" if report.ok and not report.findings else "fail",
+        "action": decision.action,
+        "risk": decision.risk,
     }
 
 
@@ -146,7 +156,7 @@ def main() -> None:
     parser.add_argument("--ticker", required=True)
     parser.add_argument("--date", default=None)
     args = parser.parse_args()
-    day = date.fromisoformat(args.date) if args.date else date.today()
+    day = date.fromisoformat(args.date) if args.date else datetime.now(ZoneInfo("America/New_York")).date()
     ticker = args.ticker if "." in args.ticker else f"US.{args.ticker}"
     decision = session.get_decision(ticker, day)
     market = session.get_market(ticker, day)

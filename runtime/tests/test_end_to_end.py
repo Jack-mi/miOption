@@ -78,6 +78,23 @@ def test_stale_snapshot_rejected_without_deleting_cards(research):
     assert {card.id for card in desk.store.list_cards()} == before
 
 
+def test_rescan_does_not_overwrite_historical_verdict_or_prices(research):
+    desk, quote_store = research
+    first = desk.scan(["US.BIDU"])["cards"][0]
+    desk.verdict(first["id"], "adopt")
+    before = desk.store.get_card(first["id"]).as_dict()
+    pack = mock_underlying_pack("US.BIDU")
+    for option in pack["options"]:
+        if option["code"] == first["short"]["code"]:
+            option["bid"] += 0.1
+    quote_store.replace_current(pack)
+    new = next(card for card in desk.scan(["US.BIDU"])["cards"] if card["id"] == first["id"])
+    assert new["verdict"] == "adopt"
+    assert new["credit"] != before["credit"]
+    assert desk.store.get_card(first["id"]).as_dict() == before
+    assert desk.list_cards()["cards"][0]["tier"] in ("仅观察", "禁做")
+
+
 def test_source_mismatch_never_marks_live_card_with_mock(research):
     desk, quote_store = research
     card = desk.scan(["US.BIDU"])["cards"][0]

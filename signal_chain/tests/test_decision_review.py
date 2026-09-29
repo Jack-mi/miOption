@@ -3,7 +3,7 @@
 import asyncio
 from types import SimpleNamespace
 
-from signal_chain.agents.decision import run as run_decision
+from signal_chain.agents.decision import finalize_review, run as run_decision
 from signal_chain.agents.review import findings_for, run as run_review
 from signal_chain.data.models import SourceRow
 from signal_chain.tests.test_context import D0, _market
@@ -73,3 +73,15 @@ def test_review_keeps_harness_findings_when_the_model_disagrees():
 
     report = asyncio.run(run_review(market, decided, Runner(), "m"))
     assert "该跳过的源却用了" in report.findings
+
+
+def test_review_failure_is_reflected_in_final_decision():
+    market = _market()
+    decided = asyncio.run(run_decision(market, None, _SETTINGS, D0))
+    report = asyncio.run(run_review(market, decided))
+    report.ok = False
+    report.findings = ["复核证据不匹配"]
+    final = finalize_review(market, decided, report, _SETTINGS)
+    assert final.action == "观望"
+    assert final.risk["review"]["ok"] is False
+    assert all(item["tier"] != "可考虑" for item in final.risk["menu"])

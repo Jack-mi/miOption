@@ -18,6 +18,7 @@ class FieldMeta(BaseModel):
     timezone: str | None = None
     error: str | None = None
     period: str | None = None
+    market_time: str | None = None
 
 
 class QuoteField(BaseModel):

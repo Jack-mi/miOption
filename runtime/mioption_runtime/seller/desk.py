@@ -2,11 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
+from pathlib import Path
+import sys
 from typing import Any, Iterable
+from zoneinfo import ZoneInfo
 
 from ..futu.policy import TradePolicy
-from ..futu.quote import QuoteBackend, get_quote_backend
+from ..futu.quote import MockQuoteBackend, QuoteBackend, get_quote_backend
 from ..futu.quote_store import QuoteStore
 from ..futu.trade import TradeBackend
 from .monitor import MonitorParams, apply_verdict, monitor_tick
@@ -33,24 +36,62 @@ class SellerDesk:
         self.quote = quote if quote is not None else get_quote_backend()
         self.trade = trade
         self.policy = policy or TradePolicy()
-        self.params = params or ScanParams()
+        self.params = params
         self.monitor_params = monitor or MonitorParams()
         self.quote_store = quote_store
 
     def scan(self, underlyings: Iterable[str] | None = None, today: date | None = None) -> dict[str, Any]:
+        repo_root = str(Path(__file__).resolve().parents[3])
+        if repo_root not in sys.path:
+            sys.path.insert(0, repo_root)
+        from signal_chain.agents import session
+        from signal_chain.options.strategy_menu import apply_user_bias
+        from signal_chain.risk.account_equity import read_account_equity
+        from signal_chain.config import load_settings
+
+        names = resolve_underlyings(underlyings)
+        day = today or datetime.now(ZoneInfo("America/New_York")).date()
+        settings = load_settings()
+        live_account = read_account_equity("US", settings) if not isinstance(self.quote, MockQuoteBackend) else None
+        evidence = {}
+        for name in names:
+            market = session.fresh_market(name, day)
+            decision = session.get_decision(name, day)
+            direction = apply_user_bias(decision.ensemble, decision.bias).direction.value if decision else ""
+            evidence[name] = {
+                "account": live_account,
+                "closes": [(bar.trade_date, bar.close) for bar in market.snapshot.kline.bars] if market else [],
+                "earnings": market.snapshot.earnings_date if market else None,
+                "signal_ok": bool(decision and decision.risk.get("signal_gate", {}).get("approved", False)
+                                  and abs(decision.ensemble.conviction) >= settings.risk["min_conviction"]
+                                  and decision.ensemble.volatility_view != "rising"),
+                "signal_direction": ("buy" if direction in {"buy", "strong_buy"}
+                                     else "sell" if direction in {"sell", "strong_sell"} else None),
+                "review_ok": bool(decision and decision.risk.get("review", {}).get("ok", False)),
+                "config": settings.risk,
+            }
         with self.store.transaction():
             return scan_watchlist(
                 self.quote,
-                underlyings=underlyings,
+                underlyings=names,
                 today=today,
                 params=self.params,
                 store=self.store,
                 quote_store=self.quote_store,
+                evidence=evidence,
             )
 
     def list_cards(self, status: str | None = None) -> dict[str, Any]:
         cards = self.store.list_cards(status=status)
-        return {"count": len(cards), "cards": [c.as_dict() for c in cards]}
+        return {"count": len(cards), "cards": [self._historical_card(card) for card in cards]}
+
+    @staticmethod
+    def _historical_card(card) -> dict[str, Any]:
+        payload = card.as_dict()
+        if payload["tier"] != "禁做":
+            payload["tier"] = "仅观察"
+        payload["tier_reasons"] = [*payload["tier_reasons"], "历史卡片需重取盘口及决策证据"]
+        return payload
 
     def verdict(self, card_id: str, verdict: str, note: str = "") -> dict[str, Any]:
         allowed = ("adopt", "watch", "reject", "clear")
@@ -89,7 +130,7 @@ class SellerDesk:
             "watchlist": wanted or list(DEFAULT_WATCHLIST),
             "query": query or "",
             "count": len(cards),
-            "cards": [c.as_dict() for c in cards],
+            "cards": [self._historical_card(card) for card in cards],
             "events": events[-80:],
             "place_order": False,
         }

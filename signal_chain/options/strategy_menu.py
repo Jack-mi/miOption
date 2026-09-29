@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import date, timedelta
+from datetime import datetime, timezone
+
+from runtime.mioption_runtime.seller.income import candidates as income_candidates, evaluate as evaluate_income
 
 from ..risk.limits import check_proposal
 from .glossary import strategy_blurb
@@ -45,6 +48,8 @@ class MenuVerdict:
     reason: str
     proposal: StrategyProposal | None = None
     risk: RiskDecision | None = None
+    tier: str = "禁做"
+    income: dict | None = None
 
 
 CATALOG: tuple[Template, ...] = (
@@ -443,12 +448,63 @@ def screen_menu(
     max_position_risk_pct: float = 0.05,
     holds_shares: bool = False,
     today: date | None = None,
+    account: dict | None = None,
+    closes: list[tuple[date, float]] | None = None,
+    signal_ok: bool = True,
+    review_ok: bool = True,
+    now: datetime | None = None,
+    config: dict | None = None,
+    earnings_date: date | None = None,
+    signal_direction: Direction | None = None,
 ) -> list[MenuVerdict]:
     today = today or ensemble.as_of
+    now = now or datetime.now(timezone.utc)
     out: list[MenuVerdict] = []
     for t in CATALOG:
+        if t.shape in {"bull_put", "bear_call"}:
+            if chain is None or chain.spot is None or ensemble.market != "US":
+                out.append(MenuVerdict(t.name, "impossible", "没有可用的美股期权链。"))
+                continue
+            rows = [row.model_dump(mode="python") for row in chain.rows]
+            pairs = income_candidates(rows, chain.spot, now, config)
+            if t.shape == "bull_put":
+                pairs = [pair for pair in pairs if pair[0]["option_type"] == "PUT"]
+            else:
+                pairs = [pair for pair in pairs if pair[0]["option_type"] == "CALL"]
+            ranked = []
+            for short, long in pairs:
+                verdict = evaluate_income(
+                    short, long, spot=chain.spot, spot_at=chain.spot_at,
+                    source=chain.source, now=now, account=account,
+                    closes=closes or [],
+                    earnings=earnings_date,
+                    signal_ok=signal_ok and _bias_ok(t.bias, signal_direction or ensemble.direction)
+                              and abs(ensemble.conviction) >= (config or {}).get("min_conviction", 0.4)
+                              and ensemble.volatility_view != "rising",
+                    review_ok=review_ok, complete=not chain.degraded, config=config,
+                    fetched_at=chain.fetched_at.isoformat(),
+                    spot_fetched_at=chain.spot_fetched_at,
+                )
+                proposal = _finish(t.name, "保守 bid/ask 信用价差。", t.shape, True,
+                                   [_leg(OptionRow.model_validate(short), "sell"),
+                                    _leg(OptionRow.model_validate(long), "buy")], chain)
+                if proposal:
+                    proposal.net_premium = verdict["credit"]
+                    proposal.max_loss = verdict["max_loss"]
+                    proposal.max_profit = verdict["max_profit"]
+                    proposal.notes = _scenario_note(proposal.legs, verdict["credit"] / _MULT, chain.spot)
+                    risk = RiskDecision(approved=verdict["tier"] == "可考虑",
+                                        vetoes=verdict["reasons"])
+                    ranked.append(MenuVerdict(t.name, "fit", "；".join(verdict["reasons"]) or "满足条件。",
+                                              proposal, risk, verdict["tier"], verdict))
+            ranked.sort(key=lambda item: (
+                {"可考虑": 0, "条件可考虑，开盘须重报价": 1, "仅观察": 2, "禁做": 3}.get(item.tier, 4),
+                -(item.income or {}).get("return_on_risk", 0) if (item.income or {}).get("return_on_risk") else 0,
+            ))
+            out.extend(ranked[:3] or [MenuVerdict(t.name, "impossible", "链上没有符合期限/宽度的真实价差。")])
+            continue
         status, reason = _screen_one(
-            t, ensemble, chain, equity=account_equity, today=today,
+            t, ensemble, chain, equity=(account or {}).get("available_cash_usd"), today=today,
             blackout=earnings_blackout_days, holds_shares=holds_shares,
         )
         proposal, risk = None, None
@@ -475,7 +531,8 @@ def screen_menu(
                 if t.shape in _UNLIMITED:
                     vetoes = [*risk.vetoes, "最大亏损无上限"]
                     risk = risk.model_copy(update={"approved": False, "vetoes": vetoes})
-        out.append(MenuVerdict(t.name, status, reason, proposal, risk))
+        out.append(MenuVerdict(t.name, status, reason, proposal, risk,
+                               "仅观察" if proposal and risk and risk.approved else "禁做"))
     return out
 
 
@@ -488,15 +545,22 @@ def render_menu(verdicts: list[MenuVerdict]) -> str:
             legs = "，".join(f"{lg.side} {lg.code} K={lg.strike}" for lg in v.proposal.legs)
             loss = "算不出" if v.proposal.max_loss is None else f"{v.proposal.max_loss:.0f}"
             extra = f"合约 {legs}。最大亏损 {loss}。"
+            if v.income:
+                ratio = v.income["return_on_risk"]
+                extra += (f" 保守收金 {v.income['credit']:.0f}，盈亏平衡 {v.income['breakeven']}，"
+                          f"收益/风险 {ratio:.3%}，" if ratio is not None else
+                          f" 保守收金 {v.income['credit']:.0f}，收益/风险无法核验，")
+                extra += (f"报价时点 {v.income['quote_at']}；获取时点 {v.income['fetched_at']}；"
+                          f"账户时点 {v.income['account_at']}。")
             if v.proposal.notes:
                 extra += f"{v.proposal.notes}。"
             if v.risk and v.risk.vetoes:
                 extra += "风控否决：" + "；".join(v.risk.vetoes) + "。"
             elif v.risk and v.risk.approved:
-                extra += "风控通过。"
+                extra += "仅限研究，未经收租评级。" if not v.income else "满足收租评级。"
         note = strategy_blurb(v.name)
         gloss = f" 说明：{note}" if note else ""
-        lines.append(f"- {label[v.status]} · {v.name}。{v.reason}{extra}{gloss}")
+        lines.append(f"- {v.tier if v.income or v.proposal else label[v.status]} · {v.name}。{v.reason}{extra}{gloss}")
     return "\n".join(lines) + "\n"
 
 
@@ -509,7 +573,7 @@ def apply_user_bias(ensemble: EnsembleSignal, bias: str | None) -> EnsembleSigna
 
 
 def decision_action(verdicts: list[MenuVerdict]) -> str:
-    ok = [v.name for v in verdicts if v.risk and v.risk.approved]
+    ok = [v.name for v in verdicts if v.income and v.risk and v.risk.approved]
     if not ok:
         return "观望"
     return "可考虑 " + "、".join(ok)

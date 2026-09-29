@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import time
 from pathlib import Path
 from typing import Any
 
-from ..futu.policy import PolicyError, TradeEnv, TradePolicy
-from ..futu.trade import Leg, OrderRequest, TradeBackend
+from ..futu.policy import TradePolicy
+from ..futu.trade import TradeBackend
 from .store import SellerStore
 
 STOP_NAME = "STOP"
@@ -30,15 +29,13 @@ def follow_once(
     sequential: bool = False,
     whitelist: list[str] | None = None,
 ) -> dict[str, Any]:
-    """Adopted cards only. Default: research_open, no broker order.
-
-    `--submit --legs sequential` uses existing per-leg place() and tags
-    `leg_risk: sequential`. Combo REAL is out of scope for v1.
-    """
+    """Adopted cards only; research dry-run, never broker submission."""
     policy = policy or TradePolicy()
     names = set(whitelist or [])
     if stop_active(store):
         return {"ok": False, "error": "stop_file", "path": str(stop_path(store)), "orders": []}
+    if submit:
+        return {"ok": False, "error": "research_only_no_submission", "orders": []}
 
     adopted = [
         c
@@ -75,54 +72,8 @@ def follow_once(
             "combo": False,
             "note": "Futu SIMULATE does not support combo option orders",
         }
-        if not submit:
-            card.follow_status = "dry_run"
-            card.status = "tracked"
-            store.save_card(card)
-            reports.append({"ok": True, "mode": "dry_run", "placed": False, **plan})
-            continue
-
-        if not sequential:
-            card.follow_status = "research_open"
-            card.status = "tracked"
-            store.save_card(card)
-            reports.append(
-                {
-                    "ok": True,
-                    "mode": "research_open",
-                    "placed": False,
-                    "reason": "submit_without_sequential_marks_only",
-                    **plan,
-                }
-            )
-            continue
-
-        if trade is None:
-            reports.append({"ok": False, "card_id": card.id, "error": "no_trade_backend"})
-            continue
-        try:
-            policy.authorize_open(notional=card.max_loss, naked_short=False)
-        except PolicyError as exc:
-            reports.append({"ok": False, "card_id": card.id, "error": exc.code, "message": exc.message})
-            continue
-
-        req = OrderRequest(
-            underlying=card.underlying,
-            structure_id=card.structure_id,
-            env=TradeEnv.SIMULATE,
-            notional=card.max_loss,
-            naked_short=False,
-            legs=[
-                Leg(code=card.short.code, side="SELL", qty=1, price=card.short.bid, option_type=card.short.option_type, strike=card.short.strike, expiry=card.expiry),
-                Leg(code=card.long.code, side="BUY", qty=1, price=card.long.ask, option_type=card.long.option_type, strike=card.long.strike, expiry=card.expiry),
-            ],
-        )
-        result = trade.place(req)
-        if result.ok:
-            card.follow_status = "sequential_submitted"
-            card.leg_risk = "sequential"
-            card.status = "tracked"
-            store.save_card(card)
-            policy.note_order(time.time())
-        reports.append({"ok": result.ok, "mode": "sequential", "placed": result.ok, "order": result.as_dict(), **plan})
+        card.follow_status = "dry_run"
+        card.status = "tracked"
+        store.save_card(card)
+        reports.append({"ok": True, "mode": "dry_run", "placed": False, **plan})
     return {"ok": True, "count": len(reports), "orders": reports, "submit": submit, "sequential": sequential}

@@ -51,7 +51,7 @@ def run(
     parsed = parse_ticker(ticker) if isinstance(ticker, str) else ticker
     if parsed.market != "US":
         return DataReport(AGENT, parsed.canonical, "只覆盖美股", [], None, ok=False)
-    cached = session.get_market(parsed.canonical, trade_date)
+    cached = session.fresh_market(parsed.canonical, trade_date)
     if cached is None:
         cached = (load_fn or load_market)(
             parsed, trade_date, settings, include_chain=include_chain,
@@ -107,7 +107,10 @@ async def collect(
 
 
 def run_public(ticker: str, trade_date: date | None = None, question: str = "") -> dict:
-    report = asyncio.run(collect(ticker, trade_date or date.today(), question=question))
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    report = asyncio.run(collect(ticker, trade_date or datetime.now(ZoneInfo("America/New_York")).date(), question=question))
     return {
         "ok": report.ok,
         "agent": report.agent,

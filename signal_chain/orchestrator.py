@@ -10,10 +10,11 @@ from __future__ import annotations
 import argparse
 import asyncio
 import time
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from .agents.data import collect as collect_data
-from .agents.decision import run as run_decision
+from .agents.decision import finalize_review, run as run_decision
 from .agents.llm import LlmRunner
 from .agents.review import run as run_review
 from .config import RUNS_DIR, load_settings, parse_ticker
@@ -48,7 +49,7 @@ def _fallback_report(ticker: str, ensemble: EnsembleSignal, proposals, decisions
     if not proposals:
         lines.append("- （无候选结构）")
     for p, d in zip(proposals, decisions):
-        status = "通过" if d.approved else "否决: " + "; ".join(d.vetoes)
+        status = "结构检查通过（非收租晋级）" if d.approved else "否决: " + "; ".join(d.vetoes)
         lines.append(f"- **{p.name}** [{status}] {p.thesis}")
         for leg in p.legs:
             lines.append(f"  - {leg.side} {leg.code} {leg.option_type} K={leg.strike} exp={leg.expiry}")
@@ -129,18 +130,18 @@ async def process_ticker(
         "direction": ensemble.direction.value,
         "quality_notes": ensemble.quality_notes,
     }
+    reviewed = await run_review(market, decided, runner, model)
+    decided = finalize_review(market, decided, reviewed, settings)
     entry["risk"] = decided.risk
     proposals = decided.proposals
     decisions = decided.risk_decisions
     action = decided.action
     verdicts = decided.verdicts
-
-    reviewed = await run_review(market, decided, runner, model)
     entry["agents"]["review"] = reviewed.calls or [
         {"agent": reviewed.agent, "thread_id": None, "usage": None},
     ]
     entry["review"] = {"ok": reviewed.ok, "findings": reviewed.findings}
-    review_text = "通过" if not reviewed.findings else "；".join(reviewed.findings)
+    review_text = "完成既定机械检查（非交易保证）" if reviewed.ok and not reviewed.findings else "未通过：" + "；".join(reviewed.findings or [reviewed.error or "未知错误"])
 
     # 简报在 review 之后
     if runner is not None and not skip_report:
@@ -174,9 +175,17 @@ async def process_ticker(
     view = ""
     if bias or shares:
         word = {"bull": "看多", "bear": "看空", "neutral": "中性"}.get(bias or "", bias or "未改方向")
-        view = f"用户看法：**{word}**，持股 {shares}。三份信号的方向没有改。\n\n"
+        view = (f"用户看法：**{word}**，自述持股 {shares}（未作为持仓凭证）。"
+                "三份信号的方向没有改。\n\n")
     markdown = (
         f"决策动作：**{action}**。这条链路不下单。\n\n"
+        f"数据状态：报价 {snapshot.quote.meta.status}（{snapshot.quote.meta.source}，市场时间 "
+        f"{snapshot.quote.meta.market_time}，获取 {snapshot.quote.meta.fetched_at}）；"
+        f"期权链 {decided.chain or '缺失'}；财报日期 {snapshot.earnings_date or '未知'}"
+        f"（{snapshot.earnings_source or '无来源'}）；账户 "
+        f"{'REAL/' + str(decided.risk['account_equity'].get('currency')) if decided.risk.get('account_equity') else '缺失'}"
+        f"（获取 {decided.risk['account_equity'].get('fetched_at') if decided.risk.get('account_equity') else '未知'}）。\n\n"
+        f"复核范围：{review_text}。\n\n"
         f"{view}"
         f"{render_signals(signals)}\n\n"
         f"{markdown}\n{render_menu(verdicts)}"
@@ -191,7 +200,7 @@ async def process_ticker(
 def main() -> None:
     parser = argparse.ArgumentParser(description="signal_chain orchestrator")
     parser.add_argument("--tickers", default=None, help="逗号分隔，默认读 config watchlist")
-    parser.add_argument("--date", default=date.today().isoformat())
+    parser.add_argument("--date", default=datetime.now(ZoneInfo("America/New_York")).date().isoformat())
     parser.add_argument("--no-llm", action="store_true", help="跳过所有模型调用（纯确定性干跑）")
     parser.add_argument("--skip-report", action="store_true")
     parser.add_argument("--bias", choices=["bull", "bear", "neutral"], default=None)

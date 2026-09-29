@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
+from zoneinfo import ZoneInfo
 
 from ..config import parse_ticker
 from . import session
@@ -21,9 +22,9 @@ def deny_reason(tool_name: str, tool_input: dict | None, *, today: date | None =
         parsed = parse_ticker(ticker)
         if parsed.market != "US":
             return "只覆盖美股"
-        day = today or date.today()
+        day = today or datetime.now(ZoneInfo("America/New_York")).date()
         canonical = parsed.canonical
-        if "decision_agent" in name and session.get_market(canonical, day) is None:
+        if "decision_agent" in name and session.fresh_market(canonical, day) is None:
             return "没有快照"
         if "review_agent" in name and session.get_decision(canonical, day) is None:
             return "没有决策记录"

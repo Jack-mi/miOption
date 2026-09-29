@@ -271,7 +271,8 @@ def mock_underlying_pack(underlying: str, *, days: int = 60) -> dict[str, Any]:
         "windows": [{"start": start, "end": end} for start, end in windows],
         "equity": backend.snapshot(underlying),
         "options": [
-            {**contract.as_dict(), "strike_time": contract.expiry, "option_strike_price": contract.strike}
+            {**contract.as_dict(), "strike_time": contract.expiry, "option_strike_price": contract.strike,
+             "option_contract_size": 100}
             for contract in contracts
         ],
         "coverage": {"chain_contracts": len(contracts), "with_quote": len(contracts), "with_greeks": len(contracts)},
@@ -290,6 +291,7 @@ def _snapshots_with_ctx(ctx: Any, codes: list[str]) -> dict[str, dict[str, Any]]
             raise RuntimeError(f"snapshot failed: {data}")
         for rec in _frame_records(data):
             rec["source"] = "futu"
+            rec["fetched_at"] = datetime.now(timezone.utc).isoformat()
             code = str(rec.get("code") or "")
             if code:
                 out[code] = rec
@@ -368,16 +370,14 @@ def pull_underlying_pack(
     ctx = OpenQuoteContext(host=host, port=port)
     beyond: list[str] = []
     try:
-        ret, eq = ctx.get_market_snapshot([underlying])
-        if ret != RET_OK:
-            raise RuntimeError(f"equity snapshot failed: {eq}")
-        equity_rows = _frame_records(eq)
-        if not equity_rows:
-            raise RuntimeError(f"no equity snapshot for {underlying}")
-        equity = equity_rows[0]
-        equity["source"] = "futu"
         chain_rows = _chain_rows_with_ctx(ctx, underlying, days=days)
         option_snaps = _snapshots_with_ctx(ctx, [str(r["code"]) for r in chain_rows])
+        ret, eq = ctx.get_market_snapshot([underlying])
+        if ret != RET_OK or eq is None or eq.empty:
+            raise RuntimeError(f"equity refresh failed: {eq}")
+        equity = _frame_records(eq)[0]
+        equity["source"] = "futu"
+        equity["fetched_at"] = datetime.now(timezone.utc).isoformat()
         try:
             beyond = _peek_beyond_expiries(ctx, underlying, windows[-1][1]) if windows else []
         except Exception:

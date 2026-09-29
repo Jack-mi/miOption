@@ -92,7 +92,7 @@ def _option_type(raw: Any) -> str:
 
 
 def _strike(row: dict[str, Any]) -> float:
-    return float(_num(row.get("option_strike_price")) or _num(row.get("strike_price")) or 0)
+    return float(_num(row.get("option_strike_price")) or _num(row.get("strike_price")) or _num(row.get("strike")) or 0)
 
 
 def _expiry(row: dict[str, Any]) -> str:
@@ -285,7 +285,7 @@ class QuoteStore:
                 """
                 SELECT code, expiry, option_type, strike,
                        bid, ask, last, delta, gamma, vega, theta, rho,
-                       iv, oi, premium, dte, bid_vol, ask_vol
+                       iv, oi, premium, dte, bid_vol, ask_vol, extra_json
                 FROM contracts
                 WHERE pull_id = ?
                 ORDER BY expiry, strike, option_type
@@ -293,7 +293,15 @@ class QuoteStore:
                 (pull["id"],),
             ).fetchall()
             equity = json.loads(equity_row["payload_json"]) if equity_row else {}
-            rows = [dict(c) for c in contracts]
+            rows = []
+            for contract in contracts:
+                record = dict(contract)
+                record.update(json.loads(record.pop("extra_json") or "{}"))
+                record["open_interest"] = record.get("oi")
+                record["quoted_at"] = record.get("update_time") or record.get("quoted_at")
+                record["contract_size"] = (record.get("option_contract_size") if record.get("option_contract_size") is not None
+                                           else record.get("contract_size"))
+                rows.append(record)
             expiries = sorted({str(c["expiry"]) for c in rows if c["expiry"]})
             coverage = json.loads(pull["coverage_json"] or "{}")
             return {

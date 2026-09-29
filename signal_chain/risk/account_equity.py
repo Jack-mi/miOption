@@ -12,6 +12,7 @@
 from __future__ import annotations
 
 import json
+import math
 import subprocess
 
 from ..config import REPO_ROOT, require_runtime_python, Settings
@@ -26,7 +27,7 @@ def _f(data: dict, key: str) -> float | None:
         value = float(data[key])
     except (KeyError, TypeError, ValueError):
         return None
-    if value != value:
+    if not math.isfinite(value):
         return None
     return value
 
@@ -135,4 +136,10 @@ def read_account_equity(market: str, settings: Settings) -> dict | None:
         data = json.loads(line)
     except json.JSONDecodeError:
         return None
-    return equity_from_accinfo(market, data)
+    account = equity_from_accinfo(market, data)
+    if account is not None:
+        account["env"] = data.get("env")
+        account["fetched_at"] = data.get("fetched_at")
+        account["available_cash_usd"] = data.get("available_cash_usd")
+        account["positions"] = data.get("positions", [])
+    return account

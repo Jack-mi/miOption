@@ -134,6 +134,7 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
                 quote["last"] = last
                 quote["session_date"] = session
                 quote["update_time"] = update_text
+                quote["observed_at"] = datetime.now(timezone.utc).isoformat()
 
         start = (trade_date - timedelta(days=120)).isoformat()
         bars, k_error = _history(quote_ctx, symbol, start, trade_date.isoformat())
