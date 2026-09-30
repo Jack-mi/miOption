@@ -22,3 +22,7 @@ knowledge/.obsidian/workspace*.json
 /chains/
 /reports/
 /runs/
+
+# 富途官方文档本地缓存（1 MB 级，不进版本库；重新下载见 docs/futu-api/README.md）
+/docs/futu-api/*.md
+!/docs/futu-api/README.md

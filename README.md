@@ -15,4 +15,23 @@ python -m signal_chain.orchestrator --tickers HK.03690,HK.09992
 
 27 张策略笔记在 `knowledge/wiki/strategies/`。菜单在每条结构后面附一句用途说明，不改过闸结果。
 
+第二条 path：先在全市场筛出候选，再把代码喂回上面那条单股链路（只读，不下单）。
+
+```bash
+runtime/.venv/bin/python -m signal_chain.options.screener_bridge seller US 20   # 期权卖方专区
+runtime/.venv/bin/python -m signal_chain.options.screener_bridge earnings US 20 # 财报期权筛选
+runtime/.venv/bin/python -m signal_chain.options.screener_bridge rating 20      # 美股评级变动
+# 其余 screen: rank / movers / hot
+python -m signal_chain.orchestrator --tickers US.NKE,US.SOXL
+```
+
+输出单行 JSON，`candidates` 就是喂给 `--tickers` 的标的池。
+
+测试分两套 venv，别混：
+
+```bash
+./.venv-sc/bin/python -m pytest signal_chain/tests -q            # 156 passed（根目录跑）
+cd runtime && ./.venv/bin/python -m pytest tests -q              # 51 passed（runtime 里跑）
+```
+
 架构见 [docs/architecture.md](docs/architecture.md)。
