@@ -10,6 +10,7 @@ from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 _ET = ZoneInfo("America/New_York")
+_HK = ZoneInfo("Asia/Hong_Kong")
 _OPEN = time(9, 30)
 
 
@@ -17,6 +18,12 @@ def _calendar():
     import exchange_calendars as xcals
 
     return xcals.get_calendar("XNYS")
+
+
+def _hk_calendar():
+    import exchange_calendars as xcals
+
+    return xcals.get_calendar("XHKG")
 
 
 def nyse_session(day: date) -> date:
@@ -33,6 +40,20 @@ def _previous_session(day: date) -> date:
     return nyse_session(day - timedelta(days=1))
 
 
+def _hk_session(day: date) -> date:
+    import pandas as pd
+
+    cal = _hk_calendar()
+    ts = pd.Timestamp(day)
+    if cal.is_session(ts):
+        return day
+    return cal.date_to_session(ts, direction="previous").date()
+
+
+def _previous_hk_session(day: date) -> date:
+    return _hk_session(day - timedelta(days=1))
+
+
 def _as_et(moment: datetime) -> datetime:
     if moment.tzinfo is None:
         return moment.replace(tzinfo=_ET)
@@ -43,7 +64,23 @@ def _before_open(moment: datetime) -> bool:
     return _as_et(moment).time() < _OPEN
 
 
+def _before_hk_open(moment: datetime) -> bool:
+    return _as_hk(moment).time() < _OPEN
+
+
+def _as_hk(moment: datetime) -> datetime:
+    if moment.tzinfo is None:
+        return moment.replace(tzinfo=_HK)
+    return moment.astimezone(_HK)
+
+
 def session_for(market: str, day: date, now: datetime | None = None) -> date:
+    if market == "HK":
+        session = _hk_session(day)
+        moment = _as_hk(now) if now is not None else datetime.now(_HK)
+        if day == moment.date() and session == day and _before_hk_open(moment):
+            return _previous_hk_session(day)
+        return session
     if market != "US":
         return day
     session = nyse_session(day)
@@ -67,14 +104,28 @@ def quote_session(update_time: str) -> date | None:
     return session_for("US", moment.date(), now=moment)
 
 
-def align_futu_quote(payload: dict | None) -> dict | None:
+def hk_quote_session(update_time: str) -> date | None:
+    """港股报价时间归到它所属的那场。开盘前的时间戳用上一场。"""
+    text = str(update_time or "").strip()
+    if len(text) < 19 or text.lower() in {"nat", "nan", "none"}:
+        return None
+    bare = text[:26].replace("T", " ")
+    try:
+        parsed = datetime.fromisoformat(bare)
+    except ValueError:
+        return None
+    moment = _as_hk(parsed)
+    return session_for("HK", moment.date(), now=moment)
+
+
+def align_futu_quote(payload: dict | None, *, market: str = "US") -> dict | None:
     """有 update_time 时，用它覆盖快照里的报价交易日。"""
     if not payload:
         return payload
     quote = payload.get("quote")
     if not isinstance(quote, dict) or not quote.get("update_time"):
         return payload
-    session = quote_session(str(quote["update_time"]))
+    session = hk_quote_session(str(quote["update_time"])) if market == "HK" else quote_session(str(quote["update_time"]))
     if session is None:
         return payload
     return {**payload, "quote": {**quote, "session_date": session.isoformat()}}

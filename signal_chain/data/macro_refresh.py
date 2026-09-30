@@ -18,7 +18,7 @@ def main() -> None:
     )
     for row in rows:
         print(f"{row.id} {row.field} {row.state} {row.note}")
-    if not points:
+    if not points or any(row.state != "used" for row in rows):
         raise SystemExit(1)
 
 

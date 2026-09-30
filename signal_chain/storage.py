@@ -31,6 +31,8 @@ def write_chain(day: date, ticker: str, chain: BaseModel) -> Path:
     ensure_dirs()
     path = CHAINS_DIR / day.isoformat() / f"{ticker}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
+    from .data.archive import preserve
+    preserve(path)
     path.write_text(json.dumps(_dump(chain), ensure_ascii=False, indent=1), encoding="utf-8")
     return path
 
@@ -39,6 +41,8 @@ def write_report(day: date, ticker: str, markdown: str) -> Path:
     ensure_dirs()
     path = REPORTS_DIR / day.isoformat() / f"{ticker}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
+    from .data.archive import preserve
+    preserve(path)
     path.write_text(markdown, encoding="utf-8")
     return path
 
@@ -54,6 +58,8 @@ def write_coverage(
     root.mkdir(parents=True, exist_ok=True)
     path = root / f"{day.isoformat()}.coverage.json"
     if path.exists():
+        from .data.archive import preserve
+        preserve(path)
         data = json.loads(path.read_text(encoding="utf-8"))
     else:
         data = {"date": day.isoformat(), "tickers": {}}
@@ -81,6 +87,8 @@ class RunLedger:
             stored.pop("error", None)      # None 语义 = 清除陈旧错误
             entry.pop("error")
         stored.update(entry)
+        from .data.archive import preserve
+        preserve(self.path)
         self.path.write_text(
             json.dumps(self.data, ensure_ascii=False, indent=1), encoding="utf-8"
         )

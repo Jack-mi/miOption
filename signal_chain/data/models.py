@@ -76,3 +76,4 @@ class MarketData:
     news_text: str | None = None
     ratios: list[Ratio] = field(default_factory=list)
     excerpts: list[FilingExcerpt] = field(default_factory=list)
+    evidence_persisted: bool = True

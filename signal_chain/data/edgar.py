@@ -59,7 +59,8 @@ def _full_year_usd(units: list) -> list:
 def _best_annual(rows: list) -> dict | None:
     if not rows:
         return None
-    return max(rows, key=lambda item: (str(item["end"]), _span_days(item)))
+    return max(rows, key=lambda item: (str(item["end"]), _span_days(item),
+                                       str(item.get("filed") or "")))
 
 
 def latest_quarter_revenue(facts: dict) -> tuple[float, str] | None:
@@ -154,7 +155,8 @@ def _by_year(rows: list, limit: int = _HISTORY_YEARS) -> list[dict]:
             continue
         year = end[:4]
         prev = chosen.get(year)
-        if prev is None or end > str(prev.get("end")):
+        if prev is None or (end, str(row.get("filed") or "")) > (
+                str(prev.get("end")), str(prev.get("filed") or "")):
             chosen[year] = row
     years = sorted(chosen, reverse=True)[:limit]
     return [chosen[year] for year in years]

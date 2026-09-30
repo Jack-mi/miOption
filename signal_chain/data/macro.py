@@ -30,6 +30,10 @@ def _upsert_url() -> str:
     return f"{SUPABASE_URL}/rest/v1/macro_observations"
 
 
+def _state_url() -> str:
+    return f"{SUPABASE_URL}/rest/v1/rpc/record_macro_refresh"
+
+
 def read_macro(api_key: str | None, get=get_json) -> tuple[list[MacroPoint], list[SourceRow]]:
     if not api_key:
         return [], [SourceRow("supabase", "macro", "missing", "没有 SUPABASE_SERVICE_ROLE_KEY")]
@@ -40,8 +44,36 @@ def read_macro(api_key: str | None, get=get_json) -> tuple[list[MacroPoint], lis
         return [], [SourceRow("supabase", "macro", "missing", str(exc)[:160])]
     if not points:
         return [], [SourceRow("supabase", "macro", "missing", "宏观快照为空")]
-    note = "；".join(f"{p.series} {p.as_of.isoformat()}" for p in points)
-    return points, [SourceRow("supabase", "macro", "used", note)]
+    state_error = None
+    try:
+        states = get(f"{SUPABASE_URL}/rest/v1/macro_refresh_state?select=series,last_attempt,last_success,last_error",
+                     _headers(api_key))
+        if not isinstance(states, list):
+            raise ValueError("宏观刷新状态无效")
+    except Exception as exc:
+        states = []
+        state_error = str(exc)[:160]
+    note = "；".join(f"{p.series} 观测 {p.as_of.isoformat()}" for p in points)
+    fetched = [str(row.get("fetched_at") or "") for row in payload if isinstance(row, dict)]
+    if fetched:
+        note += "；获取 " + ",".join(sorted(set(fetched)))
+    failures = [f"{row['series']}: {row['last_error']}" for row in states
+                if row.get("last_error")]
+    if failures:
+        note += "；刷新失败 " + "；".join(failures)
+    state_by_series = {row["series"]: row for row in states if isinstance(row, dict) and row.get("series")}
+    missing = [point.series for point in points if point.series not in state_by_series]
+    if missing:
+        note += "；尚无刷新状态 " + ",".join(missing)
+    successes = [f"{point.series} {state_by_series[point.series]['last_success']}"
+                 for point in points if point.series in state_by_series and
+                 state_by_series[point.series].get("last_success")]
+    if successes:
+        note += "；最近刷新 " + "；".join(successes)
+    rows = [SourceRow("supabase", "macro", "used", note)]
+    if state_error:
+        rows.append(SourceRow("supabase", "macro_refresh_state", "missing", state_error))
+    return points, rows
 
 
 def _parse_latest(payload: Any) -> list[MacroPoint]:
@@ -82,26 +114,27 @@ def refresh_macro(
 
     points: list[MacroPoint] = []
     errors: list[str] = []
+    state_rows: list[dict] = []
+    attempted_at = datetime.now(timezone.utc).isoformat()
     for series, series_id in fred.SERIES:
         try:
             payload = get(fred.observations_url(series_id, fred_key))
             found = fred.latest(payload)
         except Exception as exc:
-            errors.append(f"{series}: {fred.public_error(exc)}")
+            reason = fred.public_error(exc)
+            errors.append(f"{series}: {reason}")
+            state_rows.append({"series": series, "last_attempt": attempted_at, "last_error": reason})
             continue
         if found is None:
             errors.append(f"{series}: 无观测")
+            state_rows.append({"series": series, "last_attempt": attempted_at, "last_error": "无观测"})
             continue
         points.append(MacroPoint(series, found[0], found[1], "fred"))
 
-    if not points:
-        return [], [SourceRow("fred", "macro_refresh", "missing", "；".join(errors) or "无观测")]
-
     try:
-        post(
-            _upsert_url(),
-            {**_headers(supabase_key), "Prefer": "resolution=merge-duplicates"},
-            [
+        if points:
+            post(_upsert_url(), {**_headers(supabase_key), "Prefer": "resolution=merge-duplicates"},
+                 [
                 {
                     "series": p.series,
                     "as_of": p.as_of.isoformat(),
@@ -110,12 +143,17 @@ def refresh_macro(
                     "fetched_at": datetime.now(timezone.utc).isoformat(),
                 }
                 for p in points
-            ],
-        )
+                 ])
+            state_rows.extend({"series": p.series, "last_attempt": attempted_at,
+                               "last_success": attempted_at, "last_error": None} for p in points)
+        if state_rows:
+            post(_state_url(), _headers(supabase_key), {"input_rows": state_rows})
     except Exception as exc:
         return points, [SourceRow("supabase", "macro_refresh", "missing", str(exc)[:160])]
+    if not points:
+        return [], [SourceRow("fred", "macro_refresh", "missing", "；".join(errors) or "无观测")]
 
     note = "；".join(f"{p.series} {p.as_of.isoformat()}" for p in points)
     if errors:
         note += "；失败 " + "；".join(errors)
-    return points, [SourceRow("supabase", "macro_refresh", "used", note)]
+    return points, [SourceRow("supabase", "macro_refresh", "missing" if errors else "used", note)]

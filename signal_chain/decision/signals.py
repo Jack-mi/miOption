@@ -152,7 +152,7 @@ async def research_signal(market: MarketData, pack: str, runner, model: str | No
     direction, conviction = mapped
     bundle = _bundle(
         "research", market, direction, conviction, result.analysis,
-        "技术面；资金面；基本面；新闻；社交", [],
+        "技术面；资金面；基本面；新闻" + ("；社交" if market.social else ""), [],
     )
     usage = getattr(meta, "usage", None) if meta is not None else None
     thread_id = getattr(meta, "thread_id", None) if meta is not None else None
@@ -171,7 +171,7 @@ async def value_signal(market: MarketData, runner, model: str | None, *, trace_d
     if run.abstain_reason or run.rating is None:
         bundle = _abstain("value", market, run.abstain_reason or "价值信号弃权", faces)
         _stamp_value(bundle, run)
-        for gap in (run.role_gaps or ROLE_GAPS):
+        for gap in (run.role_gaps or []):
             if gap not in bundle.data_gaps:
                 bundle.data_gaps.append(gap)
         return _with_calls(bundle, run.calls, model)
@@ -181,7 +181,7 @@ async def value_signal(market: MarketData, runner, model: str | None, *, trace_d
         return _with_calls(_stamp_value(bundle, run), run.calls, model)
     direction, conviction = mapped
     bundle = _bundle(
-        "value", market, direction, conviction, run.memo, faces, list(run.role_gaps or ROLE_GAPS),
+        "value", market, direction, conviction, run.memo, faces, list(run.role_gaps or []),
     )
     return _with_calls(_stamp_value(bundle, run), run.calls, model)
 

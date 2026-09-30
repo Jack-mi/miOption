@@ -28,6 +28,7 @@ def credit_vertical_payoff(
     short_strike: float,
     long_strike: float,
     credit: float,
+    multiplier: float = 100.0,
 ) -> dict[str, Any]:
     """Max profit / max loss / break-even at expiration for a 1x1 credit vertical.
 
@@ -44,8 +45,8 @@ def credit_vertical_payoff(
         raise ValueError(f"unsupported structure {structure_id}")
     if width <= 0:
         raise ValueError("protection strike is on the wrong side of the short")
-    max_profit = round(credit * 100.0, 2)
-    max_loss = round((width - credit) * 100.0, 2)
+    max_profit = round(credit * multiplier, 2)
+    max_loss = round((width - credit) * multiplier, 2)
     return {
         "structure_id": structure_id,
         "width": width,

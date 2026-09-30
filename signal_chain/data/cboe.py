@@ -1,4 +1,4 @@
-"""Cboe 延迟期权链。Futu 不可用时的免费兜底。"""
+"""Cboe 延迟期权链解析；程序化抓取需另行确认许可。"""
 
 from __future__ import annotations
 

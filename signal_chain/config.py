@@ -17,6 +17,7 @@ REPORTS_DIR = REPO_ROOT / "reports"
 RUNS_DIR = REPO_ROOT / "runs"
 # futu-api 只装在这个解释器里。缺失就报这条路径，不用当前进程的 Python 顶上。
 RUNTIME_VENV_PY = REPO_ROOT / "runtime" / ".venv" / "bin" / "python"
+SUPPORTED_HK = {"HK.03690", "HK.09992"}
 
 
 def require_runtime_python() -> Path:

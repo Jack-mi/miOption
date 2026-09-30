@@ -141,7 +141,7 @@ def _earnings(market: MarketData) -> str:
     note = next(
         (
             row.note for row in market.sources
-            if row.field == "earnings" and row.id in {"nasdaq", "finnhub"} and row.state == "used" and row.note
+            if row.field == "earnings" and row.state == "used" and row.note
         ),
         "",
     )
@@ -153,13 +153,16 @@ def _filing(market: MarketData) -> str:
     note = next(
         (
             row.note for row in market.sources
-            if row.field == "earnings" and row.id == "edgar" and "申报日" in (row.note or "")
+            if row.field == "filing" and row.state == "used" and row.note
         ),
         "",
     )
     if not note:
         return "最近申报日缺失"
-    return f"最近申报日：{note}，出处 edgar"
+    source = next((row.id for row in market.sources if row.field == "filing" and row.state == "used"), "未知")
+    if source == "futu_morningstar":
+        return f"研究更新：{note}，出处 {source}"
+    return f"最近申报日：{note}，出处 {source}"
 
 
 def _excerpt(market: MarketData, section: str, missing: str) -> str:

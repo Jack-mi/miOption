@@ -335,6 +335,8 @@ def _write_trace(run: WorkflowRun, trace_dir: Path | None) -> None:
         return
     trace_dir.mkdir(parents=True, exist_ok=True)
     path = trace_dir / f"{run.as_of}_{run.ticker.replace('.', '-')}.jsonl"
+    from ..data.archive import preserve
+    preserve(path)
     row = {
         "version": run.version,
         "model": run.model,

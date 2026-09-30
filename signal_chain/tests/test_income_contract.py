@@ -90,6 +90,18 @@ def test_invalid_structure_and_unknown_multiplier_are_forbidden():
     assert grade(short, {**long, "expiry": date(2026, 10, 16)})["tier"] == "禁做"
 
 
+def test_hk_contract_size_uses_real_multiplier_and_hkd_account():
+    short, long = legs()
+    short.update(contract_size=200)
+    long.update(contract_size=200)
+    hk_account = {**account(), "currency": "HKD", "available_cash": 1000}
+    result = grade(short, long, account=hk_account, multiplier=200, currency="HKD")
+    assert result["tier"] == "可考虑"
+    assert result["credit"] == 200
+    assert result["max_loss"] == 800
+    assert result["max_profit"] == 200
+
+
 def test_completed_sessions_drawdown_and_recovery():
     days = [date(2026, 9, day) for day in (10, 11, 14, 15, 16, 17, 18, 21, 22, 23, 24, 25)]
     prices = [100, 100, 100, 100, 100, 100, 89, 90, 91, 92, 93, 94]
@@ -159,7 +171,7 @@ def test_seller_scan_matches_menu_from_same_persisted_evidence(tmp_path):
     scanned = scan_watchlist(MockQuoteBackend(), underlyings=["US.TEST"], quote_store=quotes,
                              now=NOW, evidence={"US.TEST": {"account": account(), "closes": closes(),
                              "earnings": date(2026, 11, 20), "signal_ok": True,
-                             "signal_direction": "buy", "review_ok": True}})
+                             "signal_direction": "buy", "review_ok": True, "evidence_ok": True}})
     card = next(card for card in scanned["cards"] if card["short"]["code"] == short["code"])
     assert (scanned["errors"], card["tier"], card["max_loss"], card["max_profit"]) == (
         {}, menu.tier, menu.proposal.max_loss, menu.proposal.max_profit)

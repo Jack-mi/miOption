@@ -1,11 +1,12 @@
 # miOption
 
-对一只美股做投研，写出不下单的简报。默认标的是 `US.AAPL`。港股取数代码还在，这次不以港股为跑通标准。
+对一只美股做投研，写出不下单的简报。默认标的是 `US.AAPL`。港股仅放行 `HK.03690`、`HK.09992` 两只，其余港股仍拒绝。
 
 ```bash
 python -m signal_chain.orchestrator --tickers US.AAPL
 python -m signal_chain.orchestrator --tickers US.AAPL --no-llm
 python -m signal_chain.orchestrator --tickers US.AAPL --bias bull --shares 100
+python -m signal_chain.orchestrator --tickers HK.03690,HK.09992
 ```
 
 顺序是：数据层取数，三份信号，规则合成，27 个结构过风控，中文简报。模型走 Claude Agent SDK，只请求 DeepSeek 官方的 `deepseek-flash`。密钥在仓库根目录 `.env` 的 `DEEPSEEK_API_KEY`。

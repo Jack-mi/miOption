@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import fcntl
+import hashlib
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,9 +53,21 @@ class SellerStore:
         temporary = path.with_name(f".{path.name}.{uuid4().hex}.tmp")
         try:
             temporary.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
+            temporary.chmod(0o600)
             temporary.replace(path)
         finally:
             temporary.unlink(missing_ok=True)
+
+    def _preserve(self, path: Path) -> None:
+        if not path.is_file():
+            return
+        archive = self.root.parent / "archive" / path.relative_to(self.root)
+        content = path.read_bytes()
+        version = archive / hashlib.sha256(content).hexdigest()
+        version.parent.mkdir(parents=True, exist_ok=True)
+        if not version.exists():
+            version.write_bytes(content)
+        version.chmod(0o600)
 
     def _read_json(self, path: Path) -> Any:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -63,7 +76,9 @@ class SellerStore:
         if not card.created_at:
             card.created_at = _now()
         card.updated_at = _now()
-        self._write_json(self.signals / f"{card.id}.json", card.as_dict())
+        path = self.signals / f"{card.id}.json"
+        self._preserve(path)
+        self._write_json(path, card.as_dict())
         return card
 
     def get_card(self, card_id: str) -> SellerCard | None:
@@ -95,7 +110,9 @@ class SellerStore:
             "note": note,
             "at": _now(),
         }
-        self._write_json(self.marks / f"{card_id}.json", payload)
+        path = self.marks / f"{card_id}.json"
+        self._preserve(path)
+        self._write_json(path, payload)
         return payload
 
     def append_event(self, event: dict[str, Any]) -> dict[str, Any]:

@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-KEEP_PULLS = 3
 MAX_QUOTE_AGE_SECONDS = 3 * 24 * 60 * 60
 
 
@@ -140,6 +139,7 @@ class QuoteStore:
         self.path = Path(path) if path is not None else default_db_path()
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._init()
+        self.path.chmod(0o600)
 
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.path)
@@ -197,7 +197,7 @@ class QuoteStore:
                 """
             )
 
-    def replace_current(self, pack: dict[str, Any], *, keep: int = KEEP_PULLS) -> int:
+    def replace_current(self, pack: dict[str, Any]) -> int:
         underlying = str(pack["underlying"])
         options = list(pack.get("options") or [])
         with self._connect() as conn:
@@ -261,12 +261,6 @@ class QuoteStore:
                 (underlying,),
             )
             conn.execute("UPDATE pulls SET is_current = 1 WHERE id = ?", (pull_id,))
-            ids = conn.execute(
-                "SELECT id FROM pulls WHERE underlying = ? ORDER BY id DESC",
-                (underlying,),
-            ).fetchall()
-            for item in ids[keep:]:
-                conn.execute("DELETE FROM pulls WHERE id = ?", (int(item["id"]),))
             return pull_id
 
     def current(self, underlying: str) -> dict[str, Any] | None:

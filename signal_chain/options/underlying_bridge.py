@@ -15,6 +15,7 @@ from datetime import date, datetime, timedelta, timezone
 logging.disable(logging.CRITICAL)
 
 _TZ = {"US": "America/New_York", "HK": "Asia/Hong_Kong"}
+_NEWS_KEYWORDS = {"HK.09992": "泡泡瑪特", "HK.03690": "美團"}
 
 
 def _num(v):
@@ -106,6 +107,116 @@ def _capital_flow(quote_ctx, symbol: str) -> dict:
     return {"net": net, "as_of": session, "error": None}
 
 
+def _report_items(report: dict) -> dict[str, float | None]:
+    return {
+        str(item.get("display_name")): _num(item.get("data"))
+        for item in report.get("item_list", [])
+    }
+
+
+def _financials(quote_ctx, symbol: str, snapshot_row) -> dict:
+    income_ret, income = quote_ctx.get_financials_statements(symbol, statement_type=1, num=4)
+    metric_ret, metrics = quote_ctx.get_financials_statements(symbol, statement_type=4, num=4)
+    income_reports = income.get("report_list", []) if income_ret == 0 and isinstance(income, dict) else []
+    metric_reports = metrics.get("report_list", []) if metric_ret == 0 and isinstance(metrics, dict) else []
+    if not income_reports:
+        return {"error": "Futu 无利润表", "period": None, "as_of": None}
+    latest = income_reports[0]
+    same_period = next((r for r in metric_reports if r.get("period_text") == latest.get("period_text")), metric_reports[0] if metric_reports else None)
+    income_items = _report_items(latest)
+    metric_items = _report_items(same_period) if same_period else {}
+    return {
+        "period": latest.get("period_text"),
+        "as_of": latest.get("date_time_str"),
+        "currency": latest.get("currency_code"),
+        "auditor_report": latest.get("auditor_report") or None,
+        "income": {
+            "revenue": income_items.get("Total Revenue"),
+            "gross_profit": income_items.get("Gross Profit"),
+            "operating_profit": income_items.get("Operating Profit"),
+            "net_profit": income_items.get("Net Profit"),
+            "net_profit_parent": income_items.get("Net Income to Parent Company"),
+            "basic_eps": income_items.get("Basic EPS"),
+            "diluted_eps": income_items.get("Diluted EPS"),
+        },
+        "metrics": {
+            "period": same_period.get("period_text") if same_period else None,
+            "as_of": same_period.get("date_time_str") if same_period else None,
+            "net_asset_per_share": metric_items.get("Net Assets Per Share"),
+            "gross_margin": metric_items.get("Gross Profit Ratio"),
+            "operating_margin": metric_items.get("Operating Profit Ratio"),
+            "net_margin": metric_items.get("Net Profit Ratio"),
+            "roe": metric_items.get("ROE"),
+            "roa": metric_items.get("ROA"),
+            "current_ratio": metric_items.get("Current Ratio"),
+            "quick_ratio": metric_items.get("Quick Ratio"),
+            "inventory_turnover": metric_items.get("Inventory Turnover (T)"),
+        },
+        "valuation": {
+            "as_of": _session_date(snapshot_row.get("update_time")),
+            "currency": "HKD",
+            "market_cap": _num(snapshot_row.get("total_market_val")),
+            "pe_ttm": _num(snapshot_row.get("pe_ttm_ratio")),
+            "pb": _num(snapshot_row.get("pb_ratio")),
+            "dividend_ttm": _num(snapshot_row.get("dividend_ttm")),
+            "dividend_yield_ttm": _num(snapshot_row.get("dividend_ratio_ttm")),
+        },
+        "error": None,
+    }
+
+
+def _research(quote_ctx, symbol: str) -> dict:
+    ret, report = quote_ctx.get_research_morningstar_report(symbol)
+    if ret != 0 or not isinstance(report, dict):
+        return {"sections": {}, "error": str(report)[:200]}
+    sections = {
+        "business": report.get("investment_thesis_content", {}).get("context"),
+        "competition": report.get("economic_moat_content", {}).get("context"),
+        "risk_factors": report.get("uncertainty_content", {}).get("context"),
+        "governance": report.get("capital_allocation_content", {}).get("context"),
+        "financial_health": report.get("financial_health_content", {}).get("context"),
+    }
+    return {
+        "sections": {key: value for key, value in sections.items() if value},
+        "as_of": report.get("analyst_report_update_time_str"),
+        "source": "futu_morningstar",
+        "star_rating": report.get("star_rating"),
+        "fair_value": report.get("fair_value"),
+        "moat": report.get("economic_moat_label"),
+        "uncertainty": report.get("uncertainty_label"),
+        "analyst": report.get("analyst_report_by_line"),
+        "error": None,
+    }
+
+
+def _news(quote_ctx, name: str, today: date) -> list[dict]:
+    import futu as ft
+
+    ret, frame = quote_ctx.get_search_news(name, max_count=10, news_sub_type=ft.NewsSubType.NEWS)
+    if ret != 0 or frame is None or frame.empty:
+        return []
+    out = []
+    for _, row in frame.iterrows():
+        title = str(row.get("title") or "").strip()
+        if not title:
+            continue
+        raw_time = str(row.get("publish_time") or "").strip()
+        try:
+            month, day = (int(part) for part in raw_time.split("/", 1))
+            published = date(today.year, month, day)
+            if (published - today).days > 30:
+                published = date(today.year - 1, month, day)
+        except (ValueError, TypeError):
+            published = None
+        out.append({
+            "title": title,
+            "source": str(row.get("source") or "futu_news"),
+            "published": published.isoformat() if published else None,
+            "url": str(row.get("url") or "") or None,
+        })
+    return out[:5]
+
+
 def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
     import futu as ft
 
@@ -117,11 +228,15 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
     quote_ctx = ft.OpenQuoteContext(host=host, port=port)
     try:
         quote = {"last": None, "session_date": None, "error": None}
+        name = ""
+        snapshot_row = None
         ret, snap = quote_ctx.get_market_snapshot([symbol])
         if ret != ft.RET_OK or snap is None or snap.empty:
             quote["error"] = f"snapshot 失败: {snap}"[:400]
         else:
             row = snap.iloc[0]
+            snapshot_row = row
+            name = str(row.get("name") or "").strip()
             raw_update = row.get("update_time")
             update_text = "" if raw_update is None else str(raw_update).strip()
             if update_text.lower() in {"nat", "nan", "none"}:
@@ -136,8 +251,9 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
                 quote["update_time"] = update_text
                 quote["observed_at"] = datetime.now(timezone.utc).isoformat()
 
-        start = (trade_date - timedelta(days=120)).isoformat()
-        bars, k_error = _history(quote_ctx, symbol, start, trade_date.isoformat())
+        start = sys.argv[5] if len(sys.argv) > 5 else (trade_date - timedelta(days=120)).isoformat()
+        bars, k_error = (_history(quote_ctx, symbol, start, trade_date.isoformat())
+                         if start <= trade_date.isoformat() else ([], None))
         kline = {
             "adjusted": True,
             "bars": bars,
@@ -152,6 +268,11 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
             "quote": quote,
             "kline": kline,
             "capital_flow": _capital_flow(quote_ctx, symbol),
+            "name": name,
+            "financials": _financials(quote_ctx, symbol, snapshot_row) if snapshot_row is not None else {"error": "snapshot 缺失"},
+            "research": _research(quote_ctx, symbol),
+            "news": _news(quote_ctx, _NEWS_KEYWORDS.get(symbol, name), trade_date)
+                     if _NEWS_KEYWORDS.get(symbol, name) else [],
             "error": None,
         }
     finally:

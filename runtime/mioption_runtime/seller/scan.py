@@ -450,6 +450,7 @@ def scan_underlying(
     signal_ok: bool = False,
     signal_direction: str | None = None,
     review_ok: bool = False,
+    evidence_ok: bool = False,
     config: dict | None = None,
     now: datetime | None = None,
 ) -> list[SellerCard]:
@@ -463,7 +464,7 @@ def scan_underlying(
         _, _, session_open, session_close = _sessions(clock)
         pulled = market_time((pack or {}).get("pulled_at"))
         cfg = {**DEFAULTS, **(config or {})}
-        if pack is None or (session_open <= clock < session_close and
+        if pack is None or pack.get("stale") or (session_open <= clock < session_close and
                             (pulled is None or clock - pulled > timedelta(seconds=cfg["quote_max_age_seconds"]))):
             pack = pull_underlying_pack(underlying, days=cfg["dte_max"], host=backend.host, port=backend.port)
             quote_store.replace_current(pack)
@@ -517,6 +518,7 @@ def scan_underlying(
             account=account, closes=closes or [], earnings=earnings,
             signal_ok=signal_ok and signal_direction == ("buy" if short["option_type"] == "PUT" else "sell"),
             review_ok=review_ok, complete=complete, config=cfg,
+            evidence_ok=evidence_ok,
             fetched_at=pack.get("pulled_at") if pack else None,
             spot_fetched_at=(equity or {}).get("fetched_at"),
         )
@@ -604,6 +606,7 @@ def scan_watchlist(
                     earnings=context.get("earnings"), signal_ok=context.get("signal_ok", False),
                     signal_direction=context.get("signal_direction"),
                     review_ok=context.get("review_ok", False), config=context.get("config"),
+                    evidence_ok=context.get("evidence_ok", False),
                     now=now,
                 )
             )

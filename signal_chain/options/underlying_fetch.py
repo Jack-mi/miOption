@@ -185,6 +185,35 @@ def _with_error(field, message: str):
     return field.model_copy(update={"meta": meta})
 
 
+def _hk_fundamentals_field(raw: dict | None, fetched_at: datetime, tz: str) -> FieldMeta:
+    if not raw or raw.get("error") or not raw.get("period") or not raw.get("as_of"):
+        return FieldMeta(
+            status="missing", source="futu_financials", fetched_at=fetched_at,
+            timezone=tz, error=(raw or {}).get("error") or "Futu 无财务报表",
+        )
+    return FieldMeta(
+        status="available", source="futu_financials",
+        as_of=date.fromisoformat(str(raw["as_of"])[:10]), fetched_at=fetched_at,
+        timezone=tz, period=str(raw["period"]),
+    )
+
+
+def _futu_news_field(raw: list | None, session: date, fetched_at: datetime, tz: str) -> tuple[FieldMeta, str | None]:
+    rows = [row for row in (raw or []) if row.get("title")]
+    if not rows:
+        return FieldMeta(
+            status="missing", source="futu_news", as_of=session, fetched_at=fetched_at,
+            timezone=tz, error="Futu 无新闻",
+        ), None
+    dates = [row.get("published") for row in rows if row.get("published")]
+    as_of = date.fromisoformat(max(dates)[:10]) if dates else session
+    text = "\n".join(f"{row['title']}（{row.get('source') or 'futu_news'}）" for row in rows)
+    return FieldMeta(
+        status="available", source="futu_news", as_of=as_of, fetched_at=fetched_at,
+        timezone=tz,
+    ), text
+
+
 def _pick(primary, secondary, *, futu_error: str | None, fallback_error: str | None):
     """主源可用则用主源；否则仅在降级源 available 时替换，并写明 Futu 失败原因。"""
     if primary.meta.status == "available":
@@ -238,6 +267,7 @@ def build_snapshot(
     fallback: dict | None = None,
     fallback_error: str | None = None,
     fallback_source: str = "fmp",
+    kline_session: date | None = None,
 ) -> UnderlyingSnapshot:
     """把富途探测和可选降级源收成一份快照。as_of 是这场交易日，不是运行日。"""
     if market not in _CCY:
@@ -246,6 +276,8 @@ def build_snapshot(
     tz = _TZ[market]
     currency = _CCY[market]
     futu = align_futu_quote(futu) if market == "US" else futu
+    if market == "HK" and futu:
+        futu = align_futu_quote(futu, market="HK")
     futu = futu or {}
     fallback = fallback or {}
     quote = _pick(
@@ -256,11 +288,19 @@ def build_snapshot(
         futu_error=futu_error, fallback_error=fallback_error,
     )
     kline = _pick(
-        _kline_field(futu.get("kline"), source="futu" if futu else None, trade_date=session,
+        _kline_field(futu.get("kline"), source="futu" if futu else None, trade_date=kline_session or session,
                      fetched_at=fetched_at, tz=tz, prior_error=futu_error),
-        _kline_field(fallback.get("kline"), source=fallback_source if fallback else None, trade_date=session,
+        _kline_field(fallback.get("kline"), source=fallback_source if fallback else None, trade_date=kline_session or session,
                      fetched_at=fetched_at, tz=tz, prior_error=fallback_error),
         futu_error=futu_error, fallback_error=fallback_error,
+    )
+    fundamentals = (
+        _hk_fundamentals_field(futu.get("financials"), fetched_at, tz)
+        if market == "HK" else FieldMeta(status="unsupported", error="本轮不接入基本面")
+    )
+    news_meta, news_text = (
+        _futu_news_field(futu.get("news"), session, fetched_at, tz)
+        if market == "HK" else (FieldMeta(status="unsupported", error="本轮不接入新闻"), None)
     )
     return UnderlyingSnapshot(
         ticker=ticker,
@@ -270,7 +310,9 @@ def build_snapshot(
         fetched_at=fetched_at,
         quote=quote,
         kline=kline,
-        technical=_technical(kline, session, fetched_at, tz),
+        technical=_technical(kline, kline_session or session, fetched_at, tz),
+        fundamentals=fundamentals,
+        news=news_meta,
     )
 
 
@@ -281,7 +323,8 @@ def _json_line(stdout: str) -> dict | None:
     return None
 
 
-def probe_futu(t: NormTicker, trade_date: date, settings: Settings) -> tuple[dict | None, str | None]:
+def probe_futu(t: NormTicker, trade_date: date, settings: Settings,
+               history_start: date | None = None) -> tuple[dict | None, str | None]:
     cfg = settings.chain
     try:
         runtime_py = require_runtime_python()
@@ -292,6 +335,8 @@ def probe_futu(t: NormTicker, trade_date: date, settings: Settings) -> tuple[dic
         t.futu_format, trade_date.isoformat(),
         str(cfg["futu_opend_host"]), str(cfg["futu_opend_port"]),
     ]
+    if history_start is not None:
+        cmd.append(history_start.isoformat())
     try:
         proc = subprocess.run(
             cmd, capture_output=True, text=True, timeout=_BRIDGE_TIMEOUT, cwd=str(REPO_ROOT),

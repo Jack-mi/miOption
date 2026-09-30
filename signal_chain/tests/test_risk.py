@@ -62,7 +62,7 @@ def test_conflicted_veto():
 def test_earnings_window_short_vol_veto():
     cat = [Catalyst(type="earnings", expected_date=D0 + timedelta(days=5),
                     description="Q3")]
-    d = check_proposal(_spread(), _ensemble(catalysts=cat), _chain())
+    d = check_proposal(_spread(), _ensemble(catalysts=cat), _chain(), today=D0)
     assert any("财报窗口" in v for v in d.vetoes)
 
 
@@ -72,7 +72,7 @@ def test_earnings_expiry_window_short_vol_veto_even_when_earnings_are_far():
     proposal = _spread()
     proposal.legs[0].expiry = D0 + timedelta(days=22)
     proposal.legs[1].expiry = D0 + timedelta(days=22)
-    d = check_proposal(proposal, _ensemble(catalysts=cat), _chain())
+    d = check_proposal(proposal, _ensemble(catalysts=cat), _chain(), today=D0)
     assert any("财报窗口内到期" in v for v in d.vetoes)
 
 

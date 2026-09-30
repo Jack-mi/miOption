@@ -95,7 +95,8 @@ def main() -> int:
         if ret != ft.RET_OK:
             print(f"expiration dates failed: {dates}", file=sys.stderr)
             return 3
-        today = datetime.now(ZoneInfo("America/New_York")).date()
+        tz = ZoneInfo("Asia/Hong_Kong") if market == "HK" else ZoneInfo("America/New_York")
+        today = datetime.now(tz).date()
         horizon = today + timedelta(days=window_days)
         expiries = sorted({
             d for d in dates["strike_time"].tolist()

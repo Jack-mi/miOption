@@ -23,6 +23,17 @@ from ..schema import (
 _MULT = 100  # ponytail: 美股一张 100 股。港股乘数不猜，选合约直接做不了。
 _MIN_DTE = 7
 
+
+def _multiplier(chain: ChainSnapshot | None) -> float | None:
+    if chain is None:
+        return None
+    sizes = {row.contract_size for row in chain.rows if row.contract_size}
+    if len(sizes) == 1:
+        return float(next(iter(sizes)))
+    if not sizes and chain.market == "US":
+        return float(_MULT)
+    return None
+
 _BULL = {Direction.BUY, Direction.STRONG_BUY}
 _BEAR = {Direction.SELL, Direction.STRONG_SELL}
 _UNLIMITED = {"short_straddle", "short_strangle"}
@@ -212,11 +223,11 @@ def _cash(legs: list[StrategyLeg], by_code: dict[str, OptionRow]) -> float | Non
     return total
 
 
-def _max_loss(shape: str, legs: list[StrategyLeg], net: float | None) -> float | None:
+def _max_loss(shape: str, legs: list[StrategyLeg], net: float | None, multiplier: float) -> float | None:
     if net is None or shape in _UNLIMITED:
         return None
     if shape == "cash_put":
-        return round((legs[0].strike - max(net, 0)) * _MULT, 2)
+        return round((legs[0].strike - max(net, 0)) * multiplier, 2)
     if shape in _CREDIT:
         if shape in {"iron_condor", "iron_butterfly"}:
             calls = [lg.strike for lg in legs if lg.option_type == "CALL"]
@@ -224,20 +235,20 @@ def _max_loss(shape: str, legs: list[StrategyLeg], net: float | None) -> float |
             width = max(abs(calls[0] - calls[1]), abs(puts[0] - puts[1]))
         else:
             width = abs(legs[0].strike - legs[1].strike)
-        return round((width - max(net, 0)) * _MULT, 2)
-    return round(abs(min(net, 0)) * _MULT, 2)
+        return round((width - max(net, 0)) * multiplier, 2)
+    return round(abs(min(net, 0)) * multiplier, 2)
 
 
-def _scenario_note(legs: list[StrategyLeg], net: float | None, spot: float) -> str | None:
+def _scenario_note(legs: list[StrategyLeg], net: float | None, spot: float, multiplier: float) -> str | None:
     """同到期结构给 -5%/-10% 的到期损益边界；非到期市值不做假精确。"""
     if net is None or len({leg.expiry for leg in legs}) != 1:
         return None
 
     def pnl(target: float) -> float:
-        total = net * _MULT
+        total = net * multiplier
         for leg in legs:
             intrinsic = max(target - leg.strike, 0) if leg.option_type == "CALL" else max(leg.strike - target, 0)
-            total += (-1 if leg.side == "sell" else 1) * intrinsic * leg.quantity * _MULT
+            total += (-1 if leg.side == "sell" else 1) * intrinsic * leg.quantity * multiplier
         return total
 
     down_5, down_10 = pnl(spot * 0.95), pnl(spot * 0.90)
@@ -245,7 +256,7 @@ def _scenario_note(legs: list[StrategyLeg], net: float | None, spot: float) -> s
 
 
 def _finish(name: str, thesis: str, shape: str, short_vol: bool,
-            legs: list[StrategyLeg], chain: ChainSnapshot) -> StrategyProposal | None:
+            legs: list[StrategyLeg], chain: ChainSnapshot, multiplier: float) -> StrategyProposal | None:
     if not legs or any(lg is None for lg in legs):
         return None
     by_code = {r.code: r for r in chain.rows}
@@ -254,14 +265,14 @@ def _finish(name: str, thesis: str, shape: str, short_vol: bool,
     net = _cash(legs, by_code)
     return StrategyProposal(
         name=name, thesis=thesis, legs=legs,
-        max_loss=_max_loss(shape, legs, net),
-        net_premium=None if net is None else round(net * _MULT, 2),
+        max_loss=_max_loss(shape, legs, net, multiplier),
+        net_premium=None if net is None else round(net * multiplier, 2),
         is_short_vol=short_vol,
-        notes=_scenario_note(legs, net, chain.spot or 0),
+        notes=_scenario_note(legs, net, chain.spot or 0, multiplier),
     )
 
 
-def _build(t: Template, chain: ChainSnapshot, as_of: date) -> StrategyProposal | None:
+def _build(t: Template, chain: ChainSnapshot, as_of: date, multiplier: float) -> StrategyProposal | None:
     spot = chain.spot
     if spot is None:
         return None
@@ -361,7 +372,7 @@ def _build(t: Template, chain: ChainSnapshot, as_of: date) -> StrategyProposal |
             return None
     else:
         return None
-    return _finish(t.name, thesis, shape, short, legs, chain)
+    return _finish(t.name, thesis, shape, short, legs, chain, multiplier)
 
 
 def _calendar(chain, exps, spot, opt) -> list[StrategyLeg] | None:
@@ -395,14 +406,14 @@ def _vol_reason(t: Template, ensemble: EnsembleSignal, today: date, blackout: in
     return "".join(parts) or None
 
 
-def _cash_reason(chain: ChainSnapshot | None, equity: float | None) -> str | None:
+def _cash_reason(chain: ChainSnapshot | None, equity: float | None, multiplier: float) -> str | None:
     if chain is None or chain.spot is None:
-        return "没有现价，无法确认能担保 100 股。"
-    need = chain.spot * _MULT
+        return "没有现价，无法确认担保股数。"
+    need = chain.spot * multiplier
     if equity is None:
-        return "没有账户现金记录，无法确认能担保 100 股。"
+        return "没有账户现金记录，无法确认担保股数。"
     if equity < need:
-        return f"现金 {equity:.0f} 不够买下 100 股（现价 {chain.spot:.2f}）。"
+        return f"现金 {equity:.0f} 不够买下 {multiplier:.0f} 股（现价 {chain.spot:.2f}）。"
     return None
 
 
@@ -415,11 +426,14 @@ def _screen_one(
     today: date,
     blackout: int,
     holds_shares: bool,
+    multiplier: float | None,
 ) -> tuple[str, str]:
     if t.no_formula:
         return "impossible", "没有单一盈亏公式。"
     if t.naked:
         return "impossible", "禁止裸卖。"
+    if multiplier is None:
+        return "impossible", "合约乘数未知。"
     if t.needs_shares and not holds_shares:
         return "impossible", "没有正股持仓记录。"
     if not _bias_ok(t.bias, ensemble.direction):
@@ -429,7 +443,7 @@ def _screen_one(
     if blocked:
         return "unfit", blocked
     if t.cash_secured:
-        cash = _cash_reason(chain, equity)
+        cash = _cash_reason(chain, equity, multiplier)
         if cash:
             return "impossible", cash
     return "fit", "方向与波动率都过了菜单。"
@@ -456,14 +470,17 @@ def screen_menu(
     config: dict | None = None,
     earnings_date: date | None = None,
     signal_direction: Direction | None = None,
+    evidence_ok: bool = True,
 ) -> list[MenuVerdict]:
     today = today or ensemble.as_of
     now = now or datetime.now(timezone.utc)
+    multiplier = _multiplier(chain)
+    currency = "HKD" if ensemble.market == "HK" else "USD"
     out: list[MenuVerdict] = []
     for t in CATALOG:
         if t.shape in {"bull_put", "bear_call"}:
-            if chain is None or chain.spot is None or ensemble.market != "US":
-                out.append(MenuVerdict(t.name, "impossible", "没有可用的美股期权链。"))
+            if chain is None or chain.spot is None or multiplier is None:
+                out.append(MenuVerdict(t.name, "impossible", "没有可用期权链或合约乘数未知。"))
                 continue
             rows = [row.model_dump(mode="python") for row in chain.rows]
             pairs = income_candidates(rows, chain.spot, now, config)
@@ -484,15 +501,18 @@ def screen_menu(
                     review_ok=review_ok, complete=not chain.degraded, config=config,
                     fetched_at=chain.fetched_at.isoformat(),
                     spot_fetched_at=chain.spot_fetched_at,
+                    evidence_ok=evidence_ok,
+                    multiplier=multiplier,
+                    currency=currency,
                 )
                 proposal = _finish(t.name, "保守 bid/ask 信用价差。", t.shape, True,
                                    [_leg(OptionRow.model_validate(short), "sell"),
-                                    _leg(OptionRow.model_validate(long), "buy")], chain)
+                                    _leg(OptionRow.model_validate(long), "buy")], chain, multiplier)
                 if proposal:
                     proposal.net_premium = verdict["credit"]
                     proposal.max_loss = verdict["max_loss"]
                     proposal.max_profit = verdict["max_profit"]
-                    proposal.notes = _scenario_note(proposal.legs, verdict["credit"] / _MULT, chain.spot)
+                    proposal.notes = _scenario_note(proposal.legs, verdict["credit"] / multiplier, chain.spot, multiplier)
                     risk = RiskDecision(approved=verdict["tier"] == "可考虑",
                                         vetoes=verdict["reasons"])
                     ranked.append(MenuVerdict(t.name, "fit", "；".join(verdict["reasons"]) or "满足条件。",
@@ -504,16 +524,15 @@ def screen_menu(
             out.extend(ranked[:3] or [MenuVerdict(t.name, "impossible", "链上没有符合期限/宽度的真实价差。")])
             continue
         status, reason = _screen_one(
-            t, ensemble, chain, equity=(account or {}).get("available_cash_usd"), today=today,
-            blackout=earnings_blackout_days, holds_shares=holds_shares,
+            t, ensemble, chain, equity=(account or {}).get("available_cash", (account or {}).get("available_cash_usd")),
+            today=today, blackout=earnings_blackout_days, holds_shares=holds_shares,
+            multiplier=multiplier,
         )
         proposal, risk = None, None
-        if status == "fit" and ensemble.market != "US":
-            status, reason = "impossible", "港股本轮不按未知乘数选合约。"
-        elif status == "fit" and (chain is None or chain.spot is None):
+        if status == "fit" and (chain is None or chain.spot is None):
             status, reason = "impossible", "没有期权链，选不了合约。"
         elif status == "fit":
-            proposal = _build(t, chain, today)
+            proposal = _build(t, chain, today, multiplier)
             if proposal is None:
                 status, reason = "impossible", "链上凑不齐可报价的合约。"
             else:

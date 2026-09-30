@@ -153,6 +153,7 @@ async def process_ticker(
             "方向异号时再写一段分歧焦点。"
             "可以引用 review 的毛病清单，但不能把它改写成另一份判断。"
             "结构菜单会附在简报后面，不要改写其中的适合、不适合、做不了，也不要另造结构。"
+            "简报正文不要写“未附结构菜单”或“不列结构”。"
             f"富途价格证据：报价 {snapshot.quote.meta.status} as_of {snapshot.quote.meta.as_of}，"
             f"日线 {snapshot.kline.meta.status} 最后交易日 {snapshot.kline.meta.as_of}，"
             f"技术 {snapshot.technical.meta.status}。"
@@ -208,8 +209,14 @@ def main() -> None:
     args = parser.parse_args()
 
     settings = load_settings()
-    trade_date = date.fromisoformat(args.date)
     tickers = args.tickers.split(",") if args.tickers else settings.watchlist
+    parsed = [parse_ticker(ticker) for ticker in tickers]
+    if args.date:
+        trade_date = date.fromisoformat(args.date)
+    elif parsed and all(t.market == "HK" for t in parsed):
+        trade_date = datetime.now(ZoneInfo("Asia/Hong_Kong")).date()
+    else:
+        trade_date = datetime.now(ZoneInfo("America/New_York")).date()
     ledger = RunLedger(trade_date)
 
     async def _run():

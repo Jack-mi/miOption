@@ -95,11 +95,12 @@ async def run(
     sig_gate = check_signal(ensemble)
     held = sum(float(row.get("can_sell_qty") or 0) for row in (account or {}).get("positions", [])
                if row.get("code") == ticker)
+    contract_size = min((row.contract_size for row in chain.rows if row.contract_size), default=100) if chain else 100
     closes = [(bar.trade_date, bar.close) for bar in market.snapshot.kline.bars]
     biased = apply_user_bias(ensemble, bias)
     verdicts = screen_menu(
         biased, chain,
-        holds_shares=held >= 100,
+        holds_shares=held >= contract_size,
         account_equity=account["value"] if account else None,
         equity_currency=account["currency"] if account else None,
         equity_note=account.get("note") if account else None,
@@ -112,6 +113,7 @@ async def run(
         now=datetime.now(timezone.utc), config=risk_cfg,
         earnings_date=market.snapshot.earnings_date,
         signal_direction=biased.direction,
+        evidence_ok=market.evidence_persisted,
     )
     proposals = [v.proposal for v in verdicts if v.proposal is not None]
     risk_decisions = [v.risk for v in verdicts if v.risk is not None]
@@ -152,13 +154,14 @@ def finalize_review(market, decision: DecisionReport, review, settings) -> Decis
     signal_ok = bool(decision.risk.get("signal_gate", {}).get("approved"))
     settings_risk = settings.risk
     biased = apply_user_bias(decision.ensemble, decision.bias)
+    contract_size = min((row.contract_size for row in chain.rows if row.contract_size), default=100) if chain else 100
     verdicts = screen_menu(
         biased, chain,
         account_equity=account.get("value") if account else None,
         equity_currency=account.get("currency") if account else None,
         equity_note=account.get("note") if account else None,
         holds_shares=any(row.get("code") == decision.ticker and
-                         float(row.get("can_sell_qty") or 0) >= 100
+                         float(row.get("can_sell_qty") or 0) >= contract_size
                          for row in (account or {}).get("positions", [])),
         account=account,
         closes=[(bar.trade_date, bar.close) for bar in market.snapshot.kline.bars],
@@ -166,6 +169,7 @@ def finalize_review(market, decision: DecisionReport, review, settings) -> Decis
         today=decision.ensemble.as_of, now=datetime.now(timezone.utc), config=settings_risk,
         earnings_date=market.snapshot.earnings_date,
         signal_direction=biased.direction,
+        evidence_ok=market.evidence_persisted,
         earnings_blackout_days=settings_risk["earnings_blackout_days"],
         min_open_interest=settings_risk["min_open_interest"],
         max_spread_pct=settings_risk["max_spread_pct"],

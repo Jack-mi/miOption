@@ -46,11 +46,12 @@ def _pack(underlying: str, pulled_at: str, last: float, code_suffix: str) -> dic
     }
 
 
-def test_replace_current_keeps_three(tmp_path: Path):
+def test_replace_current_preserves_history(tmp_path: Path):
     store = QuoteStore(tmp_path / "quotes.sqlite")
+    assert store.path.stat().st_mode & 0o777 == 0o600
     for i in range(5):
         store.replace_current(_pack("US.BIDU", f"2026-09-0{i+1}T00:00:00Z", 90 + i, f"0{i}"))
-    assert store.pull_count("US.BIDU") == 3
+    assert store.pull_count("US.BIDU") == 5
     cur = store.current("US.BIDU")
     assert cur is not None
     assert cur["equity"]["last_price"] == 94

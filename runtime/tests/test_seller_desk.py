@@ -321,6 +321,30 @@ def test_scan_preserves_historical_cards_for_underlying(tmp_path: Path):
     assert any(c.id == "US.BIDU-stale-old" for c in seller.list_cards())
 
 
+def test_live_scan_refetches_expired_pack(monkeypatch, tmp_path: Path):
+    from mioption_runtime.futu.quote import FutuQuoteBackend
+    from mioption_runtime.futu.quote_store import QuoteStore
+    from mioption_runtime.seller import scan
+
+    quote_store = QuoteStore(tmp_path / "quotes.sqlite")
+    quote_store.replace_current({"underlying": "US.TEST", "source": "futu",
+                                 "pulled_at": "2026-01-01T00:00:00Z", "options": []})
+    calls = []
+
+    def pull(underlying, **kwargs):
+        calls.append(underlying)
+        return {"underlying": underlying, "source": "futu",
+                "pulled_at": datetime.now(timezone.utc).isoformat(),
+                "equity": {"last_price": 100}, "options": []}
+
+    monkeypatch.setattr(scan, "pull_underlying_pack", pull)
+    try:
+        scan.scan_underlying(FutuQuoteBackend(), "US.TEST", quote_store=quote_store)
+    except ValueError as exc:
+        assert "完整实时盘口缺失" in str(exc)
+    assert calls == ["US.TEST"]
+
+
 def test_mock_scan_yields_credit_verticals(tmp_path: Path):
     from mioption_runtime.futu.quote import MockQuoteBackend
     from mioption_runtime.seller.desk import SellerDesk

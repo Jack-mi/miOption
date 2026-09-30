@@ -176,7 +176,8 @@ def test_chain_spot_uses_the_price_cascade_spot():
     assert ("cboe", "skipped") in _states(market, "chain")
 
 
-def test_cboe_fills_chain_when_futu_fails():
+def test_cboe_fills_chain_when_futu_fails(monkeypatch):
+    monkeypatch.setenv("MIOPTION_CBOE_PROGRAMMATIC_LICENSE", "confirmed")
     def get(url, headers=None):
         if "cdn-api.cboe.com/api/global/delayed_quotes/options/AAPL.json" in url:
             return {
@@ -206,6 +207,15 @@ def test_cboe_fills_chain_when_futu_fails():
     assert market.chain.spot == 100.0
     assert ("futu", "missing") in _states(market, "chain")
     assert ("cboe", "used") in _states(market, "chain")
+
+
+def test_cboe_is_not_scraped_without_licensed_access(monkeypatch):
+    monkeypatch.delenv("MIOPTION_CBOE_PROGRAMMATIC_LICENSE", raising=False)
+    market = _load(futu=_futu(), get=lambda url, headers=None: (_ for _ in ()).throw(
+        AssertionError("Cboe must not be fetched")), include_chain=True,
+        chain_fetch=lambda *_a, **_k: (_ for _ in ()).throw(RuntimeError("OpenD down")))
+    assert market.chain is None
+    assert ("cboe", "skipped") in _states(market, "chain")
 
 
 def test_fmp_price_when_both_fail():
@@ -253,13 +263,51 @@ def test_non_us_load_does_not_fetch():
         get=refuse, quota=lambda: True,
         futu_probe=refuse, chain_fetch=refuse,
     )
-    assert result.chain_error == "只覆盖美股"
+    assert result.chain_error == "只覆盖美股和指定港股"
     assert ("loader", "unsupported") in _states(result, "market")
     with pytest.raises(ValueError, match="只覆盖美股"):
         load(
             NormTicker("CN", "600519"), D0, object(), include_chain=False,
             get=refuse, futu_probe=refuse, chain_fetch=refuse,
         )
+
+
+def test_hk_allowlist_provides_full_research_payload():
+    futu = {
+        "quote": {"last": 152.6, "session_date": D0.isoformat(), "error": None,
+                  "update_time": "2026-09-23 16:07:55"},
+        "kline": {"adjusted": True, "bars": _bars(), "error": None},
+        "capital_flow": {"net": -12.0, "as_of": D0.isoformat(), "error": None},
+        "financials": {
+            "period": "2025/FY", "as_of": "2025-12-31", "currency": "CNY",
+            "income": {"revenue": 37120052000.0, "net_profit": 13012042000.0},
+            "metrics": {"period": "2025/FY", "roe": 78.1},
+            "valuation": {"as_of": D0.isoformat(), "market_cap": 203229506377.8,
+                           "pe_ttm": 13.3},
+            "error": None,
+        },
+        "research": {
+            "sections": {"business": "IP business", "competition": "No moat",
+                          "risk_factors": "IP cyclicality", "governance": "Standard"},
+            "as_of": "2026-08-21", "source": "futu_morningstar", "error": None,
+        },
+        "news": [{"title": "Interim report", "source": "HKEX",
+                   "published": D0.isoformat()}],
+    }
+
+    market = _load(market="HK", code="09992", futu=futu)
+    assert market.snapshot.quote.meta.status == "available"
+    assert market.snapshot.kline.meta.status == "available"
+    assert market.snapshot.technical.meta.status == "available"
+    assert market.snapshot.capital_flow.status == "available"
+    assert market.snapshot.fundamentals.status == "available"
+    assert market.snapshot.fundamentals.source == "futu_financials"
+    assert market.snapshot.fundamentals.period == "2025/FY"
+    assert market.snapshot.news.status == "available"
+    assert market.news_text and "Interim report" in market.news_text
+    assert any(fact.metric == "revenue" and fact.source == "futu_financials" for fact in market.facts)
+    assert any(ratio.metric == "roe" for ratio in market.ratios)
+    assert {item.section for item in market.excerpts} >= {"business", "competition", "risk_factors", "governance"}
 
 
 def test_capital_flow_available_requires_source():

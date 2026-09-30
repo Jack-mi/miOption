@@ -69,5 +69,5 @@ def test_data_agent_refuses_non_us_without_a_fetch():
 
     report = run("HK.00700", D0, object(), load_fn=fake_load)
     assert report.ok is False
-    assert report.text == "只覆盖美股"
+    assert report.text == "只覆盖美股和指定港股"
     assert report.agent == "data"

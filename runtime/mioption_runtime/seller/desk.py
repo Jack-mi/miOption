@@ -68,6 +68,7 @@ class SellerDesk:
                 "signal_direction": ("buy" if direction in {"buy", "strong_buy"}
                                      else "sell" if direction in {"sell", "strong_sell"} else None),
                 "review_ok": bool(decision and decision.risk.get("review", {}).get("ok", False)),
+                "evidence_ok": bool(market and market.evidence_persisted),
                 "config": settings.risk,
             }
         with self.store.transaction():

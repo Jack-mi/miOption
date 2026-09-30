@@ -60,6 +60,9 @@ def main() -> int:
             "hkd_assets": _num(row, "hkd_assets"),
             "other_assets": sum(_num(row, key) for key in _OTHER_ASSET_FIELDS),
             "available_cash_usd": _num(row, "us_avl_withdrawal_cash") if market == "US" and row.get("us_avl_withdrawal_cash") is not None else None,
+            "available_cash": _num(row, "hk_avl_withdrawal_cash") if market == "HK" and row.get("hk_avl_withdrawal_cash") is not None else (
+                _num(row, "us_avl_withdrawal_cash") if market == "US" and row.get("us_avl_withdrawal_cash") is not None else None
+            ),
             "positions": [
                 {"code": str(position.get("code") or ""),
                  "can_sell_qty": _num(position, "can_sell_qty")}

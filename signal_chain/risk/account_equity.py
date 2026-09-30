@@ -141,5 +141,6 @@ def read_account_equity(market: str, settings: Settings) -> dict | None:
         account["env"] = data.get("env")
         account["fetched_at"] = data.get("fetched_at")
         account["available_cash_usd"] = data.get("available_cash_usd")
+        account["available_cash"] = data.get("available_cash")
         account["positions"] = data.get("positions", [])
     return account

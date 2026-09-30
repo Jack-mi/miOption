@@ -9,7 +9,7 @@ from datetime import date
 
 from pydantic import BaseModel
 
-from ..config import load_settings, parse_ticker
+from ..config import SUPPORTED_HK, load_settings, parse_ticker
 from ..data.context import _NAMES, card, slice as render_slice
 from ..data.layer import load as load_market
 from ..data.models import MarketData
@@ -49,8 +49,8 @@ def run(
     """harness 执行 load。非美股在发请求前返回。同一标的和交易日命中缓存。"""
     settings = settings if settings is not None else load_settings()
     parsed = parse_ticker(ticker) if isinstance(ticker, str) else ticker
-    if parsed.market != "US":
-        return DataReport(AGENT, parsed.canonical, "只覆盖美股", [], None, ok=False)
+    if parsed.market not in {"US", "HK"} or (parsed.market == "HK" and parsed.canonical not in SUPPORTED_HK):
+        return DataReport(AGENT, parsed.canonical, "只覆盖美股和指定港股", [], None, ok=False)
     cached = session.fresh_market(parsed.canonical, trade_date)
     if cached is None:
         cached = (load_fn or load_market)(

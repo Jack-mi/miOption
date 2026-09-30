@@ -112,6 +112,9 @@ def evaluate(
     complete: bool = True, config: dict | None = None,
     fetched_at: str | None = None,
     spot_fetched_at: str | None = None,
+    evidence_ok: bool = True,
+    multiplier: float = 100.0,
+    currency: str = "USD",
 ) -> dict:
     cfg = {**DEFAULTS, **(config or {})}
     reasons: list[str] = []
@@ -139,11 +142,13 @@ def evaluate(
     credit = conservative_credit(short_bid=bid, long_ask=ask) if isfinite(bid) and isfinite(ask) else 0
     if not short.get("code") or not long.get("code") or short.get("code") == long.get("code"):
         blocking.append("合约代码缺失或重复")
+    if multiplier is None or multiplier <= 0:
+        blocking.append("合约乘数未知")
     for leg in (short, long):
         if leg.get("contract_size") is None:
-            reasons.append("合约乘数未知，按 100 股仅供研究估算")
-        elif leg["contract_size"] != 100:
-            blocking.append("非标准 100 股合约，不能使用本损益公式")
+            reasons.append("合约乘数未知，按默认乘数仅供研究估算")
+        if leg.get("contract_size") is not None and leg["contract_size"] != multiplier:
+            blocking.append("两腿合约乘数不一致")
     if credit <= 0:
         blocking.append("保守买卖盘无法收到净权利金")
     for leg in (short, long):
@@ -160,6 +165,7 @@ def evaluate(
         payoff = credit_vertical_payoff(
             "bull_put_spread" if opt == "PUT" else "bear_call_spread",
             short_strike=short_strike, long_strike=long_strike, credit=credit,
+            multiplier=multiplier,
         )
         if payoff["max_loss"] <= 0:
             blocking.append("价差风险无法计算")
@@ -180,6 +186,8 @@ def evaluate(
             reasons.append(f"{label}获取时间缺失或过期")
     if not complete:
         reasons.append("期权链未完整获取")
+    if not evidence_ok:
+        reasons.append("共享研究证据未持久化，仅供观察")
     if not signal_ok:
         reasons.append("信号不支持收租")
     if not review_ok:
@@ -197,9 +205,11 @@ def evaluate(
         equity = float((account or {}).get("value"))
     except (TypeError, ValueError):
         equity = float("nan")
-    if not account or account.get("env") != "REAL" or account.get("currency") != "USD" or stamp is None or clock is None or not timedelta(0) <= clock - stamp <= timedelta(seconds=cfg["account_max_age_seconds"]):
-        reasons.append("美元真实账户状态缺失或过期")
-    elif account.get("available_cash_usd") is None or not isinstance(account.get("positions"), list):
+    if not account or account.get("env") != "REAL" or account.get("currency") != currency or stamp is None or clock is None or not timedelta(0) <= clock - stamp <= timedelta(seconds=cfg["account_max_age_seconds"]):
+        reasons.append("真实账户状态缺失、币种不符或过期")
+    elif account.get("available_cash") is None and account.get("available_cash_usd") is None:
+        reasons.append("可用现金未核验")
+    elif not isinstance(account.get("positions"), list):
         reasons.append("可用现金或正股持仓未核验")
     elif not isfinite(equity) or equity <= 0 or (payoff and payoff["max_loss"] >
                                                  equity * cfg["max_position_risk_pct"]):
@@ -209,7 +219,7 @@ def evaluate(
     elif reasons:
         tier = "仅观察"
     return {"tier": tier, "reasons": list(dict.fromkeys([*blocking, *reasons])),
-            "credit": credit * 100, "max_loss": None if not payoff else payoff["max_loss"],
+            "credit": credit * multiplier, "max_loss": None if not payoff else payoff["max_loss"],
             "max_profit": None if not payoff else payoff["max_profit"],
             "breakeven": None if not payoff else payoff["breakeven"],
             "return_on_risk": None if not payoff or payoff["max_loss"] <= 0 else payoff["max_profit"] / payoff["max_loss"],

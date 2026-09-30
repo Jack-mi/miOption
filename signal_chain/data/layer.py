@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import contextlib
 import io
+import os
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
-from ..config import NormTicker, Settings
+from ..config import SUPPORTED_HK, NormTicker, Settings
 from ..options.chain_fetch import fetch_chain
 from ..options.underlying_fetch import (
     build_snapshot,
@@ -16,14 +18,12 @@ from ..options.underlying_fetch import (
 from ..sessions import align_futu_quote, session_for
 from ..research.berkshire import _cross_validate, attach_fundamentals, note_earnings
 from ..schema.underlying import FieldMeta
-from . import cboe, earnings_calendar, edgar, finnhub, fmp, fred, macro, nasdaq, polymarket, reddit
+from . import cboe, daily_store, earnings_calendar, edgar, finnhub, fmp, fred, macro, nasdaq, polymarket, reddit, underlying_store
 from .http import get_json, get_text
 from .keys import load_keys
 from .models import (
     EventOdds, Fact, FilingExcerpt, MacroPoint, MarketData, Ratio, SocialItem, SourceRow,
 )
-
-_MACRO: dict[str, tuple[list[MacroPoint], list[SourceRow]]] = {}
 
 # 取源顺序是 source of truth。新增源必须先登记在这里，再接入级联。
 SOURCE_ORDER = {
@@ -116,27 +116,65 @@ def _news_meta(text: str | None, source: str, as_of: date, fetched_at: datetime,
 
 def load_macro(keys: dict[str, str], today: date, get=get_json, quota=None) -> tuple[list[MacroPoint], list[SourceRow]]:
     """宏观只读共享层。刷新由 macro_refresh 单独负责，不在这里发 FRED 请求。"""
-    cached = _MACRO.get(today.isoformat())
-    if cached is not None:
-        return cached
-    result = macro.read_macro(keys.get("SUPABASE_SERVICE_ROLE_KEY"), get=get)
-    _MACRO[today.isoformat()] = result
-    return result
+    return macro.read_macro(keys.get("SUPABASE_SERVICE_ROLE_KEY"), get=get)
+
+
+def _completed_session(session: date, fetched_at: datetime) -> date:
+    from ..sessions import _calendar, _previous_session
+
+    local_day = fetched_at.astimezone(ZoneInfo("America/New_York")).date()
+    close = _calendar().session_close(session).to_pydatetime()
+    return _previous_session(session) if local_day == session and fetched_at < close else session
+
+
+def _history_start(prior: list[dict], completed: date, trade_date: date) -> date:
+    if not prior:
+        return trade_date - timedelta(days=120)
+    from ..sessions import _calendar
+
+    known = {str(bar["trade_date"])[:10] for bar in prior}
+    first = date.fromisoformat(min(known))
+    missing = next((day.date() for day in _calendar().sessions_in_range(first, completed)
+                    if day.date().isoformat() not in known), None)
+    return (missing or date.fromisoformat(max(known))) - timedelta(days=7)
+
+
+def _completed_bars(probe: dict, completed: date) -> dict:
+    kline = probe.get("kline") or {}
+    return {**probe, "kline": {**kline, "bars": [bar for bar in kline.get("bars") or []
+            if str(bar.get("trade_date") or "")[:10] <= completed.isoformat()]}}
 
 
 def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_probe):
     """报价和日线按 SOURCE_ORDER 级联。资金流只用这次富途探测。"""
     tried: dict[str, str] = {}
-    futu, futu_error = futu_probe(t, trade_date, settings)
+    history = None
+    session = session_for(t.market, trade_date, now=fetched_at)
+    completed = _completed_session(session, fetched_at) if t.market == "US" else session
+    if futu_probe is probe_futu:
+        history = daily_store.DailyStore()
+        prior = history.read(t.canonical, "futu", True, completed)
+        start = _history_start(prior, completed, trade_date)
+        futu, futu_error = futu_probe(t, trade_date, settings, history_start=start)
+        if futu:
+            futu = _completed_bars(futu, completed)
+            fresh_bars = futu["kline"]["bars"]
+            if fresh_bars and not futu_error and not (futu.get("kline") or {}).get("error"):
+                history.save(t.canonical, "futu", True, fresh_bars, completed, fetched_at)
+                merged = {str(bar["trade_date"])[:10]: bar for bar in prior}
+                merged.update({str(bar["trade_date"])[:10]: bar for bar in fresh_bars})
+                futu = {**futu, "kline": {**futu["kline"],
+                                        "bars": [merged[day] for day in sorted(merged)]}}
+    else:
+        futu, futu_error = futu_probe(t, trade_date, settings)
     if t.market == "US":
         futu = align_futu_quote(futu)
     tried["futu"] = futu_error or "ok"
     from ..options.underlying_fetch import _futu_field_fresh
-    session = session_for(t.market, trade_date, now=fetched_at)
-    fresh = _futu_field_fresh(futu, session, "quote") and _futu_field_fresh(futu, session, "kline")
+    fresh = _futu_field_fresh(futu, session, "quote") and _futu_field_fresh(futu, completed, "kline")
     snap = build_snapshot(
         ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
-        futu=futu, futu_error=futu_error,
+        futu=futu, futu_error=futu_error, kline_session=completed,
     )
     if fresh:
         tried["fmp"] = "skipped"
@@ -154,6 +192,7 @@ def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_
             if probe is None:
                 tried["fmp"] = limited or "无日线"
             else:
+                probe = _completed_bars(probe, completed)
                 snap = build_snapshot(
                     ticker=t.canonical, market=t.market, trade_date=trade_date,
                     fetched_at=fetched_at,
@@ -161,6 +200,7 @@ def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_
                     fallback=probe,
                     futu_error=snap.quote.meta.error,
                     fallback_source="fmp",
+                    kline_session=completed,
                 )
         except Exception as exc:
             tried["fmp"] = fmp.public_error(exc)
@@ -179,6 +219,7 @@ def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_
             if probe is None:
                 tried["nasdaq"] = "无日线"
             else:
+                probe = _completed_bars(probe, completed)
                 snap = build_snapshot(
                     ticker=t.canonical, market=t.market, trade_date=trade_date,
                     fetched_at=fetched_at,
@@ -186,6 +227,7 @@ def _price_and_flow(t, trade_date, settings, fetched_at, keys, get, quota, futu_
                     fallback=probe,
                     futu_error=snap.quote.meta.error,
                     fallback_source="nasdaq",
+                    kline_session=completed,
                 )
                 used_nasdaq = any(
                     meta.source == "nasdaq" and meta.status == "available"
@@ -208,6 +250,9 @@ def _option_chain(t, trade_date, settings, chain_fetch, get):
     except Exception as exc:
         futu_error = str(exc)[:300]
         rows.append(_row("futu", "chain", "missing", futu_error or "富途不可用"))
+        if os.environ.get("MIOPTION_CBOE_PROGRAMMATIC_LICENSE") != "confirmed":
+            rows.append(_row("cboe", "chain", "skipped", "程序化使用许可未确认"))
+            return None, f"futu: {futu_error}；cboe: 程序化使用许可未确认", rows
         try:
             chain = cboe.fetch_chain(t, trade_date, settings, get)
         except Exception as exc:
@@ -219,6 +264,137 @@ def _option_chain(t, trade_date, settings, chain_fetch, get):
     rows.append(_row("futu", "chain", "used"))
     rows.append(_row("cboe", "chain", "skipped", "上一级已可用"))
     return chain, None, rows
+
+
+def _hk_facts(financials: dict | None) -> tuple[list[Fact], list[Ratio]]:
+    facts: list[Fact] = []
+    ratios: list[Ratio] = []
+    if not financials or financials.get("error"):
+        return facts, ratios
+    period = str(financials.get("period") or "")
+    filed = str(financials.get("as_of") or "")
+    income = financials.get("income") or {}
+    for metric, key in (
+        ("revenue", "revenue"), ("gross_profit", "gross_profit"),
+        ("operating_profit", "operating_profit"), ("net_profit", "net_profit"),
+        ("net_profit_parent", "net_profit_parent"), ("basic_eps", "basic_eps"),
+        ("diluted_eps", "diluted_eps"),
+    ):
+        value = income.get(key)
+        if value is not None:
+            facts.append(Fact("futu_financials", metric, period, float(value), filed))
+    metrics = financials.get("metrics") or {}
+    metric_period = str(metrics.get("period") or period)
+    for metric, key in (
+        ("gross_margin", "gross_margin"), ("operating_margin", "operating_margin"),
+        ("net_margin", "net_margin"), ("roe", "roe"), ("roa", "roa"),
+        ("current_ratio", "current_ratio"), ("quick_ratio", "quick_ratio"),
+        ("inventory_turnover", "inventory_turnover"),
+    ):
+        value = metrics.get(key)
+        if value is not None:
+            ratios.append(Ratio(metric, float(value), metric_period, "futu_financials"))
+    valuation = financials.get("valuation") or {}
+    valuation_period = "TTM"
+    for metric, key in (
+        ("market_cap", "market_cap"), ("pe_ttm", "pe_ttm"), ("pb", "pb"),
+        ("dividend_ttm", "dividend_ttm"), ("dividend_yield_ttm", "dividend_yield_ttm"),
+    ):
+        value = valuation.get(key)
+        if value is not None:
+            facts.append(Fact("futu_snapshot", metric, valuation_period, float(value),
+                              str(valuation.get("as_of") or "")))
+    return facts, ratios
+
+
+def _hk_excerpts(research: dict | None) -> list[FilingExcerpt]:
+    if not research or research.get("error") or not research.get("sections"):
+        return []
+    try:
+        as_of = date.fromisoformat(str(research.get("as_of"))[:10])
+    except ValueError:
+        as_of = None
+    source = str(research.get("source") or "futu_morningstar")
+    return [
+        FilingExcerpt(str(section), str(text), source, as_of, "futu_research")
+        for section, text in research["sections"].items() if text
+    ]
+
+
+def _hk_news(news: list | None) -> str | None:
+    rows = [row for row in (news or []) if row.get("title")]
+    if not rows:
+        return None
+    return "\n".join(
+        f"{row['title']}（{row.get('source') or 'futu_news'}，{row.get('published') or '无日期'}）"
+        for row in rows
+    )
+
+
+def _load_hk(
+    t: NormTicker,
+    trade_date: date,
+    settings: Settings,
+    *,
+    include_chain: bool,
+    keys: dict[str, str],
+    get,
+    futu_probe,
+    chain_fetch,
+    fetch_macro=None,
+) -> MarketData:
+    fetched_at = datetime.now(timezone.utc)
+    futu, futu_error = futu_probe(t, trade_date, settings)
+    snap = build_snapshot(
+        ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
+        futu=futu, futu_error=futu_error,
+    )
+    snap, flow_rows, flow_net = _capital_flow(snap, futu, fetched_at)
+    facts, ratios = _hk_facts((futu or {}).get("financials"))
+    excerpts = _hk_excerpts((futu or {}).get("research"))
+    news_text = _hk_news((futu or {}).get("news"))
+    rows = [*_price_rows(snap, {"futu": futu_error or "ok"}), *flow_rows]
+    if snap.fundamentals.status == "available":
+        rows.append(_row("futu_financials", "fundamentals", "used", snap.fundamentals.period or ""))
+    else:
+        rows.append(_row("futu_financials", "fundamentals", "missing", snap.fundamentals.error or "无财务报表"))
+    if news_text:
+        rows.append(_row("futu_news", "news", "used"))
+    else:
+        rows.append(_row("futu_news", "news", "missing", "Futu 无新闻"))
+    if excerpts:
+        rows.append(_row("futu_morningstar", "filing", "used",
+                          f"研究更新 {excerpts[0].as_of.isoformat() if excerpts[0].as_of else '未知'}"))
+    else:
+        rows.append(_row("futu_morningstar", "filing", "missing", "Futu 无研究摘要"))
+    rows.append(_row("futu_earnings", "earnings", "missing", "未确认下一次财报日"))
+    rows.append(_row("reddit", "social", "unsupported", "港股本轮不接 Reddit"))
+
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        events_f = pool.submit(_events, t, get, fetch_macro)
+        macro_f = pool.submit(load_macro, keys, trade_date, get)
+        chain_f = pool.submit(
+            _option_chain, t, trade_date, settings, chain_fetch, get,
+        ) if include_chain else None
+        events, event_rows = events_f.result()
+        macro, macro_rows = macro_f.result()
+        chain_result = chain_f.result() if chain_f else (None, None, [])
+    chain, chain_error, chain_rows = chain_result
+    if chain is not None:
+        if snap.quote.meta.status == "available" and snap.quote.last is not None:
+            chain = chain.model_copy(update={
+                "spot": snap.quote.last, "spot_at": snap.quote.meta.market_time,
+                "spot_fetched_at": snap.quote.meta.fetched_at.isoformat() if snap.quote.meta.fetched_at else None,
+            })
+        else:
+            chain = chain.model_copy(update={"spot": None, "spot_at": None, "degraded": True})
+    rows.extend([*event_rows, *macro_rows, *chain_rows])
+    return MarketData(
+        snap, chain, chain_error, macro, [], events, facts, rows,
+        flow_net if snap.capital_flow.status == "available" else None,
+        news_text if snap.news.status == "available" else None,
+        ratios, excerpts, False,
+    )
 
 
 def load(
@@ -234,56 +410,179 @@ def load(
     chain_fetch=fetch_chain,
     get_text=get_text,
     fetch_macro=None,
+    evidence_store: underlying_store.UnderlyingStore | None = None,
+    slow_only: bool = False,
 ) -> MarketData:
     keys = keys if keys is not None else load_keys()
     fetched_at = datetime.now(timezone.utc)
+    if t.market == "HK":
+        if t.canonical not in SUPPORTED_HK:
+            skeleton = build_snapshot(
+                ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
+            )
+            return MarketData(
+                skeleton, None, "只覆盖美股和指定港股", [], [], [], [],
+                [_row("loader", "market", "unsupported", "港股 allowlist 之外")],
+                None, None, [], [],
+            )
+        return _load_hk(
+            t, trade_date, settings, include_chain=include_chain, keys=keys, get=get,
+            futu_probe=futu_probe, chain_fetch=chain_fetch, fetch_macro=fetch_macro,
+        )
     if t.market != "US":
-        if t.market != "HK":
-            raise ValueError("只覆盖美股")
-        skeleton = build_snapshot(
-            ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
-        )
-        return MarketData(
-            skeleton, None, "只覆盖美股", [], [], [], [],
-            [_row("loader", "market", "unsupported", "只覆盖美股")],
-            None, None, [], [],
-        )
+        raise ValueError("只覆盖美股和指定港股")
     quota = quota or (lambda: fmp.take_quota(trade_date))
+    store = evidence_store or (underlying_store.UnderlyingStore(keys["SUPABASE_SERVICE_ROLE_KEY"])
+                               if keys.get("SUPABASE_SERVICE_ROLE_KEY") else None)
+    evidence = {category: [] for category in underlying_store.CATEGORIES}
+    refresh: dict = {}
+    persisted = True
+    store_error = None
+    if store is not None:
+        try:
+            evidence, refresh = store.read(t.canonical)
+        except Exception as exc:
+            persisted = False
+            store_error = f"共享标的库不可用: {str(exc)[:120]}"
+    else:
+        persisted = False
+        store_error = "共享标的库缺少凭据"
+
     skeleton = build_snapshot(
         ticker=t.canonical, market=t.market, trade_date=trade_date, fetched_at=fetched_at,
     )
 
+    def cached(category):
+        return persisted and underlying_store.usable(category, refresh.get(category),
+                    evidence[category], fetched_at, day=trade_date)
+
+    def throttled(category):
+        return persisted and not underlying_store.due(category, refresh.get(category),
+                    evidence[category], fetched_at, day=trade_date)
+
+    def fundamentals_job():
+        if cached("fundamentals"):
+            facts, ratios, meta = underlying_store.facts_from(evidence["fundamentals"], trade_date)
+            if meta.status == "available":
+                return (skeleton.model_copy(update={"fundamentals": meta}),
+                        [underlying_store.used("fundamentals", facts)], facts, ratios)
+        if throttled("fundamentals"):
+            return skeleton, [_row("supabase", "fundamentals", "stale", "上次失败，等待重试")], [], []
+        return _fundamentals(t, skeleton, trade_date, fetched_at, keys, get, quota, cik)
+
+    identity = underlying_store.current(evidence["company"], day=trade_date)
+    company_cached = cached("company") and bool(identity)
+    company = identity[0]["payload"] if identity else None
+    company_fresh = company_cached
+    company_error = None
+    if not company_cached and not throttled("company"):
+        try:
+            tickers = get("https://www.sec.gov/files/company_tickers.json",
+                          edgar.user_agent(keys.get("EDGAR_CONTACT", "")))
+            company = next(({"cik": str(row["cik_str"]).zfill(10),
+                             "ticker": t.code, "name": str(row.get("title") or "")}
+                            for row in tickers.values() if isinstance(row, dict) and
+                            str(row.get("ticker") or "").upper() == t.code), None)
+            company_fresh = bool(company)
+            if not company:
+                company_error = "SEC company_tickers 缺少标的"
+        except Exception as exc:
+            company_error = str(exc)[:160]
+        if not company_fresh and identity:
+            company = identity[0]["payload"]
+    cik = (company or {}).get("cik")
+
+    filing_cached = cached("filing")
+    filing_throttled = throttled("filing") and not filing_cached
+    earnings_throttled = throttled("earnings") and not cached("earnings")
+    old_excerpts = (underlying_store.excerpts_from(evidence["filing"], trade_date)
+                    if filing_cached else [])
+    old_earnings = (underlying_store.earnings_from(evidence["earnings"], trade_date)
+                    if persisted and cached("earnings") else (None, None))
+
     def chain_job():
-        if not include_chain:
+        if not include_chain or slow_only:
             return None, None, []
         return _option_chain(t, trade_date, settings, chain_fetch, get)
 
     with ThreadPoolExecutor(max_workers=8) as pool:
-        price_f = pool.submit(
+        price_f = None if slow_only else pool.submit(
             _price_and_flow, t, trade_date, settings, fetched_at, keys, get, quota,
             futu_probe,
         )
-        fund_f = pool.submit(
-            _fundamentals, t, skeleton, trade_date, fetched_at, keys, get, quota,
-        )
-        earn_f = pool.submit(
-            _earnings, t, skeleton, trade_date, fetched_at, keys, get, get_text,
-        )
-        news_f = pool.submit(
+        fund_f = pool.submit(fundamentals_job)
+        earn_f = pool.submit(_earnings, t, skeleton, trade_date, fetched_at, keys, get, get_text,
+                             old_excerpts or None, old_earnings, filing_cached, cik,
+                             filing_throttled, earnings_throttled)
+        news_f = None if slow_only else pool.submit(
             _news, t, session_for(t.market, trade_date, now=fetched_at), skeleton, trade_date, fetched_at, keys, get,
         )
-        social_f = pool.submit(_social, t, keys, get, trade_date)
-        events_f = pool.submit(_events, t, get, fetch_macro)
-        macro_f = pool.submit(load_macro, keys, trade_date, get)
+        social_f = None if slow_only else pool.submit(_social, t, keys, get, trade_date)
+        events_f = None if slow_only else pool.submit(_events, t, get, fetch_macro)
+        macro_f = None if slow_only else pool.submit(load_macro, keys, trade_date, get)
         chain_f = pool.submit(chain_job)
-        snap, price_rows, flow_net = price_f.result()
+        snap, price_rows, flow_net = price_f.result() if price_f else (skeleton, [], None)
         fund_snap, fact_rows, facts, ratios = fund_f.result()
         earn_snap, earn_rows, excerpts = earn_f.result()
-        news_snap, news_rows, news_text = news_f.result()
-        social, social_rows = social_f.result()
-        events, event_rows = events_f.result()
-        macro, macro_rows = macro_f.result()
+        news_snap, news_rows, news_text = news_f.result() if news_f else (skeleton, [], None)
+        social, social_rows = social_f.result() if social_f else ([], [])
+        events, event_rows = events_f.result() if events_f else ([], [])
+        macro, macro_rows = macro_f.result() if macro_f else ([], [])
         chain, chain_error, chain_rows = chain_f.result()
+
+    if fund_snap.fundamentals.status != "available" and persisted and evidence["fundamentals"]:
+        previous_facts, previous_ratios, previous_meta = underlying_store.facts_from(
+            evidence["fundamentals"], trade_date)
+        if previous_meta.status == "available":
+            facts, ratios = previous_facts, previous_ratios
+            fact_rows.append(_row("supabase", "fundamentals", "stale",
+                                  "刷新失败，历史证据仅作背景，不参与本轮财务可用判断"))
+    filing_stale = not filing_cached and not excerpts and persisted and bool(evidence["filing"])
+    if filing_stale:
+        excerpts = underlying_store.excerpts_from(evidence["filing"], trade_date)
+        if excerpts:
+            earn_rows.append(_row("supabase", "filing", "stale", "刷新失败，沿用有出处的旧摘录"))
+
+    stale_evidence = any(row.state == "stale" and row.field in {"fundamentals", "filing"}
+                         for row in (*fact_rows, *earn_rows))
+    unpersisted_fundamentals = fund_snap.fundamentals.status == "available" and not (
+        cached("fundamentals") or underlying_store.evidence_rows(
+            "fundamentals", (facts, ratios), fetched_at))
+    stale_company = bool(identity) and not company_fresh
+
+    if store is not None and persisted:
+        for category, data, report_rows in (
+            ("company", company if company_fresh else None, []),
+            ("fundamentals", (facts, ratios), fact_rows),
+            ("filing", excerpts, earn_rows),
+            ("earnings", (earn_snap.earnings_date, earn_snap.earnings_source), earn_rows),
+        ):
+            if throttled(category) and not cached(category):
+                continue
+            if (category == "company" and company_cached) or (
+                category == "fundamentals" and any(row.id == "supabase" and row.field == category
+                                                     for row in fact_rows)) or (category == "filing" and filing_cached) or (
+                category == "earnings" and old_earnings[0]):
+                continue
+            records = [] if (category == "fundamentals" and fund_snap.fundamentals.status != "available") or (
+                category == "filing" and filing_stale
+            ) else underlying_store.evidence_rows(category, data, fetched_at)
+            errors = [row.note for row in report_rows if row.state == "missing" and row.field == category]
+            if category == "company" and company_error:
+                errors.append(company_error)
+            if records:
+                errors = []
+            try:
+                store.save(t.canonical, category, records, "; ".join(errors)[:300] or None)
+            except Exception as exc:
+                persisted = False
+                store_error = f"标的证据写入失败: {str(exc)[:120]}"
+    if stale_evidence or unpersisted_fundamentals or stale_company:
+        persisted = False
+        store_error = store_error or ("部分慢变证据仅有旧版，不能作为本轮晋级证据"
+                                      if stale_evidence or stale_company else "财务仅有未持久化的来源，不能晋级")
+    if store_error:
+        chain_rows.append(_row("supabase", "evidence", "missing", store_error))
 
     # 报价/日线级联选出的 spot 是唯一基准价；期权链只保留链合约，不另立价格。
     if chain is not None:
@@ -309,7 +608,7 @@ def load(
         flow_net if snap.capital_flow.status == "available" else None,
         news_text if snap.news.status == "available" else None,
         ratios,
-        excerpts,
+        excerpts, persisted,
     )
 
 
@@ -468,7 +767,7 @@ def _period_end(label: str) -> date | None:
         return None
 
 
-def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
+def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota, cik=None):
     facts: list[Fact] = []
     annual_values: dict[str, float] = {}
     annual_periods: dict[str, str] = {}
@@ -493,8 +792,9 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
     if t.market == "US":
         symbol = t.code
         try:
-            tickers = get("https://www.sec.gov/files/company_tickers.json", edgar.user_agent(contact))
-            cik = edgar.cik_for(tickers, symbol)
+            if cik is None:
+                tickers = get("https://www.sec.gov/files/company_tickers.json", edgar.user_agent(contact))
+                cik = edgar.cik_for(tickers, symbol)
             if cik is None:
                 raise ValueError("无 CIK")
             facts_payload = get(
@@ -513,6 +813,13 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
             keep(quarter_values, quarter_periods, quarter_ends, "edgar", quarter[0], quarter[1], "revenue",
                  _period_end(quarter[1]), quarter[1])
         if facts_payload:
+            filed_by_metric_period = {
+                (metric, period): filed for metric, period, _value, filed
+                in edgar.annual_history(facts_payload) if filed
+            }
+            for fact in facts:
+                if fact.source == "edgar" and not fact.filed:
+                    fact.filed = filed_by_metric_period.get((fact.metric, fact.period), "")
             seen = {(item.source, item.metric, item.period) for item in facts}
             added = 0
             for metric, period, value, filed in edgar.annual_history(facts_payload):
@@ -574,14 +881,25 @@ def _fundamentals(t, snap, trade_date, fetched_at, keys, get, quota):
     return snap, rows, facts, ratios
 
 
-def _earnings(t, snap, trade_date, fetched_at, keys, get, read_text):
+def _earnings(t, snap, trade_date, fetched_at, keys, get, read_text,
+              cached_excerpts=None, cached_event=(None, None), filing_cached=False, cik=None,
+              filing_throttled=False, earnings_throttled=False):
     rows = []
     excerpts: list[FilingExcerpt] = []
     contact = keys.get("EDGAR_CONTACT", "")
-    if t.market == "US":
+    if filing_cached:
+        excerpts = cached_excerpts or []
+        rows.append(_row("supabase", "filing", "used", "复用有来源时点的申报摘录"))
+        if excerpts:
+            rows.append(_row("edgar", "earnings", "used",
+                             f"申报日 {max(item.as_of for item in excerpts if item.as_of).isoformat()}（共享证据）"))
+    elif filing_throttled:
+        rows.append(_row("supabase", "filing", "stale", "上次失败，等待重试"))
+    elif t.market == "US":
         try:
-            tickers = get("https://www.sec.gov/files/company_tickers.json", edgar.user_agent(contact))
-            cik = edgar.cik_for(tickers, t.code)
+            if cik is None:
+                tickers = get("https://www.sec.gov/files/company_tickers.json", edgar.user_agent(contact))
+                cik = edgar.cik_for(tickers, t.code)
             if cik is None:
                 raise ValueError("无 CIK")
             submissions = get(
@@ -604,7 +922,9 @@ def _earnings(t, snap, trade_date, fetched_at, keys, get, read_text):
                     rows.append(_row("deepseek", "risk_factors", "missing", item.quality))
     else:
         rows.append(_row("edgar", "earnings", "unsupported", "港股财报日不走 EDGAR"))
-    found, note = _next_earnings(t.code, trade_date, keys, get)
+    found, note = ((cached_event, "复用共享财报事件") if cached_event[0]
+                   else (None, "上次失败，等待重试") if earnings_throttled
+                   else _next_earnings(t.code, trade_date, keys, get))
     if found is None:
         rows.append(_row("nasdaq", "earnings", "missing", note or "日历没有下次财报日"))
         return snap, rows, excerpts
@@ -769,4 +1089,4 @@ def _events(t, get, fetch_macro=None):
 
 
 def clear_macro_cache() -> None:
-    _MACRO.clear()
+    """Compatibility shim: macro reads go to the shared source on every run."""
