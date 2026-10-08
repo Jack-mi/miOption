@@ -8,7 +8,7 @@ _NAMES = (
     "quote", "kline", "sma", "flow", "chain",
     "fundamentals", "earnings", "filing",
     "business", "competition", "risk", "governance",
-    "news", "social", "events",
+    "news", "social", "events", "dividends", "vol_basis",
     "macro",
 )
 
@@ -41,6 +41,8 @@ _FIELDS = {
     "news": ("news",),
     "social": ("social",),
     "events": ("events", "macro_odds"),
+    "dividends": ("dividends",),
+    "vol_basis": ("vol_basis",),
     "macro": ("macro",),
 }
 
@@ -147,6 +149,31 @@ def _earnings(market: MarketData) -> str:
     )
     tail = f" {note}" if note else ""
     return f"财报日: {snap.earnings_date.isoformat()}，出处 {snap.earnings_source}{tail}"
+
+
+def _dividends(market: MarketData) -> str:
+    div = market.snapshot.dividends
+    if div.meta.status != "available":
+        return f"派息缺失: {div.meta.error or div.meta.status}"
+    next_text = div.next_ex_date.isoformat() if div.next_ex_date else "已公布记录里没有未来除息"
+    lines = [f"派息：下次除息 {next_text}，出处 {div.meta.source or '无出处'}，时点 {div.meta.as_of}"]
+    for item in div.items:
+        lines.append(
+            f"- 除息 {item.ex_date.isoformat()}，登记 {item.record_date or '未知'}，"
+            f"派发 {item.payable_date or '未知'}，{item.statement or '无方案'}"
+        )
+    return "\n".join(lines)
+
+
+def _vol_basis(market: MarketData) -> str:
+    basis = market.snapshot.vol_basis
+    if basis.meta.status != "available":
+        return f"IV/HV 基准缺失: {basis.meta.error or basis.meta.status}"
+    return (
+        f"IV/HV 基准：IV {basis.iv_latest}，HV {basis.hv_latest}，比值 {basis.ratio}，"
+        f"IV 分位 {basis.iv_rank}，HV 分位 {basis.hv_rank}，"
+        f"时点 {basis.meta.as_of}，出处 {basis.meta.source or '无出处'}"
+    )
 
 
 def _filing(market: MarketData) -> str:
@@ -265,5 +292,7 @@ _SLICES = {
     "news": _news,
     "social": _social,
     "events": _events,
+    "dividends": _dividends,
+    "vol_basis": _vol_basis,
     "macro": _macro,
 }

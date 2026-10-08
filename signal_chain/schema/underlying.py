@@ -48,6 +48,33 @@ class TechnicalField(BaseModel):
     indicators: dict[str, float] = Field(default_factory=dict)
 
 
+class DividendEvent(BaseModel):
+    ex_date: date
+    record_date: date | None = None
+    payable_date: date | None = None
+    pub_date: date | None = None
+    statement: str | None = None
+
+
+class DividendField(BaseModel):
+    """派息记录。明细只留最近一次已发生和最近一次未来除息。"""
+
+    meta: FieldMeta
+    items: list[DividendEvent] = Field(default_factory=list)
+    next_ex_date: date | None = None
+
+
+class VolBasisField(BaseModel):
+    """IV/HV 基准。只存派生值，不存 250 行时间序列。"""
+
+    meta: FieldMeta
+    iv_latest: float | None = None
+    hv_latest: float | None = None
+    iv_rank: float | None = None      # 分位 0-100
+    hv_rank: float | None = None
+    ratio: float | None = None        # iv_latest / hv_latest
+
+
 def _unsupported(label: str) -> FieldMeta:
     return FieldMeta(status="unsupported", error=f"本轮不接入{label}")
 
@@ -64,6 +91,10 @@ class UnderlyingSnapshot(BaseModel):
     capital_flow: FieldMeta = Field(default_factory=lambda: _unsupported("资金流"))
     fundamentals: FieldMeta = Field(default_factory=lambda: _unsupported("基本面"))
     news: FieldMeta = Field(default_factory=lambda: _unsupported("新闻"))
+    dividends: DividendField = Field(
+        default_factory=lambda: DividendField(meta=_unsupported("派息")))
+    vol_basis: VolBasisField = Field(
+        default_factory=lambda: VolBasisField(meta=_unsupported("IV/HV 基准")))
     earnings_date: date | None = None
     earnings_source: str | None = None
 
@@ -78,9 +109,28 @@ class UnderlyingSnapshot(BaseModel):
         self._check_sourced("资金流", self.capital_flow, require_period=False)
         self._check_sourced("新闻", self.news, require_period=False)
         self._check_sourced("基本面", self.fundamentals, require_period=True)
+        self._check_sourced("派息", self.dividends.meta, require_period=False)
+        self._check_sourced("IV/HV 基准", self.vol_basis.meta, require_period=False)
+        self._check_dividends()
+        self._check_vol_basis()
         if self.earnings_date is not None and not self.earnings_source:
             raise ValueError("财报日缺少出处")
         return self
+
+    def _check_dividends(self) -> None:
+        meta = self.dividends.meta
+        if meta.status != "available" and (self.dividends.items or self.dividends.next_ex_date):
+            raise ValueError("非 available 派息字段不得携带记录")
+        if self.dividends.next_ex_date is not None and (
+                self.dividends.next_ex_date < self.as_of):
+            raise ValueError("下次除息日早于这场交易")
+
+    def _check_vol_basis(self) -> None:
+        meta = self.vol_basis.meta
+        values = (self.vol_basis.iv_latest, self.vol_basis.hv_latest,
+                  self.vol_basis.iv_rank, self.vol_basis.hv_rank, self.vol_basis.ratio)
+        if meta.status != "available" and any(v is not None for v in values):
+            raise ValueError("非 available 波动率基准不得携带数值")
 
     def _check_sourced(self, label: str, meta: FieldMeta, *, require_period: bool) -> None:
         if meta.status != "available":

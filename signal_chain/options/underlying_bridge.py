@@ -107,6 +107,129 @@ def _capital_flow(quote_ctx, symbol: str) -> dict:
     return {"net": net, "as_of": session, "error": None}
 
 
+def _slash_date(value) -> str | None:
+    """派息接口的日期是 MM/DD/YYYY，转成 ISO。"""
+    parts = str(value or "").strip().split("/")
+    if len(parts) != 3:
+        return None
+    try:
+        month, day, year = (int(part) for part in parts)
+        return date(year, month, day).isoformat()
+    except ValueError:
+        return None
+
+
+def _scan_calendar(quote_ctx, symbol: str, today: date, days: int, market):
+    """按天扫全市场派息日历，找该标的最近一次未来除息。
+
+    per-symbol 记录常常还没公布下次除息（实测 AAPL 只有已实施记录），
+    这里只在那种情况下兜底。只扫工作日，实测约 0.08s/次、60 天约 42 次请求。
+    """
+    if market is None:
+        return None
+    for offset in range(1, days + 1):
+        day = today + timedelta(days=offset)
+        if day.weekday() >= 5:
+            continue
+        try:
+            ret, data = quote_ctx.get_dividend_calendar(market, day.isoformat())
+        except Exception:
+            continue
+        if ret != 0:
+            continue
+        frame = data[1] if isinstance(data, tuple) and len(data) > 1 else data
+        if frame is None or getattr(frame, "empty", True) or "security" not in frame.columns:
+            continue
+        hit = frame[frame["security"] == symbol]
+        if hit.empty:
+            continue
+        row = hit.iloc[0]
+        ex_date = _slash_date(row.get("ex_date")) or day.isoformat()
+        if ex_date < today.isoformat():
+            continue      # 日历行里的除息日已经过去，不当成前瞻
+        return {
+            "ex_date": ex_date,
+            "record_date": _slash_date(row.get("record_date")),
+            "payable_date": _slash_date(row.get("dividend_payable_date")),
+            "pub_date": None,
+            "statement": str(row.get("statement") or "").strip() or None,
+        }
+    return None
+
+
+def _dividends(quote_ctx, symbol: str, today: date, scan_days: int = 60, market=None) -> dict:
+    """派息史。只要未来最近一条和最近一条已发生的，明细不进快照。
+
+    无记录是正常结果（不是所有标的分红），要和取数失败分开记。
+    per-symbol 没有未来除息时，且该标的确实分过红，才去扫派息日历兜底。
+    """
+    try:
+        ret, data = quote_ctx.get_corporate_actions_dividends(symbol)
+    except Exception as exc:
+        return {"items": [], "history_count": 0, "error": str(exc)[:200]}
+    if ret != 0 or not isinstance(data, dict):
+        return {"items": [], "history_count": 0, "error": str(data)[:200]}
+    rows = []
+    for row in data.get("dividend_list") or []:
+        ex_date = _slash_date(row.get("ex_date"))
+        if ex_date is None:
+            continue
+        rows.append({
+            "ex_date": ex_date,
+            "record_date": _slash_date(row.get("record_date")),
+            "payable_date": _slash_date(row.get("dividend_payable_date")),
+            "pub_date": _slash_date(row.get("pub_date")),
+            "statement": str(row.get("statement") or "").strip() or None,
+        })
+    rows.sort(key=lambda item: item["ex_date"], reverse=True)
+    today_text = today.isoformat()
+    upcoming = [row for row in rows if row["ex_date"] >= today_text]
+    past = [row for row in rows if row["ex_date"] < today_text]
+    if not upcoming and rows and scan_days > 0:
+        found = _scan_calendar(quote_ctx, symbol, today, scan_days, market)
+        if found is not None:
+            upcoming = [found]
+    # rows 是倒序，所以 upcoming[-1] 是最近一次未来除息，past[0] 是最近一次已发生。
+    picked = ([upcoming[-1]] if upcoming else []) + past[:1]
+    return {"items": picked, "history_count": len(rows), "error": None}
+
+
+def _vol_basis(quote_ctx, symbol: str) -> dict:
+    """IV/HV 时间序列只留派生值：最新值、分位、比值。250 行明细不进快照。"""
+    empty = {"iv_latest": None, "hv_latest": None, "iv_rank": None,
+             "hv_rank": None, "ratio": None, "as_of": None, "points": 0, "error": None}
+    try:
+        ret, data = quote_ctx.get_option_underlying_his_volatility(symbol)[:2]
+    except Exception as exc:
+        return {**empty, "error": str(exc)[:200]}
+    if ret != 0 or data is None or getattr(data, "empty", True):
+        return {**empty, "error": str(data)[:200]}
+    series = data.sort_values("time")
+    ivs = [_num(v) for v in series.get("iv", [])]
+    hvs = [_num(v) for v in series.get("hv", [])]
+    ivs = [v for v in ivs if v is not None]
+    hvs = [v for v in hvs if v is not None]
+    if not ivs or not hvs:
+        return {**empty, "error": "IV/HV 序列为空"}
+    iv_latest, hv_latest = ivs[-1], hvs[-1]
+    ratio = iv_latest / hv_latest if hv_latest else None
+    return {
+        "iv_latest": iv_latest,
+        "hv_latest": hv_latest,
+        "iv_rank": _percentile(ivs, iv_latest),
+        "hv_rank": _percentile(hvs, hv_latest),
+        "ratio": ratio,
+        "as_of": _session_date(series["time"].iloc[-1]),
+        "points": len(ivs),
+        "error": None,
+    }
+
+
+def _percentile(values: list[float], value: float) -> float:
+    """值在序列中的分位（0-100）。"""
+    return round(100.0 * sum(1 for v in values if v <= value) / len(values), 2)
+
+
 def _report_items(report: dict) -> dict[str, float | None]:
     return {
         str(item.get("display_name")): _num(item.get("data"))
@@ -217,7 +340,8 @@ def _news(quote_ctx, name: str, today: date) -> list[dict]:
     return out[:5]
 
 
-def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
+def probe(symbol: str, trade_date: date, host: str, port: int, scan_days: int = 60,
+          history_start: str | None = None) -> dict:
     import futu as ft
 
     market, code = symbol.split(".", 1)
@@ -251,7 +375,7 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
                 quote["update_time"] = update_text
                 quote["observed_at"] = datetime.now(timezone.utc).isoformat()
 
-        start = sys.argv[5] if len(sys.argv) > 5 else (trade_date - timedelta(days=120)).isoformat()
+        start = history_start or (trade_date - timedelta(days=120)).isoformat()
         bars, k_error = (_history(quote_ctx, symbol, start, trade_date.isoformat())
                          if start <= trade_date.isoformat() else ([], None))
         kline = {
@@ -268,6 +392,9 @@ def probe(symbol: str, trade_date: date, host: str, port: int) -> dict:
             "quote": quote,
             "kline": kline,
             "capital_flow": _capital_flow(quote_ctx, symbol),
+            "dividends": _dividends(quote_ctx, symbol, trade_date, scan_days,
+                                    getattr(ft.Market, market, None)),
+            "vol_basis": _vol_basis(quote_ctx, symbol),
             "name": name,
             "financials": _financials(quote_ctx, symbol, snapshot_row) if snapshot_row is not None else {"error": "snapshot 缺失"},
             "research": _research(quote_ctx, symbol),
@@ -284,9 +411,19 @@ def main() -> int:
     trade_date = date.fromisoformat(sys.argv[2]) if len(sys.argv) > 2 else date.today()
     host = sys.argv[3] if len(sys.argv) > 3 else "127.0.0.1"
     port = int(sys.argv[4]) if len(sys.argv) > 4 else 11111
+    scan_days = 60
+    # history_start 是 --scan-days 之外的唯一可选位置参数；先剥离 flag 再取，
+    # 否则传了 --scan-days 时 argv[5] 会错读成 "--scan-days"。
+    rest = list(sys.argv[5:])
+    if "--scan-days" in rest:
+        index = rest.index("--scan-days")
+        if len(rest) > index + 1:
+            scan_days = int(rest[index + 1])
+        del rest[index:index + 2]
+    history_start = rest[0] if rest else None
     market = symbol.split(".", 1)[0]
     try:
-        payload = probe(symbol, trade_date, host, port)
+        payload = probe(symbol, trade_date, host, port, scan_days, history_start)
         print(json.dumps(payload, ensure_ascii=False))
         return 0
     except Exception as exc:
@@ -299,6 +436,10 @@ def main() -> int:
             "quote": {"last": None, "session_date": None, "error": None},
             "kline": {"adjusted": True, "bars": [], "error": None},
             "capital_flow": {"net": None, "as_of": None, "error": None},
+            "dividends": {"items": [], "history_count": 0, "error": None},
+            "vol_basis": {"iv_latest": None, "hv_latest": None, "iv_rank": None,
+                          "hv_rank": None, "ratio": None, "as_of": None,
+                          "points": 0, "error": None},
             "error": str(exc)[:400],
         }, ensure_ascii=False))
         return 2

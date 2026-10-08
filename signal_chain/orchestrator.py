@@ -42,6 +42,10 @@ def _fallback_report(ticker: str, ensemble: EnsembleSignal, proposals, decisions
             f"- 报价: {snapshot.quote.meta.status}（{snapshot.quote.meta.as_of}）",
             f"- 日线: {snapshot.kline.meta.status}（最后交易日 {snapshot.kline.meta.as_of}）",
             f"- 技术: {snapshot.technical.meta.status}",
+            f"- 除息: {snapshot.dividends.meta.status}"
+            f"（下次 {snapshot.dividends.next_ex_date or '无公布'}）",
+            f"- IV/HV 基准: {snapshot.vol_basis.meta.status}"
+            f"（比值 {snapshot.vol_basis.ratio if snapshot.vol_basis.ratio is not None else '无'}）",
         ]
     if ensemble.dissent_summary:
         lines.append(f"- 分歧: {ensemble.dissent_summary}")
@@ -102,6 +106,8 @@ async def process_ticker(
         "capital_flow": snapshot.capital_flow.status,
         "fundamentals": snapshot.fundamentals.status,
         "news": snapshot.news.status,
+        "dividends": snapshot.dividends.meta.status,
+        "vol_basis": snapshot.vol_basis.meta.status,
     }
 
     decided = await run_decision(

@@ -8,7 +8,7 @@ from datetime import date, datetime, timezone
 from ..decision import build_signals, to_engine_signal
 from ..options.iv import derive_volatility_view
 from ..options.strategy_menu import apply_user_bias, decision_action, screen_menu
-from ..research.berkshire import earnings_catalyst
+from ..research.berkshire import dividend_catalyst, earnings_catalyst
 from ..risk.account_equity import read_account_equity
 from ..risk.limits import check_signal
 from ..synth.combine import combine
@@ -87,8 +87,14 @@ async def run(
     earnings = earnings_catalyst(market.snapshot)
     if earnings is not None:
         ensemble = ensemble.model_copy(update={"catalysts": [*ensemble.catalysts, earnings]})
+    dividend = dividend_catalyst(market.snapshot)
+    if dividend is not None:
+        ensemble = ensemble.model_copy(update={"catalysts": [*ensemble.catalysts, dividend]})
     ensemble = ensemble.model_copy(update={
-        "volatility_view": derive_volatility_view(ensemble, chain, today=trade_date),
+        "volatility_view": derive_volatility_view(
+            ensemble, chain, today=trade_date, vol_basis=market.snapshot.vol_basis,
+            iv_hv_rising_ratio=settings.risk.get("iv_hv_rising_ratio", 1.15),
+        ),
     })
     risk_cfg = settings.risk
     account = read_account_equity(market.snapshot.market, settings) if risk_cfg.get("auto_account_equity") else None
@@ -105,6 +111,7 @@ async def run(
         equity_currency=account["currency"] if account else None,
         equity_note=account.get("note") if account else None,
         earnings_blackout_days=risk_cfg["earnings_blackout_days"],
+        ex_div_blackout_days=risk_cfg.get("ex_div_blackout_days", 5),
         min_open_interest=risk_cfg["min_open_interest"],
         max_spread_pct=risk_cfg["max_spread_pct"],
         max_position_risk_pct=risk_cfg["max_position_risk_pct"],

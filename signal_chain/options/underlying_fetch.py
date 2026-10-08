@@ -17,11 +17,14 @@ from ..config import REPO_ROOT, require_runtime_python, NormTicker, Settings
 from ..sessions import align_futu_quote, session_for
 from ..schema.underlying import (
     DailyBar,
+    DividendEvent,
+    DividendField,
     FieldMeta,
     KlineField,
     QuoteField,
     TechnicalField,
     UnderlyingSnapshot,
+    VolBasisField,
 )
 
 _BRIDGE_TIMEOUT = 45
@@ -62,6 +65,16 @@ def coverage_entry(snapshot: UnderlyingSnapshot, sources: list | None = None) ->
         "capital_flow": meta(snapshot.capital_flow),
         "fundamentals": meta(snapshot.fundamentals),
         "news": meta(snapshot.news),
+        "dividends": {
+            **meta(snapshot.dividends.meta),
+            "next_ex_date": (snapshot.dividends.next_ex_date.isoformat()
+                             if snapshot.dividends.next_ex_date else None),
+            "item_count": len(snapshot.dividends.items),
+        },
+        "vol_basis": {
+            **meta(snapshot.vol_basis.meta),
+            "has_ratio": snapshot.vol_basis.ratio is not None,
+        },
         "earnings_source": snapshot.earnings_source,
     }
     if sources:
@@ -198,6 +211,65 @@ def _hk_fundamentals_field(raw: dict | None, fetched_at: datetime, tz: str) -> F
     )
 
 
+def _futu_dividends_field(raw: dict | None, session: date, fetched_at: datetime,
+                          tz: str) -> DividendField:
+    """派息记录。空列表是"没有派息"，跟取数失败要分开写。"""
+    raw = raw or {}
+    items = []
+    for row in raw.get("items") or []:
+        ex_date = _as_date(row.get("ex_date"))
+        if ex_date is None:
+            continue
+        items.append(DividendEvent(
+            ex_date=ex_date,
+            record_date=_as_date(row.get("record_date")),
+            payable_date=_as_date(row.get("payable_date")),
+            pub_date=_as_date(row.get("pub_date")),
+            statement=row.get("statement"),
+        ))
+    if raw.get("error"):
+        return DividendField(meta=FieldMeta(
+            status="missing", source="futu_dividends", fetched_at=fetched_at, timezone=tz,
+            error=str(raw["error"])[:400],
+        ))
+    if not items:
+        return DividendField(meta=FieldMeta(
+            status="missing", source="futu_dividends", as_of=session, fetched_at=fetched_at,
+            timezone=tz, error="无派息记录",
+        ))
+    upcoming = [item.ex_date for item in items if item.ex_date >= session]
+    return DividendField(
+        meta=FieldMeta(
+            status="available", source="futu_dividends", as_of=session,
+            fetched_at=fetched_at, timezone=tz,
+        ),
+        items=items,
+        next_ex_date=min(upcoming) if upcoming else None,
+    )
+
+
+def _futu_vol_basis_field(raw: dict | None, session: date, fetched_at: datetime,
+                          tz: str) -> VolBasisField:
+    raw = raw or {}
+    if raw.get("error") or raw.get("ratio") is None:
+        return VolBasisField(meta=FieldMeta(
+            status="missing", source="futu_vol_basis", fetched_at=fetched_at, timezone=tz,
+            error=str(raw.get("error") or "无 IV/HV 基准")[:400],
+        ))
+    as_of = _as_date(raw.get("as_of")) or session
+    return VolBasisField(
+        meta=FieldMeta(
+            status="available", source="futu_vol_basis", as_of=as_of,
+            fetched_at=fetched_at, timezone=tz,
+        ),
+        iv_latest=raw.get("iv_latest"),
+        hv_latest=raw.get("hv_latest"),
+        iv_rank=raw.get("iv_rank"),
+        hv_rank=raw.get("hv_rank"),
+        ratio=raw.get("ratio"),
+    )
+
+
 def _futu_news_field(raw: list | None, session: date, fetched_at: datetime, tz: str) -> tuple[FieldMeta, str | None]:
     rows = [row for row in (raw or []) if row.get("title")]
     if not rows:
@@ -313,6 +385,8 @@ def build_snapshot(
         technical=_technical(kline, kline_session or session, fetched_at, tz),
         fundamentals=fundamentals,
         news=news_meta,
+        dividends=_futu_dividends_field(futu.get("dividends"), session, fetched_at, tz),
+        vol_basis=_futu_vol_basis_field(futu.get("vol_basis"), session, fetched_at, tz),
     )
 
 
@@ -334,6 +408,7 @@ def probe_futu(t: NormTicker, trade_date: date, settings: Settings,
         str(runtime_py), "-m", "signal_chain.options.underlying_bridge",
         t.futu_format, trade_date.isoformat(),
         str(cfg["futu_opend_host"]), str(cfg["futu_opend_port"]),
+        "--scan-days", str(cfg.get("dividends_scan_days", 60)),
     ]
     if history_start is not None:
         cmd.append(history_start.isoformat())

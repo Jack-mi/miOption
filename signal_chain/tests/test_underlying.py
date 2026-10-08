@@ -8,11 +8,13 @@ from pydantic import ValidationError
 
 from signal_chain.options.underlying_fetch import build_snapshot, coverage_entry
 from signal_chain.schema.underlying import (
+    DividendField,
     FieldMeta,
     KlineField,
     QuoteField,
     TechnicalField,
     UnderlyingSnapshot,
+    VolBasisField,
 )
 from signal_chain.storage import write_coverage
 
@@ -54,6 +56,88 @@ def _empty(**kw):
 def test_currency_mismatch_rejected():
     with pytest.raises(ValidationError, match="币种"):
         _empty(currency="HKD")
+
+
+def test_available_dividends_require_source_and_as_of():
+    with pytest.raises(ValidationError, match="派息"):
+        _empty(dividends=DividendField(meta=FieldMeta(status="available"), next_ex_date=D0))
+
+
+def test_unavailable_vol_basis_cannot_carry_values():
+    with pytest.raises(ValidationError, match="波动率基准"):
+        _empty(vol_basis=VolBasisField(meta=FieldMeta(status="missing", error="无"), ratio=1.2))
+
+
+def test_next_ex_date_before_snapshot_rejected():
+    with pytest.raises(ValidationError, match="除息"):
+        _empty(dividends=DividendField(
+            meta=FieldMeta(status="available", source="futu_dividends", as_of=D0, fetched_at=NOW),
+            next_ex_date=D0 - timedelta(days=1),
+        ))
+
+
+def _dividend_probe():
+    return {
+        **_fresh_probe(),
+        "dividends": {
+            "items": [
+                {"ex_date": "2026-11-07", "record_date": "2026-11-09",
+                 "payable_date": "2026-11-12", "pub_date": "2026-08-01",
+                 "statement": "Cash Dividend: 0.27 USD Per Share"},
+                {"ex_date": "2026-08-10", "record_date": None, "payable_date": None,
+                 "pub_date": None, "statement": "Cash Dividend: 0.25 USD Per Share"},
+            ],
+            "history_count": 57,
+            "error": None,
+        },
+        "vol_basis": {
+            "iv_latest": 27.372, "hv_latest": 23.891, "iv_rank": 61.2, "hv_rank": 55.0,
+            "ratio": 1.146, "as_of": "2026-09-22", "points": 250, "error": None,
+        },
+    }
+
+
+def test_dividends_and_vol_basis_mapped_from_futu():
+    snap = build_snapshot(
+        ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW, futu=_dividend_probe(),
+    )
+    assert snap.dividends.meta.status == "available"
+    assert snap.dividends.next_ex_date == date(2026, 11, 7)
+    assert len(snap.dividends.items) == 2
+    assert snap.dividends.items[0].statement.startswith("Cash Dividend")
+    assert snap.vol_basis.meta.status == "available"
+    assert snap.vol_basis.ratio == 1.146
+    assert snap.vol_basis.hv_rank == 55.0
+
+
+def test_no_dividend_record_is_missing_not_available():
+    probe = {**_fresh_probe(), "dividends": {"items": [], "history_count": 0, "error": None}}
+    snap = build_snapshot(
+        ticker="HK.03690", market="HK", trade_date=D0, fetched_at=NOW, futu=probe,
+    )
+    assert snap.dividends.meta.status == "missing"
+    assert snap.dividends.next_ex_date is None
+    assert "无派息" in (snap.dividends.meta.error or "")
+
+
+def test_vol_basis_failure_is_missing_not_fabricated():
+    probe = {**_fresh_probe(), "vol_basis": {"ratio": None, "error": "期权标的无此数据"}}
+    snap = build_snapshot(
+        ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW, futu=probe,
+    )
+    assert snap.vol_basis.meta.status == "missing"
+    assert snap.vol_basis.ratio is None
+
+
+def test_coverage_entry_reports_new_fields():
+    snap = build_snapshot(
+        ticker="US.AAPL", market="US", trade_date=D0, fetched_at=NOW, futu=_dividend_probe(),
+    )
+    entry = coverage_entry(snap)
+    assert entry["dividends"]["next_ex_date"] == "2026-11-07"
+    assert entry["dividends"]["item_count"] == 2
+    assert entry["vol_basis"]["has_ratio"] is True
+    assert "27.372" not in json.dumps(entry)      # 脱敏账本不带数值
 
 
 def test_available_quote_requires_last():

@@ -388,7 +388,8 @@ def _calendar(chain, exps, spot, opt) -> list[StrategyLeg] | None:
     return None
 
 
-def _vol_reason(t: Template, ensemble: EnsembleSignal, today: date, blackout: int) -> str | None:
+def _vol_reason(t: Template, ensemble: EnsembleSignal, today: date, blackout: int,
+                ex_div_blackout: int = 5) -> str | None:
     if t.vol != "short":
         return None
     parts = []
@@ -403,6 +404,17 @@ def _vol_reason(t: Template, ensemble: EnsembleSignal, today: date, blackout: in
                     "该日期不是富途事实。"
                 )
             break
+    if ex_div_blackout > 0:
+        for c in ensemble.catalysts:
+            if c.type != "dividend" or not c.expected_date:
+                continue
+            gap = (c.expected_date - today).days
+            if 0 <= gap <= ex_div_blackout:
+                parts.append(
+                    f"这个结构做空波动率，{c.expected_date} 除息（{gap} 天后，富途派息记录），"
+                    "行权价可能被提前指派。"
+                )
+                break
     return "".join(parts) or None
 
 
@@ -425,6 +437,7 @@ def _screen_one(
     equity: float | None,
     today: date,
     blackout: int,
+    ex_div_blackout: int = 5,
     holds_shares: bool,
     multiplier: float | None,
 ) -> tuple[str, str]:
@@ -439,7 +452,7 @@ def _screen_one(
     if not _bias_ok(t.bias, ensemble.direction):
         need = {"bull": "看多", "bear": "看空", "neutral": "中性"}[t.bias]
         return "unfit", f"合成是{_dir_word(ensemble.direction)}，这个结构要{need}。"
-    blocked = _vol_reason(t, ensemble, today, blackout)
+    blocked = _vol_reason(t, ensemble, today, blackout, ex_div_blackout)
     if blocked:
         return "unfit", blocked
     if t.cash_secured:
@@ -457,6 +470,7 @@ def screen_menu(
     equity_currency: str | None = None,
     equity_note: str | None = None,
     earnings_blackout_days: int = 10,
+    ex_div_blackout_days: int = 5,
     min_open_interest: int = 100,
     max_spread_pct: float = 0.10,
     max_position_risk_pct: float = 0.05,
@@ -526,7 +540,7 @@ def screen_menu(
         status, reason = _screen_one(
             t, ensemble, chain, equity=(account or {}).get("available_cash", (account or {}).get("available_cash_usd")),
             today=today, blackout=earnings_blackout_days, holds_shares=holds_shares,
-            multiplier=multiplier,
+            multiplier=multiplier, ex_div_blackout=ex_div_blackout_days,
         )
         proposal, risk = None, None
         if status == "fit" and (chain is None or chain.spot is None):
@@ -539,6 +553,7 @@ def screen_menu(
                 risk = check_proposal(
                     proposal, ensemble, chain,
                     earnings_blackout_days=earnings_blackout_days,
+                    ex_div_blackout_days=ex_div_blackout_days,
                     min_open_interest=min_open_interest,
                     max_spread_pct=max_spread_pct,
                     account_equity=account_equity,

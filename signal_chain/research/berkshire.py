@@ -114,3 +114,20 @@ def earnings_catalyst(snapshot: UnderlyingSnapshot) -> Catalyst | None:
         expected_date=snapshot.earnings_date,
         description=snapshot.earnings_source or "",
     )
+
+
+def dividend_catalyst(snapshot: UnderlyingSnapshot) -> Catalyst | None:
+    """下次除息日。日期必须来自富途派息记录，不推。"""
+    ex_date = snapshot.dividends.next_ex_date
+    if ex_date is None:
+        return None
+    statement = next(
+        (item.statement for item in snapshot.dividends.items
+         if item.ex_date == ex_date and item.statement),
+        "",
+    )
+    return Catalyst(
+        type="dividend",
+        expected_date=ex_date,
+        description=f"除息 {ex_date.isoformat()} {statement}".strip(),
+    )

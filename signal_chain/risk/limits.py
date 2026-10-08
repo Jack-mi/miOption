@@ -3,6 +3,7 @@
 一票否决项（方案 v5）：
 - conflicted 信号；
 - 财报日前后 earnings_blackout_days 内到期的 short-vol 结构；volatility_view=rising 时 short-vol；
+- 除息日落在持仓期内且距腿到期 ex_div_blackout_days 内的 short-vol 结构（提前指派风险）；
 - 单腿流动性不达标：OI < min_open_interest 或 spread_pct > max_spread_pct；
 - 单标的新结构最大亏损 > max_position_risk_pct * 账户权益（美股为总资产折美元；读取失败时跳过并告警）。
 """
@@ -43,6 +44,7 @@ def check_proposal(
     chain: ChainSnapshot,
     *,
     earnings_blackout_days: int = 10,
+    ex_div_blackout_days: int = 5,
     min_open_interest: int = 100,
     max_spread_pct: float = 0.10,
     account_equity: float | None = None,
@@ -74,6 +76,16 @@ def check_proposal(
         if signal.volatility_view == "rising":
             vetoes.append(f"volatility_view=rising 时禁止 short-vol 结构：{proposal.name}")
 
+    for leg, ex_date, gap in _ex_div_conflicts(signal, proposal, today, ex_div_blackout_days):
+        note = (
+            f"除息窗口内到期：{ex_date.isoformat()} 除息，腿 {leg.code} {leg.expiry.isoformat()} 到期"
+            f"（{gap} 天后）；结构 {proposal.name}"
+        )
+        if proposal.is_short_vol:
+            vetoes.append(f"禁止 short-vol 承接除息指派风险 — {note}")
+        else:
+            warnings.append(f"持仓期内有除息，注意提前指派 — {note}")
+
     for leg in proposal.legs:
         row = _find_row(chain, leg.code)
         if row is None:
@@ -100,3 +112,25 @@ def check_proposal(
         )
 
     return RiskDecision(approved=not vetoes, vetoes=vetoes, warnings=warnings)
+
+
+def _ex_div_conflicts(
+    signal: EnsembleSignal,
+    proposal: StrategyProposal,
+    today: date,
+    window: int,
+) -> list[tuple]:
+    """除息落在 [今天, 腿到期] 内、且到期距除息不超过 window 天的腿。"""
+    if window <= 0:
+        return []
+    events = [c.expected_date for c in signal.catalysts
+              if c.type == "dividend" and c.expected_date]
+    conflicts = []
+    for leg in proposal.legs:
+        for ex_date in events:
+            if not today <= ex_date <= leg.expiry:
+                continue
+            gap = (leg.expiry - ex_date).days
+            if gap <= window:
+                conflicts.append((leg, ex_date, gap))
+    return conflicts

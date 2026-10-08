@@ -7,10 +7,14 @@
   runtime/.venv/bin/python -m signal_chain.options.screener_bridge rating   [N]
   runtime/.venv/bin/python -m signal_chain.options.screener_bridge movers   [US|HK] [N]
   runtime/.venv/bin/python -m signal_chain.options.screener_bridge hot      [US|HK] [N]
+  runtime/.venv/bin/python -m signal_chain.options.screener_bridge events   [US|HK] [N]
+  runtime/.venv/bin/python -m signal_chain.options.screener_bridge pcr      [US|HK] [N]
+  runtime/.venv/bin/python -m signal_chain.options.screener_bridge prob     <期权合约代码> [N]
 
-输出: stdout 单行 JSON（screen / market / as_of / count / candidates / rows / error）。
+输出: stdout 单行 JSON（screen / market / target / as_of / count / candidates / rows / error）。
 `candidates` 是筛出的标的池，可直接喂给 `--tickers`。
-只读：不调用交易接口。每次调用各接口只发一次请求，各自限频 60 次/30 秒（卖方专区同）。
+`prob` 是合约级，不产 candidates。
+只读：不调用交易接口。每次调用各接口只发一次请求，各自限频 60 次/30 秒（期权链 10 次/30 秒）。
 """
 
 from __future__ import annotations
@@ -39,10 +43,16 @@ _FIELDS = {
                "volume_ratio", "market_cap", "pe_ttm"],
     "hot": ["security", "name", "trade_heat", "search_heat", "news_heat", "average_heat",
             "news_title", "news_url"],
+    "events": ["owner_code", "symbol", "option_code", "option_type", "strike_price",
+               "strike_time", "dte", "price", "volume", "turnover", "iv", "otm",
+               "underlying_price", "delta", "vo_ratio", "sentiment", "strategy_type",
+               "fill_time"],
+    "pcr": ["time", "call_value", "put_value", "total_value", "ratio"],
+    "prob": ["timestamp_str", "security_price", "strike_probability"],
 }
 # 哪些列直接就是标的池。rank 不在里面：它返回的是合约，标的需要另推（见下）。
 _TICKER_FIELD = {"seller": "owner", "earnings": "owner", "rating": "security",
-                 "movers": "security", "hot": "security"}
+                 "movers": "security", "hot": "security", "events": "owner_code"}
 # 合约代码形如 US.NVDA260930C232500，去掉日期+方向+行权价就是标的。
 _CONTRACT_ROOT = re.compile(r"^([A-Za-z][A-Za-z.]*?)\d{6}[CP]\d+$")
 _MARKET_OPT = {"US": "US_SECURITY", "HK": "HK_SECURITY"}
@@ -104,12 +114,14 @@ def _frame(data):
     return data
 
 
-def screen(name: str, market: str, limit: int, host: str, port: int) -> dict:
+def screen(name: str, target: str, limit: int, host: str, port: int) -> dict:
     import futu as ft
 
+    market = (target.split(".", 1)[0] if name == "prob" else target).upper()
     out = {
         "screen": name,
         "market": market,
+        "target": target,
         "as_of": datetime.now(timezone.utc).isoformat(),
         "source": "futu_screener",
         "count": 0,
@@ -144,6 +156,18 @@ def screen(name: str, market: str, limit: int, host: str, port: int) -> dict:
         elif name == "hot":
             ret, data = ctx.get_hot_list(getattr(ft.Market, _MARKET[market]), count=limit)
             data = _frame(data)
+        elif name == "events":
+            ret, data = ctx.get_option_event(
+                getattr(ft.OptionMarket, _MARKET_OPT[market]), count=limit)
+            if ret == ft.RET_OK and isinstance(data, dict):
+                data = data.get("event_list")
+        elif name == "pcr":
+            ret, data = ctx.get_option_market_statistic(
+                getattr(ft.OptionMarket, _MARKET_OPT[market]),
+                ft.OptionStatisticDataType.VOLUME)[:2]
+            data = _frame(data)
+        elif name == "prob":
+            ret, data = ctx.get_option_exercise_probability(target)
         else:
             raise ValueError(f"unknown screen: {name}")
     except ValueError:
@@ -165,17 +189,24 @@ def main() -> None:
     argv = sys.argv[1:]
     if not argv or argv[0] not in _SCREENS:
         print(f"usage: -m signal_chain.options.screener_bridge {{{'|'.join(_SCREENS)}}} "
-              f"[US|HK] [N]", file=sys.stderr)
+              f"[US|HK] [N]  # prob 用合约代码代替市场", file=sys.stderr)
         sys.exit(2)
     name = argv[0]
-    market = (argv[1] if len(argv) > 1 else "US").upper()
-    limit = int(argv[2]) if len(argv) > 2 else 20
-    host = argv[3] if len(argv) > 3 else "127.0.0.1"
-    port = int(argv[4]) if len(argv) > 4 else 11111
+    rest = argv[1:]
+    if name == "prob" and not rest:
+        print("prob 需要一个期权合约代码", file=sys.stderr)
+        sys.exit(2)
+    target = (rest[0] if name == "prob" else (rest[0].upper() if rest else "US"))
+    rest = rest[1:]
+    limit = int(rest[0]) if rest else 20
+    host = rest[1] if len(rest) > 1 else "127.0.0.1"
+    port = int(rest[2]) if len(rest) > 2 else 11111
+    market = (target.split(".", 1)[0] if name == "prob" else target).upper()
     try:
-        out = screen(name, market, limit, host, port)
+        out = screen(name, target, limit, host, port)
     except Exception as exc:  # 连不上 OpenD 也要留 JSON，退出码非零
         out = {"screen": name, "market": market,
+               "target": target,
                "as_of": datetime.now(timezone.utc).isoformat(), "source": "futu_screener",
                "count": 0, "candidates": [], "rows": [],
                "error": f"{type(exc).__name__}: {exc}"[:400]}

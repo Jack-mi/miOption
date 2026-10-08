@@ -43,6 +43,8 @@ def findings_for(market, decision) -> list[str]:
             "capital_flow": market.snapshot.capital_flow.status,
             "fundamentals": market.snapshot.fundamentals.status,
             "news": market.snapshot.news.status,
+            "dividends": market.snapshot.dividends.meta.status,
+            "vol_basis": market.snapshot.vol_basis.meta.status,
         }
         by_field: dict[str, list] = {}
         for row in market.sources:

@@ -18,12 +18,15 @@ from .options import (
 )
 from .underlying import (
     DailyBar,
+    DividendEvent,
+    DividendField,
     FieldMeta,
     FieldStatus,
     KlineField,
     QuoteField,
     TechnicalField,
     UnderlyingSnapshot,
+    VolBasisField,
 )
 
 __all__ = [
@@ -42,10 +45,13 @@ __all__ = [
     "StrategyLeg",
     "StrategyProposal",
     "DailyBar",
+    "DividendEvent",
+    "DividendField",
     "FieldMeta",
     "FieldStatus",
     "KlineField",
     "QuoteField",
     "TechnicalField",
     "UnderlyingSnapshot",
+    "VolBasisField",
 ]
